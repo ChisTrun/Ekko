@@ -8,21 +8,128 @@ import (
 )
 
 var (
-	// ExamplesColumns holds the columns for the "examples" table.
-	ExamplesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
+	// AnswerSubmissionsColumns holds the columns for the "answer_submissions" table.
+	AnswerSubmissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "submission_attempt_id", Type: field.TypeUint64},
+		{Name: "question_id", Type: field.TypeUint64},
+		{Name: "answer", Type: field.TypeString, Size: 2147483647},
+		{Name: "relevance", Type: field.TypeFloat64},
+		{Name: "clarity_completeness", Type: field.TypeFloat64},
+		{Name: "accuracy", Type: field.TypeFloat64},
+		{Name: "overall", Type: field.TypeFloat64},
+		{Name: "status", Type: field.TypeInt32},
 	}
-	// ExamplesTable holds the schema information for the "examples" table.
-	ExamplesTable = &schema.Table{
-		Name:       "examples",
-		Columns:    ExamplesColumns,
-		PrimaryKey: []*schema.Column{ExamplesColumns[0]},
+	// AnswerSubmissionsTable holds the schema information for the "answer_submissions" table.
+	AnswerSubmissionsTable = &schema.Table{
+		Name:       "answer_submissions",
+		Columns:    AnswerSubmissionsColumns,
+		PrimaryKey: []*schema.Column{AnswerSubmissionsColumns[0]},
+	}
+	// QuestionsColumns holds the columns for the "questions" table.
+	QuestionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "criteria", Type: field.TypeString, Size: 2147483647},
+		{Name: "hint", Type: field.TypeString, Size: 2147483647},
+		{Name: "content", Type: field.TypeString, Size: 2147483647},
+		{Name: "sentence_id", Type: field.TypeUint64},
+	}
+	// QuestionsTable holds the schema information for the "questions" table.
+	QuestionsTable = &schema.Table{
+		Name:       "questions",
+		Columns:    QuestionsColumns,
+		PrimaryKey: []*schema.Column{QuestionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "questions_scenarios_questions",
+				Columns:    []*schema.Column{QuestionsColumns[6]},
+				RefColumns: []*schema.Column{ScenariosColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ScenariosColumns holds the columns for the "scenarios" table.
+	ScenariosColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "bm_id", Type: field.TypeUint64},
+		{Name: "name", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Size: 2147483647},
+	}
+	// ScenariosTable holds the schema information for the "scenarios" table.
+	ScenariosTable = &schema.Table{
+		Name:       "scenarios",
+		Columns:    ScenariosColumns,
+		PrimaryKey: []*schema.Column{ScenariosColumns[0]},
+	}
+	// ScenarioCandidatesColumns holds the columns for the "scenario_candidates" table.
+	ScenarioCandidatesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "candidate_id", Type: field.TypeUint64},
+		{Name: "scenario_id", Type: field.TypeUint64},
+	}
+	// ScenarioCandidatesTable holds the schema information for the "scenario_candidates" table.
+	ScenarioCandidatesTable = &schema.Table{
+		Name:       "scenario_candidates",
+		Columns:    ScenarioCandidatesColumns,
+		PrimaryKey: []*schema.Column{ScenarioCandidatesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "scenario_candidates_scenarios_candidates",
+				Columns:    []*schema.Column{ScenarioCandidatesColumns[4]},
+				RefColumns: []*schema.Column{ScenariosColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// SubmissionAttemptsColumns holds the columns for the "submission_attempts" table.
+	SubmissionAttemptsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "attempt_number", Type: field.TypeInt32},
+		{Name: "scenario_candidate_id", Type: field.TypeUint64},
+	}
+	// SubmissionAttemptsTable holds the schema information for the "submission_attempts" table.
+	SubmissionAttemptsTable = &schema.Table{
+		Name:       "submission_attempts",
+		Columns:    SubmissionAttemptsColumns,
+		PrimaryKey: []*schema.Column{SubmissionAttemptsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "submission_attempts_scenario_candidates_attempts",
+				Columns:    []*schema.Column{SubmissionAttemptsColumns[4]},
+				RefColumns: []*schema.Column{ScenarioCandidatesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "submissionattempt_scenario_candidate_id_attempt_number",
+				Unique:  true,
+				Columns: []*schema.Column{SubmissionAttemptsColumns[4], SubmissionAttemptsColumns[3]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		ExamplesTable,
+		AnswerSubmissionsTable,
+		QuestionsTable,
+		ScenariosTable,
+		ScenarioCandidatesTable,
+		SubmissionAttemptsTable,
 	}
 )
 
 func init() {
+	QuestionsTable.ForeignKeys[0].RefTable = ScenariosTable
+	ScenarioCandidatesTable.ForeignKeys[0].RefTable = ScenariosTable
+	SubmissionAttemptsTable.ForeignKeys[0].RefTable = ScenarioCandidatesTable
 }

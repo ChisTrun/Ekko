@@ -8,3 +8,9 @@ option go_package = "ekko/api;ekko";
 service Ekko {
 }
 
+enum SubmissionStatus {
+    SUBMISSION_STATUS_UNKNOWN = 0;
+    SUBMISSION_STATUS_IN_PROGRESS = 1;
+    SUBMISSION_STATUS_FAILED = 2;
+    SUBMISSION_STATUS_SUCCESS = 3;
+}

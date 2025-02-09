@@ -4,7 +4,11 @@ package ent
 
 import (
 	"context"
-	"ekko/package/ent/example"
+	"ekko/package/ent/answersubmission"
+	"ekko/package/ent/question"
+	"ekko/package/ent/scenario"
+	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/submissionattempt"
 	"errors"
 	"fmt"
 	"reflect"
@@ -73,7 +77,11 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			example.Table: example.ValidColumn,
+			answersubmission.Table:  answersubmission.ValidColumn,
+			question.Table:          question.ValidColumn,
+			scenario.Table:          scenario.ValidColumn,
+			scenariocandidate.Table: scenariocandidate.ValidColumn,
+			submissionattempt.Table: submissionattempt.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

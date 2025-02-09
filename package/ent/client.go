@@ -11,11 +11,16 @@ import (
 
 	"ekko/package/ent/migrate"
 
-	"ekko/package/ent/example"
+	"ekko/package/ent/answersubmission"
+	"ekko/package/ent/question"
+	"ekko/package/ent/scenario"
+	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/submissionattempt"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 
 	stdsql "database/sql"
 )
@@ -25,8 +30,16 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// Example is the client for interacting with the Example builders.
-	Example *ExampleClient
+	// AnswerSubmission is the client for interacting with the AnswerSubmission builders.
+	AnswerSubmission *AnswerSubmissionClient
+	// Question is the client for interacting with the Question builders.
+	Question *QuestionClient
+	// Scenario is the client for interacting with the Scenario builders.
+	Scenario *ScenarioClient
+	// ScenarioCandidate is the client for interacting with the ScenarioCandidate builders.
+	ScenarioCandidate *ScenarioCandidateClient
+	// SubmissionAttempt is the client for interacting with the SubmissionAttempt builders.
+	SubmissionAttempt *SubmissionAttemptClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -38,7 +51,11 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.Example = NewExampleClient(c.config)
+	c.AnswerSubmission = NewAnswerSubmissionClient(c.config)
+	c.Question = NewQuestionClient(c.config)
+	c.Scenario = NewScenarioClient(c.config)
+	c.ScenarioCandidate = NewScenarioCandidateClient(c.config)
+	c.SubmissionAttempt = NewSubmissionAttemptClient(c.config)
 }
 
 type (
@@ -129,9 +146,13 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Example: NewExampleClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		AnswerSubmission:  NewAnswerSubmissionClient(cfg),
+		Question:          NewQuestionClient(cfg),
+		Scenario:          NewScenarioClient(cfg),
+		ScenarioCandidate: NewScenarioCandidateClient(cfg),
+		SubmissionAttempt: NewSubmissionAttemptClient(cfg),
 	}, nil
 }
 
@@ -149,16 +170,20 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:     ctx,
-		config:  cfg,
-		Example: NewExampleClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		AnswerSubmission:  NewAnswerSubmissionClient(cfg),
+		Question:          NewQuestionClient(cfg),
+		Scenario:          NewScenarioClient(cfg),
+		ScenarioCandidate: NewScenarioCandidateClient(cfg),
+		SubmissionAttempt: NewSubmissionAttemptClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		Example.
+//		AnswerSubmission.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -180,126 +205,142 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.Example.Use(hooks...)
+	c.AnswerSubmission.Use(hooks...)
+	c.Question.Use(hooks...)
+	c.Scenario.Use(hooks...)
+	c.ScenarioCandidate.Use(hooks...)
+	c.SubmissionAttempt.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.Example.Intercept(interceptors...)
+	c.AnswerSubmission.Intercept(interceptors...)
+	c.Question.Intercept(interceptors...)
+	c.Scenario.Intercept(interceptors...)
+	c.ScenarioCandidate.Intercept(interceptors...)
+	c.SubmissionAttempt.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
-	case *ExampleMutation:
-		return c.Example.mutate(ctx, m)
+	case *AnswerSubmissionMutation:
+		return c.AnswerSubmission.mutate(ctx, m)
+	case *QuestionMutation:
+		return c.Question.mutate(ctx, m)
+	case *ScenarioMutation:
+		return c.Scenario.mutate(ctx, m)
+	case *ScenarioCandidateMutation:
+		return c.ScenarioCandidate.mutate(ctx, m)
+	case *SubmissionAttemptMutation:
+		return c.SubmissionAttempt.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
 }
 
-// ExampleClient is a client for the Example schema.
-type ExampleClient struct {
+// AnswerSubmissionClient is a client for the AnswerSubmission schema.
+type AnswerSubmissionClient struct {
 	config
 }
 
-// NewExampleClient returns a client for the Example from the given config.
-func NewExampleClient(c config) *ExampleClient {
-	return &ExampleClient{config: c}
+// NewAnswerSubmissionClient returns a client for the AnswerSubmission from the given config.
+func NewAnswerSubmissionClient(c config) *AnswerSubmissionClient {
+	return &AnswerSubmissionClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `example.Hooks(f(g(h())))`.
-func (c *ExampleClient) Use(hooks ...Hook) {
-	c.hooks.Example = append(c.hooks.Example, hooks...)
+// A call to `Use(f, g, h)` equals to `answersubmission.Hooks(f(g(h())))`.
+func (c *AnswerSubmissionClient) Use(hooks ...Hook) {
+	c.hooks.AnswerSubmission = append(c.hooks.AnswerSubmission, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `example.Intercept(f(g(h())))`.
-func (c *ExampleClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Example = append(c.inters.Example, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `answersubmission.Intercept(f(g(h())))`.
+func (c *AnswerSubmissionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AnswerSubmission = append(c.inters.AnswerSubmission, interceptors...)
 }
 
-// Create returns a builder for creating a Example entity.
-func (c *ExampleClient) Create() *ExampleCreate {
-	mutation := newExampleMutation(c.config, OpCreate)
-	return &ExampleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a AnswerSubmission entity.
+func (c *AnswerSubmissionClient) Create() *AnswerSubmissionCreate {
+	mutation := newAnswerSubmissionMutation(c.config, OpCreate)
+	return &AnswerSubmissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Example entities.
-func (c *ExampleClient) CreateBulk(builders ...*ExampleCreate) *ExampleCreateBulk {
-	return &ExampleCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of AnswerSubmission entities.
+func (c *AnswerSubmissionClient) CreateBulk(builders ...*AnswerSubmissionCreate) *AnswerSubmissionCreateBulk {
+	return &AnswerSubmissionCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *ExampleClient) MapCreateBulk(slice any, setFunc func(*ExampleCreate, int)) *ExampleCreateBulk {
+func (c *AnswerSubmissionClient) MapCreateBulk(slice any, setFunc func(*AnswerSubmissionCreate, int)) *AnswerSubmissionCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &ExampleCreateBulk{err: fmt.Errorf("calling to ExampleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &AnswerSubmissionCreateBulk{err: fmt.Errorf("calling to AnswerSubmissionClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*ExampleCreate, rv.Len())
+	builders := make([]*AnswerSubmissionCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &ExampleCreateBulk{config: c.config, builders: builders}
+	return &AnswerSubmissionCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Example.
-func (c *ExampleClient) Update() *ExampleUpdate {
-	mutation := newExampleMutation(c.config, OpUpdate)
-	return &ExampleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for AnswerSubmission.
+func (c *AnswerSubmissionClient) Update() *AnswerSubmissionUpdate {
+	mutation := newAnswerSubmissionMutation(c.config, OpUpdate)
+	return &AnswerSubmissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *ExampleClient) UpdateOne(e *Example) *ExampleUpdateOne {
-	mutation := newExampleMutation(c.config, OpUpdateOne, withExample(e))
-	return &ExampleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *AnswerSubmissionClient) UpdateOne(as *AnswerSubmission) *AnswerSubmissionUpdateOne {
+	mutation := newAnswerSubmissionMutation(c.config, OpUpdateOne, withAnswerSubmission(as))
+	return &AnswerSubmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ExampleClient) UpdateOneID(id int) *ExampleUpdateOne {
-	mutation := newExampleMutation(c.config, OpUpdateOne, withExampleID(id))
-	return &ExampleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *AnswerSubmissionClient) UpdateOneID(id uint64) *AnswerSubmissionUpdateOne {
+	mutation := newAnswerSubmissionMutation(c.config, OpUpdateOne, withAnswerSubmissionID(id))
+	return &AnswerSubmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Example.
-func (c *ExampleClient) Delete() *ExampleDelete {
-	mutation := newExampleMutation(c.config, OpDelete)
-	return &ExampleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for AnswerSubmission.
+func (c *AnswerSubmissionClient) Delete() *AnswerSubmissionDelete {
+	mutation := newAnswerSubmissionMutation(c.config, OpDelete)
+	return &AnswerSubmissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *ExampleClient) DeleteOne(e *Example) *ExampleDeleteOne {
-	return c.DeleteOneID(e.ID)
+func (c *AnswerSubmissionClient) DeleteOne(as *AnswerSubmission) *AnswerSubmissionDeleteOne {
+	return c.DeleteOneID(as.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ExampleClient) DeleteOneID(id int) *ExampleDeleteOne {
-	builder := c.Delete().Where(example.ID(id))
+func (c *AnswerSubmissionClient) DeleteOneID(id uint64) *AnswerSubmissionDeleteOne {
+	builder := c.Delete().Where(answersubmission.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &ExampleDeleteOne{builder}
+	return &AnswerSubmissionDeleteOne{builder}
 }
 
-// Query returns a query builder for Example.
-func (c *ExampleClient) Query() *ExampleQuery {
-	return &ExampleQuery{
+// Query returns a query builder for AnswerSubmission.
+func (c *AnswerSubmissionClient) Query() *AnswerSubmissionQuery {
+	return &AnswerSubmissionQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeExample},
+		ctx:    &QueryContext{Type: TypeAnswerSubmission},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Example entity by its id.
-func (c *ExampleClient) Get(ctx context.Context, id int) (*Example, error) {
-	return c.Query().Where(example.ID(id)).Only(ctx)
+// Get returns a AnswerSubmission entity by its id.
+func (c *AnswerSubmissionClient) Get(ctx context.Context, id uint64) (*AnswerSubmission, error) {
+	return c.Query().Where(answersubmission.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ExampleClient) GetX(ctx context.Context, id int) *Example {
+func (c *AnswerSubmissionClient) GetX(ctx context.Context, id uint64) *AnswerSubmission {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -308,37 +349,667 @@ func (c *ExampleClient) GetX(ctx context.Context, id int) *Example {
 }
 
 // Hooks returns the client hooks.
-func (c *ExampleClient) Hooks() []Hook {
-	return c.hooks.Example
+func (c *AnswerSubmissionClient) Hooks() []Hook {
+	return c.hooks.AnswerSubmission
 }
 
 // Interceptors returns the client interceptors.
-func (c *ExampleClient) Interceptors() []Interceptor {
-	return c.inters.Example
+func (c *AnswerSubmissionClient) Interceptors() []Interceptor {
+	return c.inters.AnswerSubmission
 }
 
-func (c *ExampleClient) mutate(ctx context.Context, m *ExampleMutation) (Value, error) {
+func (c *AnswerSubmissionClient) mutate(ctx context.Context, m *AnswerSubmissionMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&ExampleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&AnswerSubmissionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&ExampleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&AnswerSubmissionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&ExampleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&AnswerSubmissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&ExampleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&AnswerSubmissionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Example mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown AnswerSubmission mutation op: %q", m.Op())
+	}
+}
+
+// QuestionClient is a client for the Question schema.
+type QuestionClient struct {
+	config
+}
+
+// NewQuestionClient returns a client for the Question from the given config.
+func NewQuestionClient(c config) *QuestionClient {
+	return &QuestionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `question.Hooks(f(g(h())))`.
+func (c *QuestionClient) Use(hooks ...Hook) {
+	c.hooks.Question = append(c.hooks.Question, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `question.Intercept(f(g(h())))`.
+func (c *QuestionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Question = append(c.inters.Question, interceptors...)
+}
+
+// Create returns a builder for creating a Question entity.
+func (c *QuestionClient) Create() *QuestionCreate {
+	mutation := newQuestionMutation(c.config, OpCreate)
+	return &QuestionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Question entities.
+func (c *QuestionClient) CreateBulk(builders ...*QuestionCreate) *QuestionCreateBulk {
+	return &QuestionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *QuestionClient) MapCreateBulk(slice any, setFunc func(*QuestionCreate, int)) *QuestionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &QuestionCreateBulk{err: fmt.Errorf("calling to QuestionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*QuestionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &QuestionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Question.
+func (c *QuestionClient) Update() *QuestionUpdate {
+	mutation := newQuestionMutation(c.config, OpUpdate)
+	return &QuestionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *QuestionClient) UpdateOne(q *Question) *QuestionUpdateOne {
+	mutation := newQuestionMutation(c.config, OpUpdateOne, withQuestion(q))
+	return &QuestionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *QuestionClient) UpdateOneID(id uint64) *QuestionUpdateOne {
+	mutation := newQuestionMutation(c.config, OpUpdateOne, withQuestionID(id))
+	return &QuestionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Question.
+func (c *QuestionClient) Delete() *QuestionDelete {
+	mutation := newQuestionMutation(c.config, OpDelete)
+	return &QuestionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *QuestionClient) DeleteOne(q *Question) *QuestionDeleteOne {
+	return c.DeleteOneID(q.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *QuestionClient) DeleteOneID(id uint64) *QuestionDeleteOne {
+	builder := c.Delete().Where(question.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &QuestionDeleteOne{builder}
+}
+
+// Query returns a query builder for Question.
+func (c *QuestionClient) Query() *QuestionQuery {
+	return &QuestionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeQuestion},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Question entity by its id.
+func (c *QuestionClient) Get(ctx context.Context, id uint64) (*Question, error) {
+	return c.Query().Where(question.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *QuestionClient) GetX(ctx context.Context, id uint64) *Question {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryScenario queries the scenario edge of a Question.
+func (c *QuestionClient) QueryScenario(q *Question) *ScenarioQuery {
+	query := (&ScenarioClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := q.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(question.Table, question.FieldID, id),
+			sqlgraph.To(scenario.Table, scenario.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, question.ScenarioTable, question.ScenarioColumn),
+		)
+		fromV = sqlgraph.Neighbors(q.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *QuestionClient) Hooks() []Hook {
+	return c.hooks.Question
+}
+
+// Interceptors returns the client interceptors.
+func (c *QuestionClient) Interceptors() []Interceptor {
+	return c.inters.Question
+}
+
+func (c *QuestionClient) mutate(ctx context.Context, m *QuestionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&QuestionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&QuestionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&QuestionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&QuestionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Question mutation op: %q", m.Op())
+	}
+}
+
+// ScenarioClient is a client for the Scenario schema.
+type ScenarioClient struct {
+	config
+}
+
+// NewScenarioClient returns a client for the Scenario from the given config.
+func NewScenarioClient(c config) *ScenarioClient {
+	return &ScenarioClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `scenario.Hooks(f(g(h())))`.
+func (c *ScenarioClient) Use(hooks ...Hook) {
+	c.hooks.Scenario = append(c.hooks.Scenario, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `scenario.Intercept(f(g(h())))`.
+func (c *ScenarioClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Scenario = append(c.inters.Scenario, interceptors...)
+}
+
+// Create returns a builder for creating a Scenario entity.
+func (c *ScenarioClient) Create() *ScenarioCreate {
+	mutation := newScenarioMutation(c.config, OpCreate)
+	return &ScenarioCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Scenario entities.
+func (c *ScenarioClient) CreateBulk(builders ...*ScenarioCreate) *ScenarioCreateBulk {
+	return &ScenarioCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ScenarioClient) MapCreateBulk(slice any, setFunc func(*ScenarioCreate, int)) *ScenarioCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ScenarioCreateBulk{err: fmt.Errorf("calling to ScenarioClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ScenarioCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ScenarioCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Scenario.
+func (c *ScenarioClient) Update() *ScenarioUpdate {
+	mutation := newScenarioMutation(c.config, OpUpdate)
+	return &ScenarioUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScenarioClient) UpdateOne(s *Scenario) *ScenarioUpdateOne {
+	mutation := newScenarioMutation(c.config, OpUpdateOne, withScenario(s))
+	return &ScenarioUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScenarioClient) UpdateOneID(id uint64) *ScenarioUpdateOne {
+	mutation := newScenarioMutation(c.config, OpUpdateOne, withScenarioID(id))
+	return &ScenarioUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Scenario.
+func (c *ScenarioClient) Delete() *ScenarioDelete {
+	mutation := newScenarioMutation(c.config, OpDelete)
+	return &ScenarioDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScenarioClient) DeleteOne(s *Scenario) *ScenarioDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScenarioClient) DeleteOneID(id uint64) *ScenarioDeleteOne {
+	builder := c.Delete().Where(scenario.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScenarioDeleteOne{builder}
+}
+
+// Query returns a query builder for Scenario.
+func (c *ScenarioClient) Query() *ScenarioQuery {
+	return &ScenarioQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeScenario},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Scenario entity by its id.
+func (c *ScenarioClient) Get(ctx context.Context, id uint64) (*Scenario, error) {
+	return c.Query().Where(scenario.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScenarioClient) GetX(ctx context.Context, id uint64) *Scenario {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryQuestions queries the questions edge of a Scenario.
+func (c *ScenarioClient) QueryQuestions(s *Scenario) *QuestionQuery {
+	query := (&QuestionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenario.Table, scenario.FieldID, id),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, scenario.QuestionsTable, scenario.QuestionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCandidates queries the candidates edge of a Scenario.
+func (c *ScenarioClient) QueryCandidates(s *Scenario) *ScenarioCandidateQuery {
+	query := (&ScenarioCandidateClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenario.Table, scenario.FieldID, id),
+			sqlgraph.To(scenariocandidate.Table, scenariocandidate.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, scenario.CandidatesTable, scenario.CandidatesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ScenarioClient) Hooks() []Hook {
+	return c.hooks.Scenario
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScenarioClient) Interceptors() []Interceptor {
+	return c.inters.Scenario
+}
+
+func (c *ScenarioClient) mutate(ctx context.Context, m *ScenarioMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScenarioCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScenarioUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScenarioUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScenarioDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Scenario mutation op: %q", m.Op())
+	}
+}
+
+// ScenarioCandidateClient is a client for the ScenarioCandidate schema.
+type ScenarioCandidateClient struct {
+	config
+}
+
+// NewScenarioCandidateClient returns a client for the ScenarioCandidate from the given config.
+func NewScenarioCandidateClient(c config) *ScenarioCandidateClient {
+	return &ScenarioCandidateClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `scenariocandidate.Hooks(f(g(h())))`.
+func (c *ScenarioCandidateClient) Use(hooks ...Hook) {
+	c.hooks.ScenarioCandidate = append(c.hooks.ScenarioCandidate, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `scenariocandidate.Intercept(f(g(h())))`.
+func (c *ScenarioCandidateClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ScenarioCandidate = append(c.inters.ScenarioCandidate, interceptors...)
+}
+
+// Create returns a builder for creating a ScenarioCandidate entity.
+func (c *ScenarioCandidateClient) Create() *ScenarioCandidateCreate {
+	mutation := newScenarioCandidateMutation(c.config, OpCreate)
+	return &ScenarioCandidateCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ScenarioCandidate entities.
+func (c *ScenarioCandidateClient) CreateBulk(builders ...*ScenarioCandidateCreate) *ScenarioCandidateCreateBulk {
+	return &ScenarioCandidateCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ScenarioCandidateClient) MapCreateBulk(slice any, setFunc func(*ScenarioCandidateCreate, int)) *ScenarioCandidateCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ScenarioCandidateCreateBulk{err: fmt.Errorf("calling to ScenarioCandidateClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ScenarioCandidateCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ScenarioCandidateCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ScenarioCandidate.
+func (c *ScenarioCandidateClient) Update() *ScenarioCandidateUpdate {
+	mutation := newScenarioCandidateMutation(c.config, OpUpdate)
+	return &ScenarioCandidateUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScenarioCandidateClient) UpdateOne(sc *ScenarioCandidate) *ScenarioCandidateUpdateOne {
+	mutation := newScenarioCandidateMutation(c.config, OpUpdateOne, withScenarioCandidate(sc))
+	return &ScenarioCandidateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScenarioCandidateClient) UpdateOneID(id uint64) *ScenarioCandidateUpdateOne {
+	mutation := newScenarioCandidateMutation(c.config, OpUpdateOne, withScenarioCandidateID(id))
+	return &ScenarioCandidateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ScenarioCandidate.
+func (c *ScenarioCandidateClient) Delete() *ScenarioCandidateDelete {
+	mutation := newScenarioCandidateMutation(c.config, OpDelete)
+	return &ScenarioCandidateDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScenarioCandidateClient) DeleteOne(sc *ScenarioCandidate) *ScenarioCandidateDeleteOne {
+	return c.DeleteOneID(sc.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScenarioCandidateClient) DeleteOneID(id uint64) *ScenarioCandidateDeleteOne {
+	builder := c.Delete().Where(scenariocandidate.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScenarioCandidateDeleteOne{builder}
+}
+
+// Query returns a query builder for ScenarioCandidate.
+func (c *ScenarioCandidateClient) Query() *ScenarioCandidateQuery {
+	return &ScenarioCandidateQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeScenarioCandidate},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ScenarioCandidate entity by its id.
+func (c *ScenarioCandidateClient) Get(ctx context.Context, id uint64) (*ScenarioCandidate, error) {
+	return c.Query().Where(scenariocandidate.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScenarioCandidateClient) GetX(ctx context.Context, id uint64) *ScenarioCandidate {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryScenario queries the scenario edge of a ScenarioCandidate.
+func (c *ScenarioCandidateClient) QueryScenario(sc *ScenarioCandidate) *ScenarioQuery {
+	query := (&ScenarioClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenariocandidate.Table, scenariocandidate.FieldID, id),
+			sqlgraph.To(scenario.Table, scenario.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, scenariocandidate.ScenarioTable, scenariocandidate.ScenarioColumn),
+		)
+		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAttempts queries the attempts edge of a ScenarioCandidate.
+func (c *ScenarioCandidateClient) QueryAttempts(sc *ScenarioCandidate) *SubmissionAttemptQuery {
+	query := (&SubmissionAttemptClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenariocandidate.Table, scenariocandidate.FieldID, id),
+			sqlgraph.To(submissionattempt.Table, submissionattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, scenariocandidate.AttemptsTable, scenariocandidate.AttemptsColumn),
+		)
+		fromV = sqlgraph.Neighbors(sc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ScenarioCandidateClient) Hooks() []Hook {
+	return c.hooks.ScenarioCandidate
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScenarioCandidateClient) Interceptors() []Interceptor {
+	return c.inters.ScenarioCandidate
+}
+
+func (c *ScenarioCandidateClient) mutate(ctx context.Context, m *ScenarioCandidateMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScenarioCandidateCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScenarioCandidateUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScenarioCandidateUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScenarioCandidateDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ScenarioCandidate mutation op: %q", m.Op())
+	}
+}
+
+// SubmissionAttemptClient is a client for the SubmissionAttempt schema.
+type SubmissionAttemptClient struct {
+	config
+}
+
+// NewSubmissionAttemptClient returns a client for the SubmissionAttempt from the given config.
+func NewSubmissionAttemptClient(c config) *SubmissionAttemptClient {
+	return &SubmissionAttemptClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `submissionattempt.Hooks(f(g(h())))`.
+func (c *SubmissionAttemptClient) Use(hooks ...Hook) {
+	c.hooks.SubmissionAttempt = append(c.hooks.SubmissionAttempt, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `submissionattempt.Intercept(f(g(h())))`.
+func (c *SubmissionAttemptClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SubmissionAttempt = append(c.inters.SubmissionAttempt, interceptors...)
+}
+
+// Create returns a builder for creating a SubmissionAttempt entity.
+func (c *SubmissionAttemptClient) Create() *SubmissionAttemptCreate {
+	mutation := newSubmissionAttemptMutation(c.config, OpCreate)
+	return &SubmissionAttemptCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SubmissionAttempt entities.
+func (c *SubmissionAttemptClient) CreateBulk(builders ...*SubmissionAttemptCreate) *SubmissionAttemptCreateBulk {
+	return &SubmissionAttemptCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SubmissionAttemptClient) MapCreateBulk(slice any, setFunc func(*SubmissionAttemptCreate, int)) *SubmissionAttemptCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SubmissionAttemptCreateBulk{err: fmt.Errorf("calling to SubmissionAttemptClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SubmissionAttemptCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SubmissionAttemptCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SubmissionAttempt.
+func (c *SubmissionAttemptClient) Update() *SubmissionAttemptUpdate {
+	mutation := newSubmissionAttemptMutation(c.config, OpUpdate)
+	return &SubmissionAttemptUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubmissionAttemptClient) UpdateOne(sa *SubmissionAttempt) *SubmissionAttemptUpdateOne {
+	mutation := newSubmissionAttemptMutation(c.config, OpUpdateOne, withSubmissionAttempt(sa))
+	return &SubmissionAttemptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubmissionAttemptClient) UpdateOneID(id uint64) *SubmissionAttemptUpdateOne {
+	mutation := newSubmissionAttemptMutation(c.config, OpUpdateOne, withSubmissionAttemptID(id))
+	return &SubmissionAttemptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SubmissionAttempt.
+func (c *SubmissionAttemptClient) Delete() *SubmissionAttemptDelete {
+	mutation := newSubmissionAttemptMutation(c.config, OpDelete)
+	return &SubmissionAttemptDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubmissionAttemptClient) DeleteOne(sa *SubmissionAttempt) *SubmissionAttemptDeleteOne {
+	return c.DeleteOneID(sa.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubmissionAttemptClient) DeleteOneID(id uint64) *SubmissionAttemptDeleteOne {
+	builder := c.Delete().Where(submissionattempt.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubmissionAttemptDeleteOne{builder}
+}
+
+// Query returns a query builder for SubmissionAttempt.
+func (c *SubmissionAttemptClient) Query() *SubmissionAttemptQuery {
+	return &SubmissionAttemptQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubmissionAttempt},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SubmissionAttempt entity by its id.
+func (c *SubmissionAttemptClient) Get(ctx context.Context, id uint64) (*SubmissionAttempt, error) {
+	return c.Query().Where(submissionattempt.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubmissionAttemptClient) GetX(ctx context.Context, id uint64) *SubmissionAttempt {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryScenarioCandidate queries the scenario_candidate edge of a SubmissionAttempt.
+func (c *SubmissionAttemptClient) QueryScenarioCandidate(sa *SubmissionAttempt) *ScenarioCandidateQuery {
+	query := (&ScenarioCandidateClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(submissionattempt.Table, submissionattempt.FieldID, id),
+			sqlgraph.To(scenariocandidate.Table, scenariocandidate.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, submissionattempt.ScenarioCandidateTable, submissionattempt.ScenarioCandidateColumn),
+		)
+		fromV = sqlgraph.Neighbors(sa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SubmissionAttemptClient) Hooks() []Hook {
+	return c.hooks.SubmissionAttempt
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubmissionAttemptClient) Interceptors() []Interceptor {
+	return c.inters.SubmissionAttempt
+}
+
+func (c *SubmissionAttemptClient) mutate(ctx context.Context, m *SubmissionAttemptMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubmissionAttemptCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubmissionAttemptUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubmissionAttemptUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubmissionAttemptDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown SubmissionAttempt mutation op: %q", m.Op())
 	}
 }
 
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Example []ent.Hook
+		AnswerSubmission, Question, Scenario, ScenarioCandidate,
+		SubmissionAttempt []ent.Hook
 	}
 	inters struct {
-		Example []ent.Interceptor
+		AnswerSubmission, Question, Scenario, ScenarioCandidate,
+		SubmissionAttempt []ent.Interceptor
 	}
 )
 

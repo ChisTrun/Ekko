@@ -14,8 +14,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// Example is the client for interacting with the Example builders.
-	Example *ExampleClient
+	// AnswerSubmission is the client for interacting with the AnswerSubmission builders.
+	AnswerSubmission *AnswerSubmissionClient
+	// Question is the client for interacting with the Question builders.
+	Question *QuestionClient
+	// Scenario is the client for interacting with the Scenario builders.
+	Scenario *ScenarioClient
+	// ScenarioCandidate is the client for interacting with the ScenarioCandidate builders.
+	ScenarioCandidate *ScenarioCandidateClient
+	// SubmissionAttempt is the client for interacting with the SubmissionAttempt builders.
+	SubmissionAttempt *SubmissionAttemptClient
 
 	// lazily loaded.
 	client     *Client
@@ -147,7 +155,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.Example = NewExampleClient(tx.config)
+	tx.AnswerSubmission = NewAnswerSubmissionClient(tx.config)
+	tx.Question = NewQuestionClient(tx.config)
+	tx.Scenario = NewScenarioClient(tx.config)
+	tx.ScenarioCandidate = NewScenarioCandidateClient(tx.config)
+	tx.SubmissionAttempt = NewSubmissionAttemptClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -157,7 +169,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Example.QueryXXX(), the query will be executed
+// applies a query, for example: AnswerSubmission.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

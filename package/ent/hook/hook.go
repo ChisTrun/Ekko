@@ -8,16 +8,64 @@ import (
 	"fmt"
 )
 
-// The ExampleFunc type is an adapter to allow the use of ordinary
-// function as Example mutator.
-type ExampleFunc func(context.Context, *ent.ExampleMutation) (ent.Value, error)
+// The AnswerSubmissionFunc type is an adapter to allow the use of ordinary
+// function as AnswerSubmission mutator.
+type AnswerSubmissionFunc func(context.Context, *ent.AnswerSubmissionMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f ExampleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ExampleMutation); ok {
+func (f AnswerSubmissionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AnswerSubmissionMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExampleMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AnswerSubmissionMutation", m)
+}
+
+// The QuestionFunc type is an adapter to allow the use of ordinary
+// function as Question mutator.
+type QuestionFunc func(context.Context, *ent.QuestionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f QuestionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.QuestionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.QuestionMutation", m)
+}
+
+// The ScenarioFunc type is an adapter to allow the use of ordinary
+// function as Scenario mutator.
+type ScenarioFunc func(context.Context, *ent.ScenarioMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScenarioFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ScenarioMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScenarioMutation", m)
+}
+
+// The ScenarioCandidateFunc type is an adapter to allow the use of ordinary
+// function as ScenarioCandidate mutator.
+type ScenarioCandidateFunc func(context.Context, *ent.ScenarioCandidateMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScenarioCandidateFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ScenarioCandidateMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScenarioCandidateMutation", m)
+}
+
+// The SubmissionAttemptFunc type is an adapter to allow the use of ordinary
+// function as SubmissionAttempt mutator.
+type SubmissionAttemptFunc func(context.Context, *ent.SubmissionAttemptMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubmissionAttemptFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubmissionAttemptMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubmissionAttemptMutation", m)
 }
 
 // Condition is a hook condition function.

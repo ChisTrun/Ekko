@@ -6,5 +6,17 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Example is the predicate function for example builders.
-type Example func(*sql.Selector)
+// AnswerSubmission is the predicate function for answersubmission builders.
+type AnswerSubmission func(*sql.Selector)
+
+// Question is the predicate function for question builders.
+type Question func(*sql.Selector)
+
+// Scenario is the predicate function for scenario builders.
+type Scenario func(*sql.Selector)
+
+// ScenarioCandidate is the predicate function for scenariocandidate builders.
+type ScenarioCandidate func(*sql.Selector)
+
+// SubmissionAttempt is the predicate function for submissionattempt builders.
+type SubmissionAttempt func(*sql.Selector)
