@@ -5,6 +5,7 @@ package ent
 import (
 	ekko "ekko/api"
 	"ekko/package/ent/answersubmission"
+	"ekko/package/ent/submissionattempt"
 	"fmt"
 	"strings"
 	"time"
@@ -37,8 +38,31 @@ type AnswerSubmission struct {
 	// Overall holds the value of the "overall" field.
 	Overall float64 `json:"overall,omitempty"`
 	// Status holds the value of the "status" field.
-	Status       ekko.SubmissionStatus `json:"status,omitempty"`
+	Status ekko.SubmissionStatus `json:"status,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AnswerSubmissionQuery when eager-loading is set.
+	Edges        AnswerSubmissionEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AnswerSubmissionEdges holds the relations/edges for other nodes in the graph.
+type AnswerSubmissionEdges struct {
+	// SubmissionAttempt holds the value of the submission_attempt edge.
+	SubmissionAttempt *SubmissionAttempt `json:"submission_attempt,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// SubmissionAttemptOrErr returns the SubmissionAttempt value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AnswerSubmissionEdges) SubmissionAttemptOrErr() (*SubmissionAttempt, error) {
+	if e.SubmissionAttempt != nil {
+		return e.SubmissionAttempt, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: submissionattempt.Label}
+	}
+	return nil, &NotLoadedError{edge: "submission_attempt"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -146,6 +170,11 @@ func (as *AnswerSubmission) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (as *AnswerSubmission) Value(name string) (ent.Value, error) {
 	return as.selectValues.Get(name)
+}
+
+// QuerySubmissionAttempt queries the "submission_attempt" edge of the AnswerSubmission entity.
+func (as *AnswerSubmission) QuerySubmissionAttempt() *SubmissionAttemptQuery {
+	return NewAnswerSubmissionClient(as.config).QuerySubmissionAttempt(as)
 }
 
 // Update returns a builder for updating this AnswerSubmission.

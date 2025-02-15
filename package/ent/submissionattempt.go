@@ -36,9 +36,11 @@ type SubmissionAttempt struct {
 type SubmissionAttemptEdges struct {
 	// ScenarioCandidate holds the value of the scenario_candidate edge.
 	ScenarioCandidate *ScenarioCandidate `json:"scenario_candidate,omitempty"`
+	// Answers holds the value of the answers edge.
+	Answers []*AnswerSubmission `json:"answers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ScenarioCandidateOrErr returns the ScenarioCandidate value or an error if the edge
@@ -50,6 +52,15 @@ func (e SubmissionAttemptEdges) ScenarioCandidateOrErr() (*ScenarioCandidate, er
 		return nil, &NotFoundError{label: scenariocandidate.Label}
 	}
 	return nil, &NotLoadedError{edge: "scenario_candidate"}
+}
+
+// AnswersOrErr returns the Answers value or an error if the edge
+// was not loaded in eager-loading.
+func (e SubmissionAttemptEdges) AnswersOrErr() ([]*AnswerSubmission, error) {
+	if e.loadedTypes[1] {
+		return e.Answers, nil
+	}
+	return nil, &NotLoadedError{edge: "answers"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -122,6 +133,11 @@ func (sa *SubmissionAttempt) Value(name string) (ent.Value, error) {
 // QueryScenarioCandidate queries the "scenario_candidate" edge of the SubmissionAttempt entity.
 func (sa *SubmissionAttempt) QueryScenarioCandidate() *ScenarioCandidateQuery {
 	return NewSubmissionAttemptClient(sa.config).QueryScenarioCandidate(sa)
+}
+
+// QueryAnswers queries the "answers" edge of the SubmissionAttempt entity.
+func (sa *SubmissionAttempt) QueryAnswers() *AnswerSubmissionQuery {
+	return NewSubmissionAttemptClient(sa.config).QueryAnswers(sa)
 }
 
 // Update returns a builder for updating this SubmissionAttempt.

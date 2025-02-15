@@ -24,10 +24,18 @@ const (
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
+	// FieldRating holds the string denoting the rating field in the database.
+	FieldRating = "rating"
+	// FieldParticipants holds the string denoting the participants field in the database.
+	FieldParticipants = "participants"
 	// EdgeQuestions holds the string denoting the questions edge name in mutations.
 	EdgeQuestions = "questions"
 	// EdgeCandidates holds the string denoting the candidates edge name in mutations.
 	EdgeCandidates = "candidates"
+	// EdgeFavorites holds the string denoting the favorites edge name in mutations.
+	EdgeFavorites = "favorites"
+	// EdgeField holds the string denoting the field edge name in mutations.
+	EdgeField = "field"
 	// Table holds the table name of the scenario in the database.
 	Table = "scenarios"
 	// QuestionsTable is the table that holds the questions relation/edge.
@@ -36,7 +44,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "question" package.
 	QuestionsInverseTable = "questions"
 	// QuestionsColumn is the table column denoting the questions relation/edge.
-	QuestionsColumn = "sentence_id"
+	QuestionsColumn = "scenario_id"
 	// CandidatesTable is the table that holds the candidates relation/edge.
 	CandidatesTable = "scenario_candidates"
 	// CandidatesInverseTable is the table name for the ScenarioCandidate entity.
@@ -44,6 +52,20 @@ const (
 	CandidatesInverseTable = "scenario_candidates"
 	// CandidatesColumn is the table column denoting the candidates relation/edge.
 	CandidatesColumn = "scenario_id"
+	// FavoritesTable is the table that holds the favorites relation/edge.
+	FavoritesTable = "scenario_favorites"
+	// FavoritesInverseTable is the table name for the ScenarioFavorite entity.
+	// It exists in this package in order to avoid circular dependency with the "scenariofavorite" package.
+	FavoritesInverseTable = "scenario_favorites"
+	// FavoritesColumn is the table column denoting the favorites relation/edge.
+	FavoritesColumn = "scenario_id"
+	// FieldTable is the table that holds the field relation/edge.
+	FieldTable = "scenario_fields"
+	// FieldInverseTable is the table name for the ScenarioField entity.
+	// It exists in this package in order to avoid circular dependency with the "scenariofield" package.
+	FieldInverseTable = "scenario_fields"
+	// FieldColumn is the table column denoting the field relation/edge.
+	FieldColumn = "scenario_field_senarios"
 )
 
 // Columns holds all SQL columns for scenario fields.
@@ -54,6 +76,8 @@ var Columns = []string{
 	FieldBmID,
 	FieldName,
 	FieldDescription,
+	FieldRating,
+	FieldParticipants,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -73,6 +97,10 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultRating holds the default value on creation for the "rating" field.
+	DefaultRating float64
+	// DefaultParticipants holds the default value on creation for the "participants" field.
+	DefaultParticipants int32
 )
 
 // OrderOption defines the ordering options for the Scenario queries.
@@ -108,6 +136,16 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
 }
 
+// ByRating orders the results by the rating field.
+func ByRating(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRating, opts...).ToFunc()
+}
+
+// ByParticipants orders the results by the participants field.
+func ByParticipants(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParticipants, opts...).ToFunc()
+}
+
 // ByQuestionsCount orders the results by questions count.
 func ByQuestionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -135,6 +173,34 @@ func ByCandidates(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCandidatesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByFavoritesCount orders the results by favorites count.
+func ByFavoritesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFavoritesStep(), opts...)
+	}
+}
+
+// ByFavorites orders the results by favorites terms.
+func ByFavorites(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFavoritesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFieldCount orders the results by field count.
+func ByFieldCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFieldStep(), opts...)
+	}
+}
+
+// ByField orders the results by field terms.
+func ByField(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFieldStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newQuestionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -147,5 +213,19 @@ func newCandidatesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CandidatesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CandidatesTable, CandidatesColumn),
+	)
+}
+func newFavoritesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FavoritesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FavoritesTable, FavoritesColumn),
+	)
+}
+func newFieldStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FieldInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, FieldTable, FieldColumn),
 	)
 }

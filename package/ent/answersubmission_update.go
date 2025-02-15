@@ -7,6 +7,7 @@ import (
 	ekko "ekko/api"
 	"ekko/package/ent/answersubmission"
 	"ekko/package/ent/predicate"
+	"ekko/package/ent/submissionattempt"
 	"errors"
 	"fmt"
 	"time"
@@ -38,7 +39,6 @@ func (asu *AnswerSubmissionUpdate) SetUpdatedAt(t time.Time) *AnswerSubmissionUp
 
 // SetSubmissionAttemptID sets the "submission_attempt_id" field.
 func (asu *AnswerSubmissionUpdate) SetSubmissionAttemptID(u uint64) *AnswerSubmissionUpdate {
-	asu.mutation.ResetSubmissionAttemptID()
 	asu.mutation.SetSubmissionAttemptID(u)
 	return asu
 }
@@ -48,12 +48,6 @@ func (asu *AnswerSubmissionUpdate) SetNillableSubmissionAttemptID(u *uint64) *An
 	if u != nil {
 		asu.SetSubmissionAttemptID(*u)
 	}
-	return asu
-}
-
-// AddSubmissionAttemptID adds u to the "submission_attempt_id" field.
-func (asu *AnswerSubmissionUpdate) AddSubmissionAttemptID(u int64) *AnswerSubmissionUpdate {
-	asu.mutation.AddSubmissionAttemptID(u)
 	return asu
 }
 
@@ -197,9 +191,20 @@ func (asu *AnswerSubmissionUpdate) AddStatus(es ekko.SubmissionStatus) *AnswerSu
 	return asu
 }
 
+// SetSubmissionAttempt sets the "submission_attempt" edge to the SubmissionAttempt entity.
+func (asu *AnswerSubmissionUpdate) SetSubmissionAttempt(s *SubmissionAttempt) *AnswerSubmissionUpdate {
+	return asu.SetSubmissionAttemptID(s.ID)
+}
+
 // Mutation returns the AnswerSubmissionMutation object of the builder.
 func (asu *AnswerSubmissionUpdate) Mutation() *AnswerSubmissionMutation {
 	return asu.mutation
+}
+
+// ClearSubmissionAttempt clears the "submission_attempt" edge to the SubmissionAttempt entity.
+func (asu *AnswerSubmissionUpdate) ClearSubmissionAttempt() *AnswerSubmissionUpdate {
+	asu.mutation.ClearSubmissionAttempt()
+	return asu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -238,6 +243,14 @@ func (asu *AnswerSubmissionUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (asu *AnswerSubmissionUpdate) check() error {
+	if asu.mutation.SubmissionAttemptCleared() && len(asu.mutation.SubmissionAttemptIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AnswerSubmission.submission_attempt"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (asu *AnswerSubmissionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AnswerSubmissionUpdate {
 	asu.modifiers = append(asu.modifiers, modifiers...)
@@ -245,6 +258,9 @@ func (asu *AnswerSubmissionUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder
 }
 
 func (asu *AnswerSubmissionUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := asu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(answersubmission.Table, answersubmission.Columns, sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64))
 	if ps := asu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -255,12 +271,6 @@ func (asu *AnswerSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 	}
 	if value, ok := asu.mutation.UpdatedAt(); ok {
 		_spec.SetField(answersubmission.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := asu.mutation.SubmissionAttemptID(); ok {
-		_spec.SetField(answersubmission.FieldSubmissionAttemptID, field.TypeUint64, value)
-	}
-	if value, ok := asu.mutation.AddedSubmissionAttemptID(); ok {
-		_spec.AddField(answersubmission.FieldSubmissionAttemptID, field.TypeUint64, value)
 	}
 	if value, ok := asu.mutation.QuestionID(); ok {
 		_spec.SetField(answersubmission.FieldQuestionID, field.TypeUint64, value)
@@ -301,6 +311,35 @@ func (asu *AnswerSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 	if value, ok := asu.mutation.AddedStatus(); ok {
 		_spec.AddField(answersubmission.FieldStatus, field.TypeInt32, value)
 	}
+	if asu.mutation.SubmissionAttemptCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.SubmissionAttemptTable,
+			Columns: []string{answersubmission.SubmissionAttemptColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submissionattempt.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asu.mutation.SubmissionAttemptIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.SubmissionAttemptTable,
+			Columns: []string{answersubmission.SubmissionAttemptColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submissionattempt.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(asu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, asu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -331,7 +370,6 @@ func (asuo *AnswerSubmissionUpdateOne) SetUpdatedAt(t time.Time) *AnswerSubmissi
 
 // SetSubmissionAttemptID sets the "submission_attempt_id" field.
 func (asuo *AnswerSubmissionUpdateOne) SetSubmissionAttemptID(u uint64) *AnswerSubmissionUpdateOne {
-	asuo.mutation.ResetSubmissionAttemptID()
 	asuo.mutation.SetSubmissionAttemptID(u)
 	return asuo
 }
@@ -341,12 +379,6 @@ func (asuo *AnswerSubmissionUpdateOne) SetNillableSubmissionAttemptID(u *uint64)
 	if u != nil {
 		asuo.SetSubmissionAttemptID(*u)
 	}
-	return asuo
-}
-
-// AddSubmissionAttemptID adds u to the "submission_attempt_id" field.
-func (asuo *AnswerSubmissionUpdateOne) AddSubmissionAttemptID(u int64) *AnswerSubmissionUpdateOne {
-	asuo.mutation.AddSubmissionAttemptID(u)
 	return asuo
 }
 
@@ -490,9 +522,20 @@ func (asuo *AnswerSubmissionUpdateOne) AddStatus(es ekko.SubmissionStatus) *Answ
 	return asuo
 }
 
+// SetSubmissionAttempt sets the "submission_attempt" edge to the SubmissionAttempt entity.
+func (asuo *AnswerSubmissionUpdateOne) SetSubmissionAttempt(s *SubmissionAttempt) *AnswerSubmissionUpdateOne {
+	return asuo.SetSubmissionAttemptID(s.ID)
+}
+
 // Mutation returns the AnswerSubmissionMutation object of the builder.
 func (asuo *AnswerSubmissionUpdateOne) Mutation() *AnswerSubmissionMutation {
 	return asuo.mutation
+}
+
+// ClearSubmissionAttempt clears the "submission_attempt" edge to the SubmissionAttempt entity.
+func (asuo *AnswerSubmissionUpdateOne) ClearSubmissionAttempt() *AnswerSubmissionUpdateOne {
+	asuo.mutation.ClearSubmissionAttempt()
+	return asuo
 }
 
 // Where appends a list predicates to the AnswerSubmissionUpdate builder.
@@ -544,6 +587,14 @@ func (asuo *AnswerSubmissionUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (asuo *AnswerSubmissionUpdateOne) check() error {
+	if asuo.mutation.SubmissionAttemptCleared() && len(asuo.mutation.SubmissionAttemptIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AnswerSubmission.submission_attempt"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (asuo *AnswerSubmissionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *AnswerSubmissionUpdateOne {
 	asuo.modifiers = append(asuo.modifiers, modifiers...)
@@ -551,6 +602,9 @@ func (asuo *AnswerSubmissionUpdateOne) Modify(modifiers ...func(u *sql.UpdateBui
 }
 
 func (asuo *AnswerSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *AnswerSubmission, err error) {
+	if err := asuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(answersubmission.Table, answersubmission.Columns, sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64))
 	id, ok := asuo.mutation.ID()
 	if !ok {
@@ -578,12 +632,6 @@ func (asuo *AnswerSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Answ
 	}
 	if value, ok := asuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(answersubmission.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := asuo.mutation.SubmissionAttemptID(); ok {
-		_spec.SetField(answersubmission.FieldSubmissionAttemptID, field.TypeUint64, value)
-	}
-	if value, ok := asuo.mutation.AddedSubmissionAttemptID(); ok {
-		_spec.AddField(answersubmission.FieldSubmissionAttemptID, field.TypeUint64, value)
 	}
 	if value, ok := asuo.mutation.QuestionID(); ok {
 		_spec.SetField(answersubmission.FieldQuestionID, field.TypeUint64, value)
@@ -623,6 +671,35 @@ func (asuo *AnswerSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Answ
 	}
 	if value, ok := asuo.mutation.AddedStatus(); ok {
 		_spec.AddField(answersubmission.FieldStatus, field.TypeInt32, value)
+	}
+	if asuo.mutation.SubmissionAttemptCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.SubmissionAttemptTable,
+			Columns: []string{answersubmission.SubmissionAttemptColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submissionattempt.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asuo.mutation.SubmissionAttemptIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.SubmissionAttemptTable,
+			Columns: []string{answersubmission.SubmissionAttemptColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submissionattempt.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(asuo.modifiers...)
 	_node = &AnswerSubmission{config: asuo.config}

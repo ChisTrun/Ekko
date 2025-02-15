@@ -6,6 +6,7 @@ import (
 	"context"
 	"ekko/package/ent/answersubmission"
 	"ekko/package/ent/predicate"
+	"ekko/package/ent/submissionattempt"
 	"fmt"
 	"math"
 
@@ -19,11 +20,12 @@ import (
 // AnswerSubmissionQuery is the builder for querying AnswerSubmission entities.
 type AnswerSubmissionQuery struct {
 	config
-	ctx        *QueryContext
-	order      []answersubmission.OrderOption
-	inters     []Interceptor
-	predicates []predicate.AnswerSubmission
-	modifiers  []func(*sql.Selector)
+	ctx                   *QueryContext
+	order                 []answersubmission.OrderOption
+	inters                []Interceptor
+	predicates            []predicate.AnswerSubmission
+	withSubmissionAttempt *SubmissionAttemptQuery
+	modifiers             []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +60,28 @@ func (asq *AnswerSubmissionQuery) Unique(unique bool) *AnswerSubmissionQuery {
 func (asq *AnswerSubmissionQuery) Order(o ...answersubmission.OrderOption) *AnswerSubmissionQuery {
 	asq.order = append(asq.order, o...)
 	return asq
+}
+
+// QuerySubmissionAttempt chains the current query on the "submission_attempt" edge.
+func (asq *AnswerSubmissionQuery) QuerySubmissionAttempt() *SubmissionAttemptQuery {
+	query := (&SubmissionAttemptClient{config: asq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := asq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := asq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(answersubmission.Table, answersubmission.FieldID, selector),
+			sqlgraph.To(submissionattempt.Table, submissionattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, answersubmission.SubmissionAttemptTable, answersubmission.SubmissionAttemptColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first AnswerSubmission entity from the query.
@@ -247,15 +271,27 @@ func (asq *AnswerSubmissionQuery) Clone() *AnswerSubmissionQuery {
 		return nil
 	}
 	return &AnswerSubmissionQuery{
-		config:     asq.config,
-		ctx:        asq.ctx.Clone(),
-		order:      append([]answersubmission.OrderOption{}, asq.order...),
-		inters:     append([]Interceptor{}, asq.inters...),
-		predicates: append([]predicate.AnswerSubmission{}, asq.predicates...),
+		config:                asq.config,
+		ctx:                   asq.ctx.Clone(),
+		order:                 append([]answersubmission.OrderOption{}, asq.order...),
+		inters:                append([]Interceptor{}, asq.inters...),
+		predicates:            append([]predicate.AnswerSubmission{}, asq.predicates...),
+		withSubmissionAttempt: asq.withSubmissionAttempt.Clone(),
 		// clone intermediate query.
 		sql:  asq.sql.Clone(),
 		path: asq.path,
 	}
+}
+
+// WithSubmissionAttempt tells the query-builder to eager-load the nodes that are connected to
+// the "submission_attempt" edge. The optional arguments are used to configure the query builder of the edge.
+func (asq *AnswerSubmissionQuery) WithSubmissionAttempt(opts ...func(*SubmissionAttemptQuery)) *AnswerSubmissionQuery {
+	query := (&SubmissionAttemptClient{config: asq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	asq.withSubmissionAttempt = query
+	return asq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -334,8 +370,11 @@ func (asq *AnswerSubmissionQuery) prepareQuery(ctx context.Context) error {
 
 func (asq *AnswerSubmissionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AnswerSubmission, error) {
 	var (
-		nodes = []*AnswerSubmission{}
-		_spec = asq.querySpec()
+		nodes       = []*AnswerSubmission{}
+		_spec       = asq.querySpec()
+		loadedTypes = [1]bool{
+			asq.withSubmissionAttempt != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AnswerSubmission).scanValues(nil, columns)
@@ -343,6 +382,7 @@ func (asq *AnswerSubmissionQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &AnswerSubmission{config: asq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(asq.modifiers) > 0 {
@@ -357,7 +397,43 @@ func (asq *AnswerSubmissionQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := asq.withSubmissionAttempt; query != nil {
+		if err := asq.loadSubmissionAttempt(ctx, query, nodes, nil,
+			func(n *AnswerSubmission, e *SubmissionAttempt) { n.Edges.SubmissionAttempt = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (asq *AnswerSubmissionQuery) loadSubmissionAttempt(ctx context.Context, query *SubmissionAttemptQuery, nodes []*AnswerSubmission, init func(*AnswerSubmission), assign func(*AnswerSubmission, *SubmissionAttempt)) error {
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*AnswerSubmission)
+	for i := range nodes {
+		fk := nodes[i].SubmissionAttemptID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(submissionattempt.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "submission_attempt_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (asq *AnswerSubmissionQuery) sqlCount(ctx context.Context) (int, error) {
@@ -387,6 +463,9 @@ func (asq *AnswerSubmissionQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != answersubmission.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if asq.withSubmissionAttempt != nil {
+			_spec.Node.AddColumnOnce(answersubmission.FieldSubmissionAttemptID)
 		}
 	}
 	if ps := asq.predicates; len(ps) > 0 {

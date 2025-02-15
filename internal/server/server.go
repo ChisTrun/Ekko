@@ -2,6 +2,12 @@ package server
 
 import (
 	"context"
+	pb0 "ekko/api"
+	"ekko/internal/feature"
+	"ekko/internal/repository"
+	"ekko/internal/server/chronobreak"
+	"ekko/internal/server/ekko"
+	"ekko/internal/utils/logging"
 	"ekko/package/config"
 	"ekko/package/ent"
 	"fmt"
@@ -29,6 +35,14 @@ func Serve(cfg *config.Config) {
 	}
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
-	log.Printf("server is runing on: %v:%v", cfg.Server.Host, cfg.Server.Port)
+
+	repo := repository.New(client)
+
+	feature := feature.New(repo)
+
+	pb0.RegisterChronobreakServer(grpcServer, chronobreak.NewServer(feature))
+	pb0.RegisterEkkoServer(grpcServer, ekko.NewServer(feature))
+
+	logging.Logger(context.Background()).Info(fmt.Sprintf("server is runing on: %v:%v", cfg.Database.Username, cfg.Server.Port))
 	grpcServer.Serve(lis)
 }

@@ -15,6 +15,8 @@ import (
 	"ekko/package/ent/question"
 	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/scenariofavorite"
+	"ekko/package/ent/scenariofield"
 	"ekko/package/ent/submissionattempt"
 
 	"entgo.io/ent"
@@ -38,6 +40,10 @@ type Client struct {
 	Scenario *ScenarioClient
 	// ScenarioCandidate is the client for interacting with the ScenarioCandidate builders.
 	ScenarioCandidate *ScenarioCandidateClient
+	// ScenarioFavorite is the client for interacting with the ScenarioFavorite builders.
+	ScenarioFavorite *ScenarioFavoriteClient
+	// ScenarioField is the client for interacting with the ScenarioField builders.
+	ScenarioField *ScenarioFieldClient
 	// SubmissionAttempt is the client for interacting with the SubmissionAttempt builders.
 	SubmissionAttempt *SubmissionAttemptClient
 }
@@ -55,6 +61,8 @@ func (c *Client) init() {
 	c.Question = NewQuestionClient(c.config)
 	c.Scenario = NewScenarioClient(c.config)
 	c.ScenarioCandidate = NewScenarioCandidateClient(c.config)
+	c.ScenarioFavorite = NewScenarioFavoriteClient(c.config)
+	c.ScenarioField = NewScenarioFieldClient(c.config)
 	c.SubmissionAttempt = NewSubmissionAttemptClient(c.config)
 }
 
@@ -152,6 +160,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Question:          NewQuestionClient(cfg),
 		Scenario:          NewScenarioClient(cfg),
 		ScenarioCandidate: NewScenarioCandidateClient(cfg),
+		ScenarioFavorite:  NewScenarioFavoriteClient(cfg),
+		ScenarioField:     NewScenarioFieldClient(cfg),
 		SubmissionAttempt: NewSubmissionAttemptClient(cfg),
 	}, nil
 }
@@ -176,6 +186,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Question:          NewQuestionClient(cfg),
 		Scenario:          NewScenarioClient(cfg),
 		ScenarioCandidate: NewScenarioCandidateClient(cfg),
+		ScenarioFavorite:  NewScenarioFavoriteClient(cfg),
+		ScenarioField:     NewScenarioFieldClient(cfg),
 		SubmissionAttempt: NewSubmissionAttemptClient(cfg),
 	}, nil
 }
@@ -205,21 +217,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AnswerSubmission.Use(hooks...)
-	c.Question.Use(hooks...)
-	c.Scenario.Use(hooks...)
-	c.ScenarioCandidate.Use(hooks...)
-	c.SubmissionAttempt.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AnswerSubmission, c.Question, c.Scenario, c.ScenarioCandidate,
+		c.ScenarioFavorite, c.ScenarioField, c.SubmissionAttempt,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AnswerSubmission.Intercept(interceptors...)
-	c.Question.Intercept(interceptors...)
-	c.Scenario.Intercept(interceptors...)
-	c.ScenarioCandidate.Intercept(interceptors...)
-	c.SubmissionAttempt.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AnswerSubmission, c.Question, c.Scenario, c.ScenarioCandidate,
+		c.ScenarioFavorite, c.ScenarioField, c.SubmissionAttempt,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -233,6 +247,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Scenario.mutate(ctx, m)
 	case *ScenarioCandidateMutation:
 		return c.ScenarioCandidate.mutate(ctx, m)
+	case *ScenarioFavoriteMutation:
+		return c.ScenarioFavorite.mutate(ctx, m)
+	case *ScenarioFieldMutation:
+		return c.ScenarioField.mutate(ctx, m)
 	case *SubmissionAttemptMutation:
 		return c.SubmissionAttempt.mutate(ctx, m)
 	default:
@@ -346,6 +364,22 @@ func (c *AnswerSubmissionClient) GetX(ctx context.Context, id uint64) *AnswerSub
 		panic(err)
 	}
 	return obj
+}
+
+// QuerySubmissionAttempt queries the submission_attempt edge of a AnswerSubmission.
+func (c *AnswerSubmissionClient) QuerySubmissionAttempt(as *AnswerSubmission) *SubmissionAttemptQuery {
+	query := (&SubmissionAttemptClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(answersubmission.Table, answersubmission.FieldID, id),
+			sqlgraph.To(submissionattempt.Table, submissionattempt.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, answersubmission.SubmissionAttemptTable, answersubmission.SubmissionAttemptColumn),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -662,6 +696,38 @@ func (c *ScenarioClient) QueryCandidates(s *Scenario) *ScenarioCandidateQuery {
 	return query
 }
 
+// QueryFavorites queries the favorites edge of a Scenario.
+func (c *ScenarioClient) QueryFavorites(s *Scenario) *ScenarioFavoriteQuery {
+	query := (&ScenarioFavoriteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenario.Table, scenario.FieldID, id),
+			sqlgraph.To(scenariofavorite.Table, scenariofavorite.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, scenario.FavoritesTable, scenario.FavoritesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryField queries the field edge of a Scenario.
+func (c *ScenarioClient) QueryField(s *Scenario) *ScenarioFieldQuery {
+	query := (&ScenarioFieldClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenario.Table, scenario.FieldID, id),
+			sqlgraph.To(scenariofield.Table, scenariofield.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, scenario.FieldTable, scenario.FieldColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ScenarioClient) Hooks() []Hook {
 	return c.hooks.Scenario
@@ -852,6 +918,304 @@ func (c *ScenarioCandidateClient) mutate(ctx context.Context, m *ScenarioCandida
 	}
 }
 
+// ScenarioFavoriteClient is a client for the ScenarioFavorite schema.
+type ScenarioFavoriteClient struct {
+	config
+}
+
+// NewScenarioFavoriteClient returns a client for the ScenarioFavorite from the given config.
+func NewScenarioFavoriteClient(c config) *ScenarioFavoriteClient {
+	return &ScenarioFavoriteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `scenariofavorite.Hooks(f(g(h())))`.
+func (c *ScenarioFavoriteClient) Use(hooks ...Hook) {
+	c.hooks.ScenarioFavorite = append(c.hooks.ScenarioFavorite, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `scenariofavorite.Intercept(f(g(h())))`.
+func (c *ScenarioFavoriteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ScenarioFavorite = append(c.inters.ScenarioFavorite, interceptors...)
+}
+
+// Create returns a builder for creating a ScenarioFavorite entity.
+func (c *ScenarioFavoriteClient) Create() *ScenarioFavoriteCreate {
+	mutation := newScenarioFavoriteMutation(c.config, OpCreate)
+	return &ScenarioFavoriteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ScenarioFavorite entities.
+func (c *ScenarioFavoriteClient) CreateBulk(builders ...*ScenarioFavoriteCreate) *ScenarioFavoriteCreateBulk {
+	return &ScenarioFavoriteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ScenarioFavoriteClient) MapCreateBulk(slice any, setFunc func(*ScenarioFavoriteCreate, int)) *ScenarioFavoriteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ScenarioFavoriteCreateBulk{err: fmt.Errorf("calling to ScenarioFavoriteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ScenarioFavoriteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ScenarioFavoriteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ScenarioFavorite.
+func (c *ScenarioFavoriteClient) Update() *ScenarioFavoriteUpdate {
+	mutation := newScenarioFavoriteMutation(c.config, OpUpdate)
+	return &ScenarioFavoriteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScenarioFavoriteClient) UpdateOne(sf *ScenarioFavorite) *ScenarioFavoriteUpdateOne {
+	mutation := newScenarioFavoriteMutation(c.config, OpUpdateOne, withScenarioFavorite(sf))
+	return &ScenarioFavoriteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScenarioFavoriteClient) UpdateOneID(id uint64) *ScenarioFavoriteUpdateOne {
+	mutation := newScenarioFavoriteMutation(c.config, OpUpdateOne, withScenarioFavoriteID(id))
+	return &ScenarioFavoriteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ScenarioFavorite.
+func (c *ScenarioFavoriteClient) Delete() *ScenarioFavoriteDelete {
+	mutation := newScenarioFavoriteMutation(c.config, OpDelete)
+	return &ScenarioFavoriteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScenarioFavoriteClient) DeleteOne(sf *ScenarioFavorite) *ScenarioFavoriteDeleteOne {
+	return c.DeleteOneID(sf.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScenarioFavoriteClient) DeleteOneID(id uint64) *ScenarioFavoriteDeleteOne {
+	builder := c.Delete().Where(scenariofavorite.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScenarioFavoriteDeleteOne{builder}
+}
+
+// Query returns a query builder for ScenarioFavorite.
+func (c *ScenarioFavoriteClient) Query() *ScenarioFavoriteQuery {
+	return &ScenarioFavoriteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeScenarioFavorite},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ScenarioFavorite entity by its id.
+func (c *ScenarioFavoriteClient) Get(ctx context.Context, id uint64) (*ScenarioFavorite, error) {
+	return c.Query().Where(scenariofavorite.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScenarioFavoriteClient) GetX(ctx context.Context, id uint64) *ScenarioFavorite {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySenario queries the senario edge of a ScenarioFavorite.
+func (c *ScenarioFavoriteClient) QuerySenario(sf *ScenarioFavorite) *ScenarioQuery {
+	query := (&ScenarioClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenariofavorite.Table, scenariofavorite.FieldID, id),
+			sqlgraph.To(scenario.Table, scenario.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, scenariofavorite.SenarioTable, scenariofavorite.SenarioColumn),
+		)
+		fromV = sqlgraph.Neighbors(sf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ScenarioFavoriteClient) Hooks() []Hook {
+	return c.hooks.ScenarioFavorite
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScenarioFavoriteClient) Interceptors() []Interceptor {
+	return c.inters.ScenarioFavorite
+}
+
+func (c *ScenarioFavoriteClient) mutate(ctx context.Context, m *ScenarioFavoriteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScenarioFavoriteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScenarioFavoriteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScenarioFavoriteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScenarioFavoriteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ScenarioFavorite mutation op: %q", m.Op())
+	}
+}
+
+// ScenarioFieldClient is a client for the ScenarioField schema.
+type ScenarioFieldClient struct {
+	config
+}
+
+// NewScenarioFieldClient returns a client for the ScenarioField from the given config.
+func NewScenarioFieldClient(c config) *ScenarioFieldClient {
+	return &ScenarioFieldClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `scenariofield.Hooks(f(g(h())))`.
+func (c *ScenarioFieldClient) Use(hooks ...Hook) {
+	c.hooks.ScenarioField = append(c.hooks.ScenarioField, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `scenariofield.Intercept(f(g(h())))`.
+func (c *ScenarioFieldClient) Intercept(interceptors ...Interceptor) {
+	c.inters.ScenarioField = append(c.inters.ScenarioField, interceptors...)
+}
+
+// Create returns a builder for creating a ScenarioField entity.
+func (c *ScenarioFieldClient) Create() *ScenarioFieldCreate {
+	mutation := newScenarioFieldMutation(c.config, OpCreate)
+	return &ScenarioFieldCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of ScenarioField entities.
+func (c *ScenarioFieldClient) CreateBulk(builders ...*ScenarioFieldCreate) *ScenarioFieldCreateBulk {
+	return &ScenarioFieldCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ScenarioFieldClient) MapCreateBulk(slice any, setFunc func(*ScenarioFieldCreate, int)) *ScenarioFieldCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ScenarioFieldCreateBulk{err: fmt.Errorf("calling to ScenarioFieldClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ScenarioFieldCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ScenarioFieldCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for ScenarioField.
+func (c *ScenarioFieldClient) Update() *ScenarioFieldUpdate {
+	mutation := newScenarioFieldMutation(c.config, OpUpdate)
+	return &ScenarioFieldUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScenarioFieldClient) UpdateOne(sf *ScenarioField) *ScenarioFieldUpdateOne {
+	mutation := newScenarioFieldMutation(c.config, OpUpdateOne, withScenarioField(sf))
+	return &ScenarioFieldUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScenarioFieldClient) UpdateOneID(id uint64) *ScenarioFieldUpdateOne {
+	mutation := newScenarioFieldMutation(c.config, OpUpdateOne, withScenarioFieldID(id))
+	return &ScenarioFieldUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for ScenarioField.
+func (c *ScenarioFieldClient) Delete() *ScenarioFieldDelete {
+	mutation := newScenarioFieldMutation(c.config, OpDelete)
+	return &ScenarioFieldDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScenarioFieldClient) DeleteOne(sf *ScenarioField) *ScenarioFieldDeleteOne {
+	return c.DeleteOneID(sf.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScenarioFieldClient) DeleteOneID(id uint64) *ScenarioFieldDeleteOne {
+	builder := c.Delete().Where(scenariofield.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScenarioFieldDeleteOne{builder}
+}
+
+// Query returns a query builder for ScenarioField.
+func (c *ScenarioFieldClient) Query() *ScenarioFieldQuery {
+	return &ScenarioFieldQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeScenarioField},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a ScenarioField entity by its id.
+func (c *ScenarioFieldClient) Get(ctx context.Context, id uint64) (*ScenarioField, error) {
+	return c.Query().Where(scenariofield.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScenarioFieldClient) GetX(ctx context.Context, id uint64) *ScenarioField {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySenarios queries the senarios edge of a ScenarioField.
+func (c *ScenarioFieldClient) QuerySenarios(sf *ScenarioField) *ScenarioQuery {
+	query := (&ScenarioClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sf.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenariofield.Table, scenariofield.FieldID, id),
+			sqlgraph.To(scenario.Table, scenario.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, scenariofield.SenariosTable, scenariofield.SenariosColumn),
+		)
+		fromV = sqlgraph.Neighbors(sf.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ScenarioFieldClient) Hooks() []Hook {
+	return c.hooks.ScenarioField
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScenarioFieldClient) Interceptors() []Interceptor {
+	return c.inters.ScenarioField
+}
+
+func (c *ScenarioFieldClient) mutate(ctx context.Context, m *ScenarioFieldMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScenarioFieldCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScenarioFieldUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScenarioFieldUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScenarioFieldDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown ScenarioField mutation op: %q", m.Op())
+	}
+}
+
 // SubmissionAttemptClient is a client for the SubmissionAttempt schema.
 type SubmissionAttemptClient struct {
 	config
@@ -976,6 +1340,22 @@ func (c *SubmissionAttemptClient) QueryScenarioCandidate(sa *SubmissionAttempt) 
 	return query
 }
 
+// QueryAnswers queries the answers edge of a SubmissionAttempt.
+func (c *SubmissionAttemptClient) QueryAnswers(sa *SubmissionAttempt) *AnswerSubmissionQuery {
+	query := (&AnswerSubmissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sa.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(submissionattempt.Table, submissionattempt.FieldID, id),
+			sqlgraph.To(answersubmission.Table, answersubmission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, submissionattempt.AnswersTable, submissionattempt.AnswersColumn),
+		)
+		fromV = sqlgraph.Neighbors(sa.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SubmissionAttemptClient) Hooks() []Hook {
 	return c.hooks.SubmissionAttempt
@@ -1004,12 +1384,12 @@ func (c *SubmissionAttemptClient) mutate(ctx context.Context, m *SubmissionAttem
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AnswerSubmission, Question, Scenario, ScenarioCandidate,
-		SubmissionAttempt []ent.Hook
+		AnswerSubmission, Question, Scenario, ScenarioCandidate, ScenarioFavorite,
+		ScenarioField, SubmissionAttempt []ent.Hook
 	}
 	inters struct {
-		AnswerSubmission, Question, Scenario, ScenarioCandidate,
-		SubmissionAttempt []ent.Interceptor
+		AnswerSubmission, Question, Scenario, ScenarioCandidate, ScenarioFavorite,
+		ScenarioField, SubmissionAttempt []ent.Interceptor
 	}
 )
 

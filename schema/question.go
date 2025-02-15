@@ -18,7 +18,7 @@ func (Question) Mixin() []ent.Mixin {
 
 func (Question) Fields() []ent.Field {
 	return []ent.Field{
-		field.Uint64("sentence_id"),
+		field.Uint64("scenario_id"),
 		field.Text("criteria"),
 		field.Text("hint"),
 		field.Text("content"),
@@ -29,7 +29,7 @@ func (Question) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("scenario", Scenario.Type).
 			Ref("questions").
-			Field("sentence_id").
+			Field("scenario_id").
 			Required().
 			Unique(),
 	}

@@ -7,6 +7,8 @@ import (
 	"ekko/package/ent/question"
 	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/scenariofavorite"
+	"ekko/package/ent/scenariofield"
 	"errors"
 	"fmt"
 	"time"
@@ -70,6 +72,34 @@ func (sc *ScenarioCreate) SetDescription(s string) *ScenarioCreate {
 	return sc
 }
 
+// SetRating sets the "rating" field.
+func (sc *ScenarioCreate) SetRating(f float64) *ScenarioCreate {
+	sc.mutation.SetRating(f)
+	return sc
+}
+
+// SetNillableRating sets the "rating" field if the given value is not nil.
+func (sc *ScenarioCreate) SetNillableRating(f *float64) *ScenarioCreate {
+	if f != nil {
+		sc.SetRating(*f)
+	}
+	return sc
+}
+
+// SetParticipants sets the "participants" field.
+func (sc *ScenarioCreate) SetParticipants(i int32) *ScenarioCreate {
+	sc.mutation.SetParticipants(i)
+	return sc
+}
+
+// SetNillableParticipants sets the "participants" field if the given value is not nil.
+func (sc *ScenarioCreate) SetNillableParticipants(i *int32) *ScenarioCreate {
+	if i != nil {
+		sc.SetParticipants(*i)
+	}
+	return sc
+}
+
 // SetID sets the "id" field.
 func (sc *ScenarioCreate) SetID(u uint64) *ScenarioCreate {
 	sc.mutation.SetID(u)
@@ -104,6 +134,36 @@ func (sc *ScenarioCreate) AddCandidates(s ...*ScenarioCandidate) *ScenarioCreate
 		ids[i] = s[i].ID
 	}
 	return sc.AddCandidateIDs(ids...)
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the ScenarioFavorite entity by IDs.
+func (sc *ScenarioCreate) AddFavoriteIDs(ids ...uint64) *ScenarioCreate {
+	sc.mutation.AddFavoriteIDs(ids...)
+	return sc
+}
+
+// AddFavorites adds the "favorites" edges to the ScenarioFavorite entity.
+func (sc *ScenarioCreate) AddFavorites(s ...*ScenarioFavorite) *ScenarioCreate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return sc.AddFavoriteIDs(ids...)
+}
+
+// AddFieldIDs adds the "field" edge to the ScenarioField entity by IDs.
+func (sc *ScenarioCreate) AddFieldIDs(ids ...uint64) *ScenarioCreate {
+	sc.mutation.AddFieldIDs(ids...)
+	return sc
+}
+
+// AddField adds the "field" edges to the ScenarioField entity.
+func (sc *ScenarioCreate) AddField(s ...*ScenarioField) *ScenarioCreate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return sc.AddFieldIDs(ids...)
 }
 
 // Mutation returns the ScenarioMutation object of the builder.
@@ -149,6 +209,14 @@ func (sc *ScenarioCreate) defaults() {
 		v := scenario.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := sc.mutation.Rating(); !ok {
+		v := scenario.DefaultRating
+		sc.mutation.SetRating(v)
+	}
+	if _, ok := sc.mutation.Participants(); !ok {
+		v := scenario.DefaultParticipants
+		sc.mutation.SetParticipants(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -167,6 +235,12 @@ func (sc *ScenarioCreate) check() error {
 	}
 	if _, ok := sc.mutation.Description(); !ok {
 		return &ValidationError{Name: "description", err: errors.New(`ent: missing required field "Scenario.description"`)}
+	}
+	if _, ok := sc.mutation.Rating(); !ok {
+		return &ValidationError{Name: "rating", err: errors.New(`ent: missing required field "Scenario.rating"`)}
+	}
+	if _, ok := sc.mutation.Participants(); !ok {
+		return &ValidationError{Name: "participants", err: errors.New(`ent: missing required field "Scenario.participants"`)}
 	}
 	return nil
 }
@@ -221,6 +295,14 @@ func (sc *ScenarioCreate) createSpec() (*Scenario, *sqlgraph.CreateSpec) {
 		_spec.SetField(scenario.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
+	if value, ok := sc.mutation.Rating(); ok {
+		_spec.SetField(scenario.FieldRating, field.TypeFloat64, value)
+		_node.Rating = value
+	}
+	if value, ok := sc.mutation.Participants(); ok {
+		_spec.SetField(scenario.FieldParticipants, field.TypeInt32, value)
+		_node.Participants = value
+	}
 	if nodes := sc.mutation.QuestionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -246,6 +328,38 @@ func (sc *ScenarioCreate) createSpec() (*Scenario, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariocandidate.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.FavoritesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.FieldIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -356,6 +470,42 @@ func (u *ScenarioUpsert) SetDescription(v string) *ScenarioUpsert {
 // UpdateDescription sets the "description" field to the value that was provided on create.
 func (u *ScenarioUpsert) UpdateDescription() *ScenarioUpsert {
 	u.SetExcluded(scenario.FieldDescription)
+	return u
+}
+
+// SetRating sets the "rating" field.
+func (u *ScenarioUpsert) SetRating(v float64) *ScenarioUpsert {
+	u.Set(scenario.FieldRating, v)
+	return u
+}
+
+// UpdateRating sets the "rating" field to the value that was provided on create.
+func (u *ScenarioUpsert) UpdateRating() *ScenarioUpsert {
+	u.SetExcluded(scenario.FieldRating)
+	return u
+}
+
+// AddRating adds v to the "rating" field.
+func (u *ScenarioUpsert) AddRating(v float64) *ScenarioUpsert {
+	u.Add(scenario.FieldRating, v)
+	return u
+}
+
+// SetParticipants sets the "participants" field.
+func (u *ScenarioUpsert) SetParticipants(v int32) *ScenarioUpsert {
+	u.Set(scenario.FieldParticipants, v)
+	return u
+}
+
+// UpdateParticipants sets the "participants" field to the value that was provided on create.
+func (u *ScenarioUpsert) UpdateParticipants() *ScenarioUpsert {
+	u.SetExcluded(scenario.FieldParticipants)
+	return u
+}
+
+// AddParticipants adds v to the "participants" field.
+func (u *ScenarioUpsert) AddParticipants(v int32) *ScenarioUpsert {
+	u.Add(scenario.FieldParticipants, v)
 	return u
 }
 
@@ -470,6 +620,48 @@ func (u *ScenarioUpsertOne) SetDescription(v string) *ScenarioUpsertOne {
 func (u *ScenarioUpsertOne) UpdateDescription() *ScenarioUpsertOne {
 	return u.Update(func(s *ScenarioUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetRating sets the "rating" field.
+func (u *ScenarioUpsertOne) SetRating(v float64) *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.SetRating(v)
+	})
+}
+
+// AddRating adds v to the "rating" field.
+func (u *ScenarioUpsertOne) AddRating(v float64) *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.AddRating(v)
+	})
+}
+
+// UpdateRating sets the "rating" field to the value that was provided on create.
+func (u *ScenarioUpsertOne) UpdateRating() *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.UpdateRating()
+	})
+}
+
+// SetParticipants sets the "participants" field.
+func (u *ScenarioUpsertOne) SetParticipants(v int32) *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.SetParticipants(v)
+	})
+}
+
+// AddParticipants adds v to the "participants" field.
+func (u *ScenarioUpsertOne) AddParticipants(v int32) *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.AddParticipants(v)
+	})
+}
+
+// UpdateParticipants sets the "participants" field to the value that was provided on create.
+func (u *ScenarioUpsertOne) UpdateParticipants() *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.UpdateParticipants()
 	})
 }
 
@@ -750,6 +942,48 @@ func (u *ScenarioUpsertBulk) SetDescription(v string) *ScenarioUpsertBulk {
 func (u *ScenarioUpsertBulk) UpdateDescription() *ScenarioUpsertBulk {
 	return u.Update(func(s *ScenarioUpsert) {
 		s.UpdateDescription()
+	})
+}
+
+// SetRating sets the "rating" field.
+func (u *ScenarioUpsertBulk) SetRating(v float64) *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.SetRating(v)
+	})
+}
+
+// AddRating adds v to the "rating" field.
+func (u *ScenarioUpsertBulk) AddRating(v float64) *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.AddRating(v)
+	})
+}
+
+// UpdateRating sets the "rating" field to the value that was provided on create.
+func (u *ScenarioUpsertBulk) UpdateRating() *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.UpdateRating()
+	})
+}
+
+// SetParticipants sets the "participants" field.
+func (u *ScenarioUpsertBulk) SetParticipants(v int32) *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.SetParticipants(v)
+	})
+}
+
+// AddParticipants adds v to the "participants" field.
+func (u *ScenarioUpsertBulk) AddParticipants(v int32) *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.AddParticipants(v)
+	})
+}
+
+// UpdateParticipants sets the "participants" field to the value that was provided on create.
+func (u *ScenarioUpsertBulk) UpdateParticipants() *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.UpdateParticipants()
 	})
 }
 

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"ekko/package/ent/answersubmission"
 	"ekko/package/ent/scenariocandidate"
 	"ekko/package/ent/submissionattempt"
 	"errors"
@@ -72,6 +73,21 @@ func (sac *SubmissionAttemptCreate) SetID(u uint64) *SubmissionAttemptCreate {
 // SetScenarioCandidate sets the "scenario_candidate" edge to the ScenarioCandidate entity.
 func (sac *SubmissionAttemptCreate) SetScenarioCandidate(s *ScenarioCandidate) *SubmissionAttemptCreate {
 	return sac.SetScenarioCandidateID(s.ID)
+}
+
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by IDs.
+func (sac *SubmissionAttemptCreate) AddAnswerIDs(ids ...uint64) *SubmissionAttemptCreate {
+	sac.mutation.AddAnswerIDs(ids...)
+	return sac
+}
+
+// AddAnswers adds the "answers" edges to the AnswerSubmission entity.
+func (sac *SubmissionAttemptCreate) AddAnswers(a ...*AnswerSubmission) *SubmissionAttemptCreate {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sac.AddAnswerIDs(ids...)
 }
 
 // Mutation returns the SubmissionAttemptMutation object of the builder.
@@ -196,6 +212,22 @@ func (sac *SubmissionAttemptCreate) createSpec() (*SubmissionAttempt, *sqlgraph.
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ScenarioCandidateID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sac.mutation.AnswersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

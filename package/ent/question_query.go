@@ -410,7 +410,7 @@ func (qq *QuestionQuery) loadScenario(ctx context.Context, query *ScenarioQuery,
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*Question)
 	for i := range nodes {
-		fk := nodes[i].SentenceID
+		fk := nodes[i].ScenarioID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -427,7 +427,7 @@ func (qq *QuestionQuery) loadScenario(ctx context.Context, query *ScenarioQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "sentence_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "scenario_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -465,7 +465,7 @@ func (qq *QuestionQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if qq.withScenario != nil {
-			_spec.Node.AddColumnOnce(question.FieldSentenceID)
+			_spec.Node.AddColumnOnce(question.FieldScenarioID)
 		}
 	}
 	if ps := qq.predicates; len(ps) > 0 {

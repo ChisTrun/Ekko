@@ -51,9 +51,9 @@ func (qc *QuestionCreate) SetNillableUpdatedAt(t *time.Time) *QuestionCreate {
 	return qc
 }
 
-// SetSentenceID sets the "sentence_id" field.
-func (qc *QuestionCreate) SetSentenceID(u uint64) *QuestionCreate {
-	qc.mutation.SetSentenceID(u)
+// SetScenarioID sets the "scenario_id" field.
+func (qc *QuestionCreate) SetScenarioID(u uint64) *QuestionCreate {
+	qc.mutation.SetScenarioID(u)
 	return qc
 }
 
@@ -78,12 +78,6 @@ func (qc *QuestionCreate) SetContent(s string) *QuestionCreate {
 // SetID sets the "id" field.
 func (qc *QuestionCreate) SetID(u uint64) *QuestionCreate {
 	qc.mutation.SetID(u)
-	return qc
-}
-
-// SetScenarioID sets the "scenario" edge to the Scenario entity by ID.
-func (qc *QuestionCreate) SetScenarioID(id uint64) *QuestionCreate {
-	qc.mutation.SetScenarioID(id)
 	return qc
 }
 
@@ -145,8 +139,8 @@ func (qc *QuestionCreate) check() error {
 	if _, ok := qc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Question.updated_at"`)}
 	}
-	if _, ok := qc.mutation.SentenceID(); !ok {
-		return &ValidationError{Name: "sentence_id", err: errors.New(`ent: missing required field "Question.sentence_id"`)}
+	if _, ok := qc.mutation.ScenarioID(); !ok {
+		return &ValidationError{Name: "scenario_id", err: errors.New(`ent: missing required field "Question.scenario_id"`)}
 	}
 	if _, ok := qc.mutation.Criteria(); !ok {
 		return &ValidationError{Name: "criteria", err: errors.New(`ent: missing required field "Question.criteria"`)}
@@ -227,7 +221,7 @@ func (qc *QuestionCreate) createSpec() (*Question, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.SentenceID = nodes[0]
+		_node.ScenarioID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -294,15 +288,15 @@ func (u *QuestionUpsert) UpdateUpdatedAt() *QuestionUpsert {
 	return u
 }
 
-// SetSentenceID sets the "sentence_id" field.
-func (u *QuestionUpsert) SetSentenceID(v uint64) *QuestionUpsert {
-	u.Set(question.FieldSentenceID, v)
+// SetScenarioID sets the "scenario_id" field.
+func (u *QuestionUpsert) SetScenarioID(v uint64) *QuestionUpsert {
+	u.Set(question.FieldScenarioID, v)
 	return u
 }
 
-// UpdateSentenceID sets the "sentence_id" field to the value that was provided on create.
-func (u *QuestionUpsert) UpdateSentenceID() *QuestionUpsert {
-	u.SetExcluded(question.FieldSentenceID)
+// UpdateScenarioID sets the "scenario_id" field to the value that was provided on create.
+func (u *QuestionUpsert) UpdateScenarioID() *QuestionUpsert {
+	u.SetExcluded(question.FieldScenarioID)
 	return u
 }
 
@@ -407,17 +401,17 @@ func (u *QuestionUpsertOne) UpdateUpdatedAt() *QuestionUpsertOne {
 	})
 }
 
-// SetSentenceID sets the "sentence_id" field.
-func (u *QuestionUpsertOne) SetSentenceID(v uint64) *QuestionUpsertOne {
+// SetScenarioID sets the "scenario_id" field.
+func (u *QuestionUpsertOne) SetScenarioID(v uint64) *QuestionUpsertOne {
 	return u.Update(func(s *QuestionUpsert) {
-		s.SetSentenceID(v)
+		s.SetScenarioID(v)
 	})
 }
 
-// UpdateSentenceID sets the "sentence_id" field to the value that was provided on create.
-func (u *QuestionUpsertOne) UpdateSentenceID() *QuestionUpsertOne {
+// UpdateScenarioID sets the "scenario_id" field to the value that was provided on create.
+func (u *QuestionUpsertOne) UpdateScenarioID() *QuestionUpsertOne {
 	return u.Update(func(s *QuestionUpsert) {
-		s.UpdateSentenceID()
+		s.UpdateScenarioID()
 	})
 }
 
@@ -694,17 +688,17 @@ func (u *QuestionUpsertBulk) UpdateUpdatedAt() *QuestionUpsertBulk {
 	})
 }
 
-// SetSentenceID sets the "sentence_id" field.
-func (u *QuestionUpsertBulk) SetSentenceID(v uint64) *QuestionUpsertBulk {
+// SetScenarioID sets the "scenario_id" field.
+func (u *QuestionUpsertBulk) SetScenarioID(v uint64) *QuestionUpsertBulk {
 	return u.Update(func(s *QuestionUpsert) {
-		s.SetSentenceID(v)
+		s.SetScenarioID(v)
 	})
 }
 
-// UpdateSentenceID sets the "sentence_id" field to the value that was provided on create.
-func (u *QuestionUpsertBulk) UpdateSentenceID() *QuestionUpsertBulk {
+// UpdateScenarioID sets the "scenario_id" field to the value that was provided on create.
+func (u *QuestionUpsertBulk) UpdateScenarioID() *QuestionUpsertBulk {
 	return u.Update(func(s *QuestionUpsert) {
-		s.UpdateSentenceID()
+		s.UpdateScenarioID()
 	})
 }
 

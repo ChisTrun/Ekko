@@ -7,6 +7,8 @@ import (
 	"ekko/package/ent/question"
 	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/scenariofavorite"
+	"ekko/package/ent/scenariofield"
 	"ekko/package/ent/submissionattempt"
 	"ekko/schema"
 	"time"
@@ -31,6 +33,22 @@ func init() {
 	answersubmission.DefaultUpdatedAt = answersubmissionDescUpdatedAt.Default.(func() time.Time)
 	// answersubmission.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	answersubmission.UpdateDefaultUpdatedAt = answersubmissionDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// answersubmissionDescRelevance is the schema descriptor for relevance field.
+	answersubmissionDescRelevance := answersubmissionFields[3].Descriptor()
+	// answersubmission.DefaultRelevance holds the default value on creation for the relevance field.
+	answersubmission.DefaultRelevance = answersubmissionDescRelevance.Default.(float64)
+	// answersubmissionDescClarityCompleteness is the schema descriptor for clarity_completeness field.
+	answersubmissionDescClarityCompleteness := answersubmissionFields[4].Descriptor()
+	// answersubmission.DefaultClarityCompleteness holds the default value on creation for the clarity_completeness field.
+	answersubmission.DefaultClarityCompleteness = answersubmissionDescClarityCompleteness.Default.(float64)
+	// answersubmissionDescAccuracy is the schema descriptor for accuracy field.
+	answersubmissionDescAccuracy := answersubmissionFields[5].Descriptor()
+	// answersubmission.DefaultAccuracy holds the default value on creation for the accuracy field.
+	answersubmission.DefaultAccuracy = answersubmissionDescAccuracy.Default.(float64)
+	// answersubmissionDescOverall is the schema descriptor for overall field.
+	answersubmissionDescOverall := answersubmissionFields[6].Descriptor()
+	// answersubmission.DefaultOverall holds the default value on creation for the overall field.
+	answersubmission.DefaultOverall = answersubmissionDescOverall.Default.(float64)
 	questionMixin := schema.Question{}.Mixin()
 	questionMixinFields0 := questionMixin[0].Fields()
 	_ = questionMixinFields0
@@ -61,6 +79,14 @@ func init() {
 	scenario.DefaultUpdatedAt = scenarioDescUpdatedAt.Default.(func() time.Time)
 	// scenario.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	scenario.UpdateDefaultUpdatedAt = scenarioDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// scenarioDescRating is the schema descriptor for rating field.
+	scenarioDescRating := scenarioFields[3].Descriptor()
+	// scenario.DefaultRating holds the default value on creation for the rating field.
+	scenario.DefaultRating = scenarioDescRating.Default.(float64)
+	// scenarioDescParticipants is the schema descriptor for participants field.
+	scenarioDescParticipants := scenarioFields[4].Descriptor()
+	// scenario.DefaultParticipants holds the default value on creation for the participants field.
+	scenario.DefaultParticipants = scenarioDescParticipants.Default.(int32)
 	scenariocandidateMixin := schema.ScenarioCandidate{}.Mixin()
 	scenariocandidateMixinFields0 := scenariocandidateMixin[0].Fields()
 	_ = scenariocandidateMixinFields0
@@ -76,6 +102,36 @@ func init() {
 	scenariocandidate.DefaultUpdatedAt = scenariocandidateDescUpdatedAt.Default.(func() time.Time)
 	// scenariocandidate.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	scenariocandidate.UpdateDefaultUpdatedAt = scenariocandidateDescUpdatedAt.UpdateDefault.(func() time.Time)
+	scenariofavoriteMixin := schema.ScenarioFavorite{}.Mixin()
+	scenariofavoriteMixinFields0 := scenariofavoriteMixin[0].Fields()
+	_ = scenariofavoriteMixinFields0
+	scenariofavoriteFields := schema.ScenarioFavorite{}.Fields()
+	_ = scenariofavoriteFields
+	// scenariofavoriteDescCreatedAt is the schema descriptor for created_at field.
+	scenariofavoriteDescCreatedAt := scenariofavoriteMixinFields0[1].Descriptor()
+	// scenariofavorite.DefaultCreatedAt holds the default value on creation for the created_at field.
+	scenariofavorite.DefaultCreatedAt = scenariofavoriteDescCreatedAt.Default.(func() time.Time)
+	// scenariofavoriteDescUpdatedAt is the schema descriptor for updated_at field.
+	scenariofavoriteDescUpdatedAt := scenariofavoriteMixinFields0[2].Descriptor()
+	// scenariofavorite.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	scenariofavorite.DefaultUpdatedAt = scenariofavoriteDescUpdatedAt.Default.(func() time.Time)
+	// scenariofavorite.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	scenariofavorite.UpdateDefaultUpdatedAt = scenariofavoriteDescUpdatedAt.UpdateDefault.(func() time.Time)
+	scenariofieldMixin := schema.ScenarioField{}.Mixin()
+	scenariofieldMixinFields0 := scenariofieldMixin[0].Fields()
+	_ = scenariofieldMixinFields0
+	scenariofieldFields := schema.ScenarioField{}.Fields()
+	_ = scenariofieldFields
+	// scenariofieldDescCreatedAt is the schema descriptor for created_at field.
+	scenariofieldDescCreatedAt := scenariofieldMixinFields0[1].Descriptor()
+	// scenariofield.DefaultCreatedAt holds the default value on creation for the created_at field.
+	scenariofield.DefaultCreatedAt = scenariofieldDescCreatedAt.Default.(func() time.Time)
+	// scenariofieldDescUpdatedAt is the schema descriptor for updated_at field.
+	scenariofieldDescUpdatedAt := scenariofieldMixinFields0[2].Descriptor()
+	// scenariofield.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	scenariofield.DefaultUpdatedAt = scenariofieldDescUpdatedAt.Default.(func() time.Time)
+	// scenariofield.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	scenariofield.UpdateDefaultUpdatedAt = scenariofieldDescUpdatedAt.UpdateDefault.(func() time.Time)
 	submissionattemptMixin := schema.SubmissionAttempt{}.Mixin()
 	submissionattemptMixinFields0 := submissionattemptMixin[0].Fields()
 	_ = submissionattemptMixinFields0

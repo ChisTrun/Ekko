@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
@@ -27,6 +28,7 @@ func (SubmissionAttempt) Fields() []ent.Field {
 func (SubmissionAttempt) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("scenario_candidate", ScenarioCandidate.Type).Ref("attempts").Field("scenario_candidate_id").Unique().Required(),
+		edge.To("answers", AnswerSubmission.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 	}
 }
 

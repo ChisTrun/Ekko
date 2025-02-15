@@ -8,6 +8,8 @@ import (
 	"ekko/package/ent/question"
 	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/scenariofavorite"
+	"ekko/package/ent/scenariofield"
 	"errors"
 	"fmt"
 	"time"
@@ -86,6 +88,48 @@ func (su *ScenarioUpdate) SetNillableDescription(s *string) *ScenarioUpdate {
 	return su
 }
 
+// SetRating sets the "rating" field.
+func (su *ScenarioUpdate) SetRating(f float64) *ScenarioUpdate {
+	su.mutation.ResetRating()
+	su.mutation.SetRating(f)
+	return su
+}
+
+// SetNillableRating sets the "rating" field if the given value is not nil.
+func (su *ScenarioUpdate) SetNillableRating(f *float64) *ScenarioUpdate {
+	if f != nil {
+		su.SetRating(*f)
+	}
+	return su
+}
+
+// AddRating adds f to the "rating" field.
+func (su *ScenarioUpdate) AddRating(f float64) *ScenarioUpdate {
+	su.mutation.AddRating(f)
+	return su
+}
+
+// SetParticipants sets the "participants" field.
+func (su *ScenarioUpdate) SetParticipants(i int32) *ScenarioUpdate {
+	su.mutation.ResetParticipants()
+	su.mutation.SetParticipants(i)
+	return su
+}
+
+// SetNillableParticipants sets the "participants" field if the given value is not nil.
+func (su *ScenarioUpdate) SetNillableParticipants(i *int32) *ScenarioUpdate {
+	if i != nil {
+		su.SetParticipants(*i)
+	}
+	return su
+}
+
+// AddParticipants adds i to the "participants" field.
+func (su *ScenarioUpdate) AddParticipants(i int32) *ScenarioUpdate {
+	su.mutation.AddParticipants(i)
+	return su
+}
+
 // AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
 func (su *ScenarioUpdate) AddQuestionIDs(ids ...uint64) *ScenarioUpdate {
 	su.mutation.AddQuestionIDs(ids...)
@@ -114,6 +158,36 @@ func (su *ScenarioUpdate) AddCandidates(s ...*ScenarioCandidate) *ScenarioUpdate
 		ids[i] = s[i].ID
 	}
 	return su.AddCandidateIDs(ids...)
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the ScenarioFavorite entity by IDs.
+func (su *ScenarioUpdate) AddFavoriteIDs(ids ...uint64) *ScenarioUpdate {
+	su.mutation.AddFavoriteIDs(ids...)
+	return su
+}
+
+// AddFavorites adds the "favorites" edges to the ScenarioFavorite entity.
+func (su *ScenarioUpdate) AddFavorites(s ...*ScenarioFavorite) *ScenarioUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return su.AddFavoriteIDs(ids...)
+}
+
+// AddFieldIDs adds the "field" edge to the ScenarioField entity by IDs.
+func (su *ScenarioUpdate) AddFieldIDs(ids ...uint64) *ScenarioUpdate {
+	su.mutation.AddFieldIDs(ids...)
+	return su
+}
+
+// AddField adds the "field" edges to the ScenarioField entity.
+func (su *ScenarioUpdate) AddField(s ...*ScenarioField) *ScenarioUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return su.AddFieldIDs(ids...)
 }
 
 // Mutation returns the ScenarioMutation object of the builder.
@@ -161,6 +235,48 @@ func (su *ScenarioUpdate) RemoveCandidates(s ...*ScenarioCandidate) *ScenarioUpd
 		ids[i] = s[i].ID
 	}
 	return su.RemoveCandidateIDs(ids...)
+}
+
+// ClearFavorites clears all "favorites" edges to the ScenarioFavorite entity.
+func (su *ScenarioUpdate) ClearFavorites() *ScenarioUpdate {
+	su.mutation.ClearFavorites()
+	return su
+}
+
+// RemoveFavoriteIDs removes the "favorites" edge to ScenarioFavorite entities by IDs.
+func (su *ScenarioUpdate) RemoveFavoriteIDs(ids ...uint64) *ScenarioUpdate {
+	su.mutation.RemoveFavoriteIDs(ids...)
+	return su
+}
+
+// RemoveFavorites removes "favorites" edges to ScenarioFavorite entities.
+func (su *ScenarioUpdate) RemoveFavorites(s ...*ScenarioFavorite) *ScenarioUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return su.RemoveFavoriteIDs(ids...)
+}
+
+// ClearFieldEdge clears all "field" edges to the ScenarioField entity.
+func (su *ScenarioUpdate) ClearFieldEdge() *ScenarioUpdate {
+	su.mutation.ClearFieldEdge()
+	return su
+}
+
+// RemoveFieldIDs removes the "field" edge to ScenarioField entities by IDs.
+func (su *ScenarioUpdate) RemoveFieldIDs(ids ...uint64) *ScenarioUpdate {
+	su.mutation.RemoveFieldIDs(ids...)
+	return su
+}
+
+// RemoveField removes "field" edges to ScenarioField entities.
+func (su *ScenarioUpdate) RemoveField(s ...*ScenarioField) *ScenarioUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return su.RemoveFieldIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -228,6 +344,18 @@ func (su *ScenarioUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Description(); ok {
 		_spec.SetField(scenario.FieldDescription, field.TypeString, value)
+	}
+	if value, ok := su.mutation.Rating(); ok {
+		_spec.SetField(scenario.FieldRating, field.TypeFloat64, value)
+	}
+	if value, ok := su.mutation.AddedRating(); ok {
+		_spec.AddField(scenario.FieldRating, field.TypeFloat64, value)
+	}
+	if value, ok := su.mutation.Participants(); ok {
+		_spec.SetField(scenario.FieldParticipants, field.TypeInt32, value)
+	}
+	if value, ok := su.mutation.AddedParticipants(); ok {
+		_spec.AddField(scenario.FieldParticipants, field.TypeInt32, value)
 	}
 	if su.mutation.QuestionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -319,6 +447,96 @@ func (su *ScenarioUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedFavoritesIDs(); len(nodes) > 0 && !su.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.FavoritesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.FieldEdgeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedFieldIDs(); len(nodes) > 0 && !su.mutation.FieldEdgeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.FieldIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(su.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -396,6 +614,48 @@ func (suo *ScenarioUpdateOne) SetNillableDescription(s *string) *ScenarioUpdateO
 	return suo
 }
 
+// SetRating sets the "rating" field.
+func (suo *ScenarioUpdateOne) SetRating(f float64) *ScenarioUpdateOne {
+	suo.mutation.ResetRating()
+	suo.mutation.SetRating(f)
+	return suo
+}
+
+// SetNillableRating sets the "rating" field if the given value is not nil.
+func (suo *ScenarioUpdateOne) SetNillableRating(f *float64) *ScenarioUpdateOne {
+	if f != nil {
+		suo.SetRating(*f)
+	}
+	return suo
+}
+
+// AddRating adds f to the "rating" field.
+func (suo *ScenarioUpdateOne) AddRating(f float64) *ScenarioUpdateOne {
+	suo.mutation.AddRating(f)
+	return suo
+}
+
+// SetParticipants sets the "participants" field.
+func (suo *ScenarioUpdateOne) SetParticipants(i int32) *ScenarioUpdateOne {
+	suo.mutation.ResetParticipants()
+	suo.mutation.SetParticipants(i)
+	return suo
+}
+
+// SetNillableParticipants sets the "participants" field if the given value is not nil.
+func (suo *ScenarioUpdateOne) SetNillableParticipants(i *int32) *ScenarioUpdateOne {
+	if i != nil {
+		suo.SetParticipants(*i)
+	}
+	return suo
+}
+
+// AddParticipants adds i to the "participants" field.
+func (suo *ScenarioUpdateOne) AddParticipants(i int32) *ScenarioUpdateOne {
+	suo.mutation.AddParticipants(i)
+	return suo
+}
+
 // AddQuestionIDs adds the "questions" edge to the Question entity by IDs.
 func (suo *ScenarioUpdateOne) AddQuestionIDs(ids ...uint64) *ScenarioUpdateOne {
 	suo.mutation.AddQuestionIDs(ids...)
@@ -424,6 +684,36 @@ func (suo *ScenarioUpdateOne) AddCandidates(s ...*ScenarioCandidate) *ScenarioUp
 		ids[i] = s[i].ID
 	}
 	return suo.AddCandidateIDs(ids...)
+}
+
+// AddFavoriteIDs adds the "favorites" edge to the ScenarioFavorite entity by IDs.
+func (suo *ScenarioUpdateOne) AddFavoriteIDs(ids ...uint64) *ScenarioUpdateOne {
+	suo.mutation.AddFavoriteIDs(ids...)
+	return suo
+}
+
+// AddFavorites adds the "favorites" edges to the ScenarioFavorite entity.
+func (suo *ScenarioUpdateOne) AddFavorites(s ...*ScenarioFavorite) *ScenarioUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return suo.AddFavoriteIDs(ids...)
+}
+
+// AddFieldIDs adds the "field" edge to the ScenarioField entity by IDs.
+func (suo *ScenarioUpdateOne) AddFieldIDs(ids ...uint64) *ScenarioUpdateOne {
+	suo.mutation.AddFieldIDs(ids...)
+	return suo
+}
+
+// AddField adds the "field" edges to the ScenarioField entity.
+func (suo *ScenarioUpdateOne) AddField(s ...*ScenarioField) *ScenarioUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return suo.AddFieldIDs(ids...)
 }
 
 // Mutation returns the ScenarioMutation object of the builder.
@@ -471,6 +761,48 @@ func (suo *ScenarioUpdateOne) RemoveCandidates(s ...*ScenarioCandidate) *Scenari
 		ids[i] = s[i].ID
 	}
 	return suo.RemoveCandidateIDs(ids...)
+}
+
+// ClearFavorites clears all "favorites" edges to the ScenarioFavorite entity.
+func (suo *ScenarioUpdateOne) ClearFavorites() *ScenarioUpdateOne {
+	suo.mutation.ClearFavorites()
+	return suo
+}
+
+// RemoveFavoriteIDs removes the "favorites" edge to ScenarioFavorite entities by IDs.
+func (suo *ScenarioUpdateOne) RemoveFavoriteIDs(ids ...uint64) *ScenarioUpdateOne {
+	suo.mutation.RemoveFavoriteIDs(ids...)
+	return suo
+}
+
+// RemoveFavorites removes "favorites" edges to ScenarioFavorite entities.
+func (suo *ScenarioUpdateOne) RemoveFavorites(s ...*ScenarioFavorite) *ScenarioUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return suo.RemoveFavoriteIDs(ids...)
+}
+
+// ClearFieldEdge clears all "field" edges to the ScenarioField entity.
+func (suo *ScenarioUpdateOne) ClearFieldEdge() *ScenarioUpdateOne {
+	suo.mutation.ClearFieldEdge()
+	return suo
+}
+
+// RemoveFieldIDs removes the "field" edge to ScenarioField entities by IDs.
+func (suo *ScenarioUpdateOne) RemoveFieldIDs(ids ...uint64) *ScenarioUpdateOne {
+	suo.mutation.RemoveFieldIDs(ids...)
+	return suo
+}
+
+// RemoveField removes "field" edges to ScenarioField entities.
+func (suo *ScenarioUpdateOne) RemoveField(s ...*ScenarioField) *ScenarioUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return suo.RemoveFieldIDs(ids...)
 }
 
 // Where appends a list predicates to the ScenarioUpdate builder.
@@ -569,6 +901,18 @@ func (suo *ScenarioUpdateOne) sqlSave(ctx context.Context) (_node *Scenario, err
 	if value, ok := suo.mutation.Description(); ok {
 		_spec.SetField(scenario.FieldDescription, field.TypeString, value)
 	}
+	if value, ok := suo.mutation.Rating(); ok {
+		_spec.SetField(scenario.FieldRating, field.TypeFloat64, value)
+	}
+	if value, ok := suo.mutation.AddedRating(); ok {
+		_spec.AddField(scenario.FieldRating, field.TypeFloat64, value)
+	}
+	if value, ok := suo.mutation.Participants(); ok {
+		_spec.SetField(scenario.FieldParticipants, field.TypeInt32, value)
+	}
+	if value, ok := suo.mutation.AddedParticipants(); ok {
+		_spec.AddField(scenario.FieldParticipants, field.TypeInt32, value)
+	}
 	if suo.mutation.QuestionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -652,6 +996,96 @@ func (suo *ScenarioUpdateOne) sqlSave(ctx context.Context) (_node *Scenario, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariocandidate.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedFavoritesIDs(); len(nodes) > 0 && !suo.mutation.FavoritesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.FavoritesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   scenario.FavoritesTable,
+			Columns: []string{scenario.FavoritesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofavorite.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.FieldEdgeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedFieldIDs(); len(nodes) > 0 && !suo.mutation.FieldEdgeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.FieldIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   scenario.FieldTable,
+			Columns: []string{scenario.FieldColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

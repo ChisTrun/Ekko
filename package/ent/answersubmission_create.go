@@ -6,6 +6,7 @@ import (
 	"context"
 	ekko "ekko/api"
 	"ekko/package/ent/answersubmission"
+	"ekko/package/ent/submissionattempt"
 	"errors"
 	"fmt"
 	"time"
@@ -75,9 +76,25 @@ func (asc *AnswerSubmissionCreate) SetRelevance(f float64) *AnswerSubmissionCrea
 	return asc
 }
 
+// SetNillableRelevance sets the "relevance" field if the given value is not nil.
+func (asc *AnswerSubmissionCreate) SetNillableRelevance(f *float64) *AnswerSubmissionCreate {
+	if f != nil {
+		asc.SetRelevance(*f)
+	}
+	return asc
+}
+
 // SetClarityCompleteness sets the "clarity_completeness" field.
 func (asc *AnswerSubmissionCreate) SetClarityCompleteness(f float64) *AnswerSubmissionCreate {
 	asc.mutation.SetClarityCompleteness(f)
+	return asc
+}
+
+// SetNillableClarityCompleteness sets the "clarity_completeness" field if the given value is not nil.
+func (asc *AnswerSubmissionCreate) SetNillableClarityCompleteness(f *float64) *AnswerSubmissionCreate {
+	if f != nil {
+		asc.SetClarityCompleteness(*f)
+	}
 	return asc
 }
 
@@ -87,9 +104,25 @@ func (asc *AnswerSubmissionCreate) SetAccuracy(f float64) *AnswerSubmissionCreat
 	return asc
 }
 
+// SetNillableAccuracy sets the "accuracy" field if the given value is not nil.
+func (asc *AnswerSubmissionCreate) SetNillableAccuracy(f *float64) *AnswerSubmissionCreate {
+	if f != nil {
+		asc.SetAccuracy(*f)
+	}
+	return asc
+}
+
 // SetOverall sets the "overall" field.
 func (asc *AnswerSubmissionCreate) SetOverall(f float64) *AnswerSubmissionCreate {
 	asc.mutation.SetOverall(f)
+	return asc
+}
+
+// SetNillableOverall sets the "overall" field if the given value is not nil.
+func (asc *AnswerSubmissionCreate) SetNillableOverall(f *float64) *AnswerSubmissionCreate {
+	if f != nil {
+		asc.SetOverall(*f)
+	}
 	return asc
 }
 
@@ -103,6 +136,11 @@ func (asc *AnswerSubmissionCreate) SetStatus(es ekko.SubmissionStatus) *AnswerSu
 func (asc *AnswerSubmissionCreate) SetID(u uint64) *AnswerSubmissionCreate {
 	asc.mutation.SetID(u)
 	return asc
+}
+
+// SetSubmissionAttempt sets the "submission_attempt" edge to the SubmissionAttempt entity.
+func (asc *AnswerSubmissionCreate) SetSubmissionAttempt(s *SubmissionAttempt) *AnswerSubmissionCreate {
+	return asc.SetSubmissionAttemptID(s.ID)
 }
 
 // Mutation returns the AnswerSubmissionMutation object of the builder.
@@ -148,6 +186,22 @@ func (asc *AnswerSubmissionCreate) defaults() {
 		v := answersubmission.DefaultUpdatedAt()
 		asc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := asc.mutation.Relevance(); !ok {
+		v := answersubmission.DefaultRelevance
+		asc.mutation.SetRelevance(v)
+	}
+	if _, ok := asc.mutation.ClarityCompleteness(); !ok {
+		v := answersubmission.DefaultClarityCompleteness
+		asc.mutation.SetClarityCompleteness(v)
+	}
+	if _, ok := asc.mutation.Accuracy(); !ok {
+		v := answersubmission.DefaultAccuracy
+		asc.mutation.SetAccuracy(v)
+	}
+	if _, ok := asc.mutation.Overall(); !ok {
+		v := answersubmission.DefaultOverall
+		asc.mutation.SetOverall(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -181,6 +235,9 @@ func (asc *AnswerSubmissionCreate) check() error {
 	}
 	if _, ok := asc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "AnswerSubmission.status"`)}
+	}
+	if len(asc.mutation.SubmissionAttemptIDs()) == 0 {
+		return &ValidationError{Name: "submission_attempt", err: errors.New(`ent: missing required edge "AnswerSubmission.submission_attempt"`)}
 	}
 	return nil
 }
@@ -223,10 +280,6 @@ func (asc *AnswerSubmissionCreate) createSpec() (*AnswerSubmission, *sqlgraph.Cr
 		_spec.SetField(answersubmission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := asc.mutation.SubmissionAttemptID(); ok {
-		_spec.SetField(answersubmission.FieldSubmissionAttemptID, field.TypeUint64, value)
-		_node.SubmissionAttemptID = value
-	}
 	if value, ok := asc.mutation.QuestionID(); ok {
 		_spec.SetField(answersubmission.FieldQuestionID, field.TypeUint64, value)
 		_node.QuestionID = value
@@ -254,6 +307,23 @@ func (asc *AnswerSubmissionCreate) createSpec() (*AnswerSubmission, *sqlgraph.Cr
 	if value, ok := asc.mutation.Status(); ok {
 		_spec.SetField(answersubmission.FieldStatus, field.TypeInt32, value)
 		_node.Status = value
+	}
+	if nodes := asc.mutation.SubmissionAttemptIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.SubmissionAttemptTable,
+			Columns: []string{answersubmission.SubmissionAttemptColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(submissionattempt.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.SubmissionAttemptID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -328,12 +398,6 @@ func (u *AnswerSubmissionUpsert) SetSubmissionAttemptID(v uint64) *AnswerSubmiss
 // UpdateSubmissionAttemptID sets the "submission_attempt_id" field to the value that was provided on create.
 func (u *AnswerSubmissionUpsert) UpdateSubmissionAttemptID() *AnswerSubmissionUpsert {
 	u.SetExcluded(answersubmission.FieldSubmissionAttemptID)
-	return u
-}
-
-// AddSubmissionAttemptID adds v to the "submission_attempt_id" field.
-func (u *AnswerSubmissionUpsert) AddSubmissionAttemptID(v uint64) *AnswerSubmissionUpsert {
-	u.Add(answersubmission.FieldSubmissionAttemptID, v)
 	return u
 }
 
@@ -526,13 +590,6 @@ func (u *AnswerSubmissionUpsertOne) UpdateUpdatedAt() *AnswerSubmissionUpsertOne
 func (u *AnswerSubmissionUpsertOne) SetSubmissionAttemptID(v uint64) *AnswerSubmissionUpsertOne {
 	return u.Update(func(s *AnswerSubmissionUpsert) {
 		s.SetSubmissionAttemptID(v)
-	})
-}
-
-// AddSubmissionAttemptID adds v to the "submission_attempt_id" field.
-func (u *AnswerSubmissionUpsertOne) AddSubmissionAttemptID(v uint64) *AnswerSubmissionUpsertOne {
-	return u.Update(func(s *AnswerSubmissionUpsert) {
-		s.AddSubmissionAttemptID(v)
 	})
 }
 
@@ -918,13 +975,6 @@ func (u *AnswerSubmissionUpsertBulk) UpdateUpdatedAt() *AnswerSubmissionUpsertBu
 func (u *AnswerSubmissionUpsertBulk) SetSubmissionAttemptID(v uint64) *AnswerSubmissionUpsertBulk {
 	return u.Update(func(s *AnswerSubmissionUpsert) {
 		s.SetSubmissionAttemptID(v)
-	})
-}
-
-// AddSubmissionAttemptID adds v to the "submission_attempt_id" field.
-func (u *AnswerSubmissionUpsertBulk) AddSubmissionAttemptID(v uint64) *AnswerSubmissionUpsertBulk {
-	return u.Update(func(s *AnswerSubmissionUpsert) {
-		s.AddSubmissionAttemptID(v)
 	})
 }
 

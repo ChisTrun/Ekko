@@ -9,6 +9,8 @@ import (
 	"ekko/package/ent/question"
 	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/scenariofavorite"
+	"ekko/package/ent/scenariofield"
 	"fmt"
 	"math"
 
@@ -28,6 +30,8 @@ type ScenarioQuery struct {
 	predicates     []predicate.Scenario
 	withQuestions  *QuestionQuery
 	withCandidates *ScenarioCandidateQuery
+	withFavorites  *ScenarioFavoriteQuery
+	withField      *ScenarioFieldQuery
 	modifiers      []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -102,6 +106,50 @@ func (sq *ScenarioQuery) QueryCandidates() *ScenarioCandidateQuery {
 			sqlgraph.From(scenario.Table, scenario.FieldID, selector),
 			sqlgraph.To(scenariocandidate.Table, scenariocandidate.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, scenario.CandidatesTable, scenario.CandidatesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFavorites chains the current query on the "favorites" edge.
+func (sq *ScenarioQuery) QueryFavorites() *ScenarioFavoriteQuery {
+	query := (&ScenarioFavoriteClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenario.Table, scenario.FieldID, selector),
+			sqlgraph.To(scenariofavorite.Table, scenariofavorite.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, scenario.FavoritesTable, scenario.FavoritesColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryField chains the current query on the "field" edge.
+func (sq *ScenarioQuery) QueryField() *ScenarioFieldQuery {
+	query := (&ScenarioFieldClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scenario.Table, scenario.FieldID, selector),
+			sqlgraph.To(scenariofield.Table, scenariofield.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, scenario.FieldTable, scenario.FieldColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -303,6 +351,8 @@ func (sq *ScenarioQuery) Clone() *ScenarioQuery {
 		predicates:     append([]predicate.Scenario{}, sq.predicates...),
 		withQuestions:  sq.withQuestions.Clone(),
 		withCandidates: sq.withCandidates.Clone(),
+		withFavorites:  sq.withFavorites.Clone(),
+		withField:      sq.withField.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -328,6 +378,28 @@ func (sq *ScenarioQuery) WithCandidates(opts ...func(*ScenarioCandidateQuery)) *
 		opt(query)
 	}
 	sq.withCandidates = query
+	return sq
+}
+
+// WithFavorites tells the query-builder to eager-load the nodes that are connected to
+// the "favorites" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ScenarioQuery) WithFavorites(opts ...func(*ScenarioFavoriteQuery)) *ScenarioQuery {
+	query := (&ScenarioFavoriteClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withFavorites = query
+	return sq
+}
+
+// WithField tells the query-builder to eager-load the nodes that are connected to
+// the "field" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ScenarioQuery) WithField(opts ...func(*ScenarioFieldQuery)) *ScenarioQuery {
+	query := (&ScenarioFieldClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withField = query
 	return sq
 }
 
@@ -409,9 +481,11 @@ func (sq *ScenarioQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sce
 	var (
 		nodes       = []*Scenario{}
 		_spec       = sq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [4]bool{
 			sq.withQuestions != nil,
 			sq.withCandidates != nil,
+			sq.withFavorites != nil,
+			sq.withField != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -449,6 +523,20 @@ func (sq *ScenarioQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Sce
 			return nil, err
 		}
 	}
+	if query := sq.withFavorites; query != nil {
+		if err := sq.loadFavorites(ctx, query, nodes,
+			func(n *Scenario) { n.Edges.Favorites = []*ScenarioFavorite{} },
+			func(n *Scenario, e *ScenarioFavorite) { n.Edges.Favorites = append(n.Edges.Favorites, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := sq.withField; query != nil {
+		if err := sq.loadField(ctx, query, nodes,
+			func(n *Scenario) { n.Edges.Field = []*ScenarioField{} },
+			func(n *Scenario, e *ScenarioField) { n.Edges.Field = append(n.Edges.Field, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -463,7 +551,7 @@ func (sq *ScenarioQuery) loadQuestions(ctx context.Context, query *QuestionQuery
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(question.FieldSentenceID)
+		query.ctx.AppendFieldOnce(question.FieldScenarioID)
 	}
 	query.Where(predicate.Question(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(scenario.QuestionsColumn), fks...))
@@ -473,10 +561,10 @@ func (sq *ScenarioQuery) loadQuestions(ctx context.Context, query *QuestionQuery
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.SentenceID
+		fk := n.ScenarioID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "sentence_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "scenario_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -507,6 +595,67 @@ func (sq *ScenarioQuery) loadCandidates(ctx context.Context, query *ScenarioCand
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "scenario_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *ScenarioQuery) loadFavorites(ctx context.Context, query *ScenarioFavoriteQuery, nodes []*Scenario, init func(*Scenario), assign func(*Scenario, *ScenarioFavorite)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*Scenario)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(scenariofavorite.FieldScenarioID)
+	}
+	query.Where(predicate.ScenarioFavorite(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(scenario.FavoritesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ScenarioID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "scenario_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (sq *ScenarioQuery) loadField(ctx context.Context, query *ScenarioFieldQuery, nodes []*Scenario, init func(*Scenario), assign func(*Scenario, *ScenarioField)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*Scenario)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.ScenarioField(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(scenario.FieldColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.scenario_field_senarios
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "scenario_field_senarios" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "scenario_field_senarios" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

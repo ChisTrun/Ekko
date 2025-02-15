@@ -22,6 +22,8 @@ func (Scenario) Fields() []ent.Field {
 		field.Uint64("bm_id"),
 		field.String("name"),
 		field.Text("description"),
+		field.Float("rating").Default(0),
+		field.Int32("participants").Default(0),
 	}
 }
 
@@ -29,5 +31,7 @@ func (Scenario) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("questions", Question.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
 		edge.To("candidates", ScenarioCandidate.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.To("favorites", ScenarioFavorite.Type).Annotations(entsql.Annotation{OnDelete: entsql.Cascade}),
+		edge.From("field", ScenarioField.Type).Ref("senarios"),
 	}
 }

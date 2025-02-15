@@ -4,6 +4,8 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
+	"ekko/package/ent/answersubmission"
 	"ekko/package/ent/predicate"
 	"ekko/package/ent/scenariocandidate"
 	"ekko/package/ent/submissionattempt"
@@ -25,6 +27,7 @@ type SubmissionAttemptQuery struct {
 	inters                []Interceptor
 	predicates            []predicate.SubmissionAttempt
 	withScenarioCandidate *ScenarioCandidateQuery
+	withAnswers           *AnswerSubmissionQuery
 	modifiers             []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -77,6 +80,28 @@ func (saq *SubmissionAttemptQuery) QueryScenarioCandidate() *ScenarioCandidateQu
 			sqlgraph.From(submissionattempt.Table, submissionattempt.FieldID, selector),
 			sqlgraph.To(scenariocandidate.Table, scenariocandidate.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, submissionattempt.ScenarioCandidateTable, submissionattempt.ScenarioCandidateColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(saq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAnswers chains the current query on the "answers" edge.
+func (saq *SubmissionAttemptQuery) QueryAnswers() *AnswerSubmissionQuery {
+	query := (&AnswerSubmissionClient{config: saq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := saq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := saq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(submissionattempt.Table, submissionattempt.FieldID, selector),
+			sqlgraph.To(answersubmission.Table, answersubmission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, submissionattempt.AnswersTable, submissionattempt.AnswersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(saq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,6 +302,7 @@ func (saq *SubmissionAttemptQuery) Clone() *SubmissionAttemptQuery {
 		inters:                append([]Interceptor{}, saq.inters...),
 		predicates:            append([]predicate.SubmissionAttempt{}, saq.predicates...),
 		withScenarioCandidate: saq.withScenarioCandidate.Clone(),
+		withAnswers:           saq.withAnswers.Clone(),
 		// clone intermediate query.
 		sql:  saq.sql.Clone(),
 		path: saq.path,
@@ -291,6 +317,17 @@ func (saq *SubmissionAttemptQuery) WithScenarioCandidate(opts ...func(*ScenarioC
 		opt(query)
 	}
 	saq.withScenarioCandidate = query
+	return saq
+}
+
+// WithAnswers tells the query-builder to eager-load the nodes that are connected to
+// the "answers" edge. The optional arguments are used to configure the query builder of the edge.
+func (saq *SubmissionAttemptQuery) WithAnswers(opts ...func(*AnswerSubmissionQuery)) *SubmissionAttemptQuery {
+	query := (&AnswerSubmissionClient{config: saq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	saq.withAnswers = query
 	return saq
 }
 
@@ -372,8 +409,9 @@ func (saq *SubmissionAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 	var (
 		nodes       = []*SubmissionAttempt{}
 		_spec       = saq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			saq.withScenarioCandidate != nil,
+			saq.withAnswers != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -400,6 +438,13 @@ func (saq *SubmissionAttemptQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 	if query := saq.withScenarioCandidate; query != nil {
 		if err := saq.loadScenarioCandidate(ctx, query, nodes, nil,
 			func(n *SubmissionAttempt, e *ScenarioCandidate) { n.Edges.ScenarioCandidate = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := saq.withAnswers; query != nil {
+		if err := saq.loadAnswers(ctx, query, nodes,
+			func(n *SubmissionAttempt) { n.Edges.Answers = []*AnswerSubmission{} },
+			func(n *SubmissionAttempt, e *AnswerSubmission) { n.Edges.Answers = append(n.Edges.Answers, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -432,6 +477,36 @@ func (saq *SubmissionAttemptQuery) loadScenarioCandidate(ctx context.Context, qu
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (saq *SubmissionAttemptQuery) loadAnswers(ctx context.Context, query *AnswerSubmissionQuery, nodes []*SubmissionAttempt, init func(*SubmissionAttempt), assign func(*SubmissionAttempt, *AnswerSubmission)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*SubmissionAttempt)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(answersubmission.FieldSubmissionAttemptID)
+	}
+	query.Where(predicate.AnswerSubmission(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(submissionattempt.AnswersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.SubmissionAttemptID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "submission_attempt_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

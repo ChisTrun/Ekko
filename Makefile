@@ -37,9 +37,11 @@ generate:
 		go_module=$$(echo ekko); \
 		base_name=$$(basename $$proto .proto); \
 		BaseName=$$(echo $$base_name | awk '{print toupper(substr($$0, 1, 1)) substr($$0, 2)}'); \
-		protoc --go_out=. --go_opt=paths=source_relative \
+		protoc --proto_path=./third_party --proto_path=. \
+			--go_out=. --go_opt=paths=source_relative \
 			--go-grpc_out=. --go-grpc_opt=paths=source_relative \
-			$$proto; \
+			--validate_out=lang=go,paths=source_relative:. \
+			$$proto;\
 		services=$$(grep 'service ' $$proto | awk '{print $$2}'); \
 		for service_name in $$services; do \
 			lowercase_service=$$(echo $$service_name | awk '{print tolower($$0)}'); \

@@ -8,6 +8,8 @@ import (
 	"ekko/package/ent/question"
 	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
+	"ekko/package/ent/scenariofavorite"
+	"ekko/package/ent/scenariofield"
 	"ekko/package/ent/submissionattempt"
 	"errors"
 	"fmt"
@@ -81,6 +83,8 @@ func checkColumn(table, column string) error {
 			question.Table:          question.ValidColumn,
 			scenario.Table:          scenario.ValidColumn,
 			scenariocandidate.Table: scenariocandidate.ValidColumn,
+			scenariofavorite.Table:  scenariofavorite.ValidColumn,
+			scenariofield.Table:     scenariofield.ValidColumn,
 			submissionattempt.Table: submissionattempt.ValidColumn,
 		})
 	})

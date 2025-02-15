@@ -22,6 +22,10 @@ type Tx struct {
 	Scenario *ScenarioClient
 	// ScenarioCandidate is the client for interacting with the ScenarioCandidate builders.
 	ScenarioCandidate *ScenarioCandidateClient
+	// ScenarioFavorite is the client for interacting with the ScenarioFavorite builders.
+	ScenarioFavorite *ScenarioFavoriteClient
+	// ScenarioField is the client for interacting with the ScenarioField builders.
+	ScenarioField *ScenarioFieldClient
 	// SubmissionAttempt is the client for interacting with the SubmissionAttempt builders.
 	SubmissionAttempt *SubmissionAttemptClient
 
@@ -159,6 +163,8 @@ func (tx *Tx) init() {
 	tx.Question = NewQuestionClient(tx.config)
 	tx.Scenario = NewScenarioClient(tx.config)
 	tx.ScenarioCandidate = NewScenarioCandidateClient(tx.config)
+	tx.ScenarioFavorite = NewScenarioFavoriteClient(tx.config)
+	tx.ScenarioField = NewScenarioFieldClient(tx.config)
 	tx.SubmissionAttempt = NewSubmissionAttemptClient(tx.config)
 }
 

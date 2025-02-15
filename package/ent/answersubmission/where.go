@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -204,26 +205,6 @@ func SubmissionAttemptIDIn(vs ...uint64) predicate.AnswerSubmission {
 // SubmissionAttemptIDNotIn applies the NotIn predicate on the "submission_attempt_id" field.
 func SubmissionAttemptIDNotIn(vs ...uint64) predicate.AnswerSubmission {
 	return predicate.AnswerSubmission(sql.FieldNotIn(FieldSubmissionAttemptID, vs...))
-}
-
-// SubmissionAttemptIDGT applies the GT predicate on the "submission_attempt_id" field.
-func SubmissionAttemptIDGT(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldGT(FieldSubmissionAttemptID, v))
-}
-
-// SubmissionAttemptIDGTE applies the GTE predicate on the "submission_attempt_id" field.
-func SubmissionAttemptIDGTE(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldGTE(FieldSubmissionAttemptID, v))
-}
-
-// SubmissionAttemptIDLT applies the LT predicate on the "submission_attempt_id" field.
-func SubmissionAttemptIDLT(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldLT(FieldSubmissionAttemptID, v))
-}
-
-// SubmissionAttemptIDLTE applies the LTE predicate on the "submission_attempt_id" field.
-func SubmissionAttemptIDLTE(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldLTE(FieldSubmissionAttemptID, v))
 }
 
 // QuestionIDEQ applies the EQ predicate on the "question_id" field.
@@ -543,6 +524,29 @@ func StatusLT(v ekko.SubmissionStatus) predicate.AnswerSubmission {
 func StatusLTE(v ekko.SubmissionStatus) predicate.AnswerSubmission {
 	vc := int32(v)
 	return predicate.AnswerSubmission(sql.FieldLTE(FieldStatus, vc))
+}
+
+// HasSubmissionAttempt applies the HasEdge predicate on the "submission_attempt" edge.
+func HasSubmissionAttempt() predicate.AnswerSubmission {
+	return predicate.AnswerSubmission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SubmissionAttemptTable, SubmissionAttemptColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubmissionAttemptWith applies the HasEdge predicate on the "submission_attempt" edge with a given conditions (other predicates).
+func HasSubmissionAttemptWith(preds ...predicate.SubmissionAttempt) predicate.AnswerSubmission {
+	return predicate.AnswerSubmission(func(s *sql.Selector) {
+		step := newSubmissionAttemptStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

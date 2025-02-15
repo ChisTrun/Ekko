@@ -80,6 +80,16 @@ func Description(v string) predicate.Scenario {
 	return predicate.Scenario(sql.FieldEQ(FieldDescription, v))
 }
 
+// Rating applies equality check predicate on the "rating" field. It's identical to RatingEQ.
+func Rating(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldEQ(FieldRating, v))
+}
+
+// Participants applies equality check predicate on the "participants" field. It's identical to ParticipantsEQ.
+func Participants(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldEQ(FieldParticipants, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Scenario {
 	return predicate.Scenario(sql.FieldEQ(FieldCreatedAt, v))
@@ -330,6 +340,86 @@ func DescriptionContainsFold(v string) predicate.Scenario {
 	return predicate.Scenario(sql.FieldContainsFold(FieldDescription, v))
 }
 
+// RatingEQ applies the EQ predicate on the "rating" field.
+func RatingEQ(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldEQ(FieldRating, v))
+}
+
+// RatingNEQ applies the NEQ predicate on the "rating" field.
+func RatingNEQ(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldNEQ(FieldRating, v))
+}
+
+// RatingIn applies the In predicate on the "rating" field.
+func RatingIn(vs ...float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldIn(FieldRating, vs...))
+}
+
+// RatingNotIn applies the NotIn predicate on the "rating" field.
+func RatingNotIn(vs ...float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldNotIn(FieldRating, vs...))
+}
+
+// RatingGT applies the GT predicate on the "rating" field.
+func RatingGT(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldGT(FieldRating, v))
+}
+
+// RatingGTE applies the GTE predicate on the "rating" field.
+func RatingGTE(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldGTE(FieldRating, v))
+}
+
+// RatingLT applies the LT predicate on the "rating" field.
+func RatingLT(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldLT(FieldRating, v))
+}
+
+// RatingLTE applies the LTE predicate on the "rating" field.
+func RatingLTE(v float64) predicate.Scenario {
+	return predicate.Scenario(sql.FieldLTE(FieldRating, v))
+}
+
+// ParticipantsEQ applies the EQ predicate on the "participants" field.
+func ParticipantsEQ(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldEQ(FieldParticipants, v))
+}
+
+// ParticipantsNEQ applies the NEQ predicate on the "participants" field.
+func ParticipantsNEQ(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldNEQ(FieldParticipants, v))
+}
+
+// ParticipantsIn applies the In predicate on the "participants" field.
+func ParticipantsIn(vs ...int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldIn(FieldParticipants, vs...))
+}
+
+// ParticipantsNotIn applies the NotIn predicate on the "participants" field.
+func ParticipantsNotIn(vs ...int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldNotIn(FieldParticipants, vs...))
+}
+
+// ParticipantsGT applies the GT predicate on the "participants" field.
+func ParticipantsGT(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldGT(FieldParticipants, v))
+}
+
+// ParticipantsGTE applies the GTE predicate on the "participants" field.
+func ParticipantsGTE(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldGTE(FieldParticipants, v))
+}
+
+// ParticipantsLT applies the LT predicate on the "participants" field.
+func ParticipantsLT(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldLT(FieldParticipants, v))
+}
+
+// ParticipantsLTE applies the LTE predicate on the "participants" field.
+func ParticipantsLTE(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldLTE(FieldParticipants, v))
+}
+
 // HasQuestions applies the HasEdge predicate on the "questions" edge.
 func HasQuestions() predicate.Scenario {
 	return predicate.Scenario(func(s *sql.Selector) {
@@ -368,6 +458,52 @@ func HasCandidates() predicate.Scenario {
 func HasCandidatesWith(preds ...predicate.ScenarioCandidate) predicate.Scenario {
 	return predicate.Scenario(func(s *sql.Selector) {
 		step := newCandidatesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFavorites applies the HasEdge predicate on the "favorites" edge.
+func HasFavorites() predicate.Scenario {
+	return predicate.Scenario(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, FavoritesTable, FavoritesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFavoritesWith applies the HasEdge predicate on the "favorites" edge with a given conditions (other predicates).
+func HasFavoritesWith(preds ...predicate.ScenarioFavorite) predicate.Scenario {
+	return predicate.Scenario(func(s *sql.Selector) {
+		step := newFavoritesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasField applies the HasEdge predicate on the "field" edge.
+func HasField() predicate.Scenario {
+	return predicate.Scenario(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, FieldTable, FieldColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFieldWith applies the HasEdge predicate on the "field" edge with a given conditions (other predicates).
+func HasFieldWith(preds ...predicate.ScenarioField) predicate.Scenario {
+	return predicate.Scenario(func(s *sql.Selector) {
+		step := newFieldStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

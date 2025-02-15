@@ -13,20 +13,28 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "submission_attempt_id", Type: field.TypeUint64},
 		{Name: "question_id", Type: field.TypeUint64},
 		{Name: "answer", Type: field.TypeString, Size: 2147483647},
-		{Name: "relevance", Type: field.TypeFloat64},
-		{Name: "clarity_completeness", Type: field.TypeFloat64},
-		{Name: "accuracy", Type: field.TypeFloat64},
-		{Name: "overall", Type: field.TypeFloat64},
+		{Name: "relevance", Type: field.TypeFloat64, Default: 0},
+		{Name: "clarity_completeness", Type: field.TypeFloat64, Default: 0},
+		{Name: "accuracy", Type: field.TypeFloat64, Default: 0},
+		{Name: "overall", Type: field.TypeFloat64, Default: 0},
 		{Name: "status", Type: field.TypeInt32},
+		{Name: "submission_attempt_id", Type: field.TypeUint64},
 	}
 	// AnswerSubmissionsTable holds the schema information for the "answer_submissions" table.
 	AnswerSubmissionsTable = &schema.Table{
 		Name:       "answer_submissions",
 		Columns:    AnswerSubmissionsColumns,
 		PrimaryKey: []*schema.Column{AnswerSubmissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "answer_submissions_submission_attempts_answers",
+				Columns:    []*schema.Column{AnswerSubmissionsColumns[10]},
+				RefColumns: []*schema.Column{SubmissionAttemptsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// QuestionsColumns holds the columns for the "questions" table.
 	QuestionsColumns = []*schema.Column{
@@ -36,7 +44,7 @@ var (
 		{Name: "criteria", Type: field.TypeString, Size: 2147483647},
 		{Name: "hint", Type: field.TypeString, Size: 2147483647},
 		{Name: "content", Type: field.TypeString, Size: 2147483647},
-		{Name: "sentence_id", Type: field.TypeUint64},
+		{Name: "scenario_id", Type: field.TypeUint64},
 	}
 	// QuestionsTable holds the schema information for the "questions" table.
 	QuestionsTable = &schema.Table{
@@ -60,6 +68,8 @@ var (
 		{Name: "bm_id", Type: field.TypeUint64},
 		{Name: "name", Type: field.TypeString},
 		{Name: "description", Type: field.TypeString, Size: 2147483647},
+		{Name: "rating", Type: field.TypeFloat64, Default: 0},
+		{Name: "participants", Type: field.TypeInt32, Default: 0},
 	}
 	// ScenariosTable holds the schema information for the "scenarios" table.
 	ScenariosTable = &schema.Table{
@@ -86,6 +96,50 @@ var (
 				Columns:    []*schema.Column{ScenarioCandidatesColumns[4]},
 				RefColumns: []*schema.Column{ScenariosColumns[0]},
 				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ScenarioFavoritesColumns holds the columns for the "scenario_favorites" table.
+	ScenarioFavoritesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeUint64},
+		{Name: "scenario_id", Type: field.TypeUint64},
+	}
+	// ScenarioFavoritesTable holds the schema information for the "scenario_favorites" table.
+	ScenarioFavoritesTable = &schema.Table{
+		Name:       "scenario_favorites",
+		Columns:    ScenarioFavoritesColumns,
+		PrimaryKey: []*schema.Column{ScenarioFavoritesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "scenario_favorites_scenarios_favorites",
+				Columns:    []*schema.Column{ScenarioFavoritesColumns[4]},
+				RefColumns: []*schema.Column{ScenariosColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ScenarioFieldsColumns holds the columns for the "scenario_fields" table.
+	ScenarioFieldsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString},
+		{Name: "scenario_field_senarios", Type: field.TypeUint64, Nullable: true},
+	}
+	// ScenarioFieldsTable holds the schema information for the "scenario_fields" table.
+	ScenarioFieldsTable = &schema.Table{
+		Name:       "scenario_fields",
+		Columns:    ScenarioFieldsColumns,
+		PrimaryKey: []*schema.Column{ScenarioFieldsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "scenario_fields_scenarios_senarios",
+				Columns:    []*schema.Column{ScenarioFieldsColumns[4]},
+				RefColumns: []*schema.Column{ScenariosColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -124,12 +178,17 @@ var (
 		QuestionsTable,
 		ScenariosTable,
 		ScenarioCandidatesTable,
+		ScenarioFavoritesTable,
+		ScenarioFieldsTable,
 		SubmissionAttemptsTable,
 	}
 )
 
 func init() {
+	AnswerSubmissionsTable.ForeignKeys[0].RefTable = SubmissionAttemptsTable
 	QuestionsTable.ForeignKeys[0].RefTable = ScenariosTable
 	ScenarioCandidatesTable.ForeignKeys[0].RefTable = ScenariosTable
+	ScenarioFavoritesTable.ForeignKeys[0].RefTable = ScenariosTable
+	ScenarioFieldsTable.ForeignKeys[0].RefTable = ScenariosTable
 	SubmissionAttemptsTable.ForeignKeys[0].RefTable = ScenarioCandidatesTable
 }

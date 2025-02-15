@@ -18,5 +18,11 @@ type Scenario func(*sql.Selector)
 // ScenarioCandidate is the predicate function for scenariocandidate builders.
 type ScenarioCandidate func(*sql.Selector)
 
+// ScenarioFavorite is the predicate function for scenariofavorite builders.
+type ScenarioFavorite func(*sql.Selector)
+
+// ScenarioField is the predicate function for scenariofield builders.
+type ScenarioField func(*sql.Selector)
+
 // SubmissionAttempt is the predicate function for submissionattempt builders.
 type SubmissionAttempt func(*sql.Selector)

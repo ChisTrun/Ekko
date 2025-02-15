@@ -36,16 +36,16 @@ func (qu *QuestionUpdate) SetUpdatedAt(t time.Time) *QuestionUpdate {
 	return qu
 }
 
-// SetSentenceID sets the "sentence_id" field.
-func (qu *QuestionUpdate) SetSentenceID(u uint64) *QuestionUpdate {
-	qu.mutation.SetSentenceID(u)
+// SetScenarioID sets the "scenario_id" field.
+func (qu *QuestionUpdate) SetScenarioID(u uint64) *QuestionUpdate {
+	qu.mutation.SetScenarioID(u)
 	return qu
 }
 
-// SetNillableSentenceID sets the "sentence_id" field if the given value is not nil.
-func (qu *QuestionUpdate) SetNillableSentenceID(u *uint64) *QuestionUpdate {
+// SetNillableScenarioID sets the "scenario_id" field if the given value is not nil.
+func (qu *QuestionUpdate) SetNillableScenarioID(u *uint64) *QuestionUpdate {
 	if u != nil {
-		qu.SetSentenceID(*u)
+		qu.SetScenarioID(*u)
 	}
 	return qu
 }
@@ -89,12 +89,6 @@ func (qu *QuestionUpdate) SetNillableContent(s *string) *QuestionUpdate {
 	if s != nil {
 		qu.SetContent(*s)
 	}
-	return qu
-}
-
-// SetScenarioID sets the "scenario" edge to the Scenario entity by ID.
-func (qu *QuestionUpdate) SetScenarioID(id uint64) *QuestionUpdate {
-	qu.mutation.SetScenarioID(id)
 	return qu
 }
 
@@ -245,16 +239,16 @@ func (quo *QuestionUpdateOne) SetUpdatedAt(t time.Time) *QuestionUpdateOne {
 	return quo
 }
 
-// SetSentenceID sets the "sentence_id" field.
-func (quo *QuestionUpdateOne) SetSentenceID(u uint64) *QuestionUpdateOne {
-	quo.mutation.SetSentenceID(u)
+// SetScenarioID sets the "scenario_id" field.
+func (quo *QuestionUpdateOne) SetScenarioID(u uint64) *QuestionUpdateOne {
+	quo.mutation.SetScenarioID(u)
 	return quo
 }
 
-// SetNillableSentenceID sets the "sentence_id" field if the given value is not nil.
-func (quo *QuestionUpdateOne) SetNillableSentenceID(u *uint64) *QuestionUpdateOne {
+// SetNillableScenarioID sets the "scenario_id" field if the given value is not nil.
+func (quo *QuestionUpdateOne) SetNillableScenarioID(u *uint64) *QuestionUpdateOne {
 	if u != nil {
-		quo.SetSentenceID(*u)
+		quo.SetScenarioID(*u)
 	}
 	return quo
 }
@@ -298,12 +292,6 @@ func (quo *QuestionUpdateOne) SetNillableContent(s *string) *QuestionUpdateOne {
 	if s != nil {
 		quo.SetContent(*s)
 	}
-	return quo
-}
-
-// SetScenarioID sets the "scenario" edge to the Scenario entity by ID.
-func (quo *QuestionUpdateOne) SetScenarioID(id uint64) *QuestionUpdateOne {
-	quo.mutation.SetScenarioID(id)
 	return quo
 }
 

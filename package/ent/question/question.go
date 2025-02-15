@@ -18,8 +18,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldSentenceID holds the string denoting the sentence_id field in the database.
-	FieldSentenceID = "sentence_id"
+	// FieldScenarioID holds the string denoting the scenario_id field in the database.
+	FieldScenarioID = "scenario_id"
 	// FieldCriteria holds the string denoting the criteria field in the database.
 	FieldCriteria = "criteria"
 	// FieldHint holds the string denoting the hint field in the database.
@@ -36,7 +36,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "scenario" package.
 	ScenarioInverseTable = "scenarios"
 	// ScenarioColumn is the table column denoting the scenario relation/edge.
-	ScenarioColumn = "sentence_id"
+	ScenarioColumn = "scenario_id"
 )
 
 // Columns holds all SQL columns for question fields.
@@ -44,7 +44,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
-	FieldSentenceID,
+	FieldScenarioID,
 	FieldCriteria,
 	FieldHint,
 	FieldContent,
@@ -87,9 +87,9 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// BySentenceID orders the results by the sentence_id field.
-func BySentenceID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldSentenceID, opts...).ToFunc()
+// ByScenarioID orders the results by the scenario_id field.
+func ByScenarioID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldScenarioID, opts...).ToFunc()
 }
 
 // ByCriteria orders the results by the criteria field.

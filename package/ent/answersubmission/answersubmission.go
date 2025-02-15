@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -33,8 +34,17 @@ const (
 	FieldOverall = "overall"
 	// FieldStatus holds the string denoting the status field in the database.
 	FieldStatus = "status"
+	// EdgeSubmissionAttempt holds the string denoting the submission_attempt edge name in mutations.
+	EdgeSubmissionAttempt = "submission_attempt"
 	// Table holds the table name of the answersubmission in the database.
 	Table = "answer_submissions"
+	// SubmissionAttemptTable is the table that holds the submission_attempt relation/edge.
+	SubmissionAttemptTable = "answer_submissions"
+	// SubmissionAttemptInverseTable is the table name for the SubmissionAttempt entity.
+	// It exists in this package in order to avoid circular dependency with the "submissionattempt" package.
+	SubmissionAttemptInverseTable = "submission_attempts"
+	// SubmissionAttemptColumn is the table column denoting the submission_attempt relation/edge.
+	SubmissionAttemptColumn = "submission_attempt_id"
 )
 
 // Columns holds all SQL columns for answersubmission fields.
@@ -69,6 +79,14 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultRelevance holds the default value on creation for the "relevance" field.
+	DefaultRelevance float64
+	// DefaultClarityCompleteness holds the default value on creation for the "clarity_completeness" field.
+	DefaultClarityCompleteness float64
+	// DefaultAccuracy holds the default value on creation for the "accuracy" field.
+	DefaultAccuracy float64
+	// DefaultOverall holds the default value on creation for the "overall" field.
+	DefaultOverall float64
 )
 
 // OrderOption defines the ordering options for the AnswerSubmission queries.
@@ -127,4 +145,18 @@ func ByOverall(opts ...sql.OrderTermOption) OrderOption {
 // ByStatus orders the results by the status field.
 func ByStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// BySubmissionAttemptField orders the results by submission_attempt field.
+func BySubmissionAttemptField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubmissionAttemptStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newSubmissionAttemptStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubmissionAttemptInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, SubmissionAttemptTable, SubmissionAttemptColumn),
+	)
 }

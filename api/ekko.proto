@@ -1,11 +1,42 @@
-syntax = "proto2";
+syntax = "proto3";
 
 package ekko;
 
 option go_package = "ekko/api;ekko";
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "validate/validate.proto";
 
-service Ekko {
+service Ekko { 
+    // Field api
+    rpc CreateField (CreateFieldRequest) returns (CreateFieldResponse);
+    rpc UpdateField (UpdateFieldRequest) returns (google.protobuf.Empty);
+    rpc DeleteField (DeleteFieldRequest) returns (google.protobuf.Empty);
+
+    // Scenario api
+    rpc CreateScenario (CreateScenarioRequest) returns (CreateScenarioResponse);
+    rpc UpdateScenario (UpdateScenarioRequest) returns (google.protobuf.Empty);
+    rpc DeleteScenario (DeleteScenarioRequest) returns (google.protobuf.Empty);
+    rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse);
+    rpc GetScenario (GetScenarioRequest) returns (GetScenarioResponse);
+    rpc FavoriteScenario (FavoriteScenarioRequest) returns (google.protobuf.Empty);
+
+
+    // Submission for candidate
+    rpc ListAttempt (ListAttemptRequest) returns (ListAttemptResponse);
+    rpc GetAttempt (GetAttemptRequest) returns (GetAttemptResponse);
+    rpc SubmitAnswer (SubmitAnswerRequest) returns (SubmitAnswerResponse);
+
+    // Submission for bm
+    rpc ListAllSubmission (ListAllSubmissionRequest) returns (ListAllSubmissionResponse);
+}
+
+service Chronobreak {   
+    rpc ListField (ListFieldRequest) returns (ListFieldResponse);
+    rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse);
+    rpc GetScenario (GetScenarioRequest) returns (GetScenarioResponse);
+
 }
 
 enum SubmissionStatus {
@@ -13,4 +44,222 @@ enum SubmissionStatus {
     SUBMISSION_STATUS_IN_PROGRESS = 1;
     SUBMISSION_STATUS_FAILED = 2;
     SUBMISSION_STATUS_SUCCESS = 3;
+}
+
+enum SortType {
+    SORT_TYPE_UNKNOWN = 0;
+    SORT_TYPE_ASC =  1;
+    SORT_TYPE_DESC = 2;
+}
+
+enum PublicationStatus {
+    PUBLICATION_STATUS_UNKNOWN = 0;
+    PUBLICATION_STATUS_DRAFT = 1;
+    PUBLICATION_STATUS_PUBLISHED = 2;
+}
+
+message Answer {
+    uint64 question_id = 1;
+    string answer = 2;
+    float relevance = 3;
+    float clarity_completeness = 4;
+    float accuracy = 5;
+    float overall = 6;
+    SubmissionStatus status = 7;
+    BaseData base_data = 8;
+}
+
+message Attempt {
+    uint64 id = 1;
+    uint64 scenario_id = 2;
+    repeated Answer answers = 3;
+    BaseData base_data = 4;
+    int32 attempt_number = 5;    
+}
+
+message Submission {
+    uint64 id = 1;
+    uint64 scenario_id = 2;
+    uint64 candidate_id = 3;
+    repeated Attempt attempts = 4;
+}
+
+message SortMethod {
+    string name = 1 [
+      (validate.rules).string = {
+        min_len: 1
+      }
+    ];
+    SortType type = 2;
+}
+
+message BaseData {
+    google.protobuf.Timestamp created_at = 1;
+    google.protobuf.Timestamp updated_at = 2;
+}
+
+message Field {
+    uint64 id = 1;
+    string name = 2;
+    BaseData base_data = 3;
+}
+
+message Scenario {
+    uint64 id = 1;
+    string name = 2;
+    string description = 3;
+    BaseData base_data = 4;
+    float rating = 5;
+    repeated Field fields = 6;
+    int32 total_participant = 7;
+    repeated Question questions = 8;
+    PublicationStatus publication_status = 9;   
+}
+
+message Question{
+    uint64 id = 1;
+    uint64 question_id = 2; 
+    string criteria =3;
+    string hint = 4;
+    string content = 5;
+    BaseData base_data = 6;    
+}
+
+message ListAllSubmissionRequest {
+    uint64 scenario_id = 1;
+    int32 page_index = 2 [(validate.rules).int32 = {gte: 0}];
+    int32 page_size = 3 [(validate.rules).int32 = {gte: 1}];
+    repeated SortMethod sort_method = 4;
+}
+
+message ListAllSubmissionResponse {
+    repeated Submission submissions = 1;
+    int32 total_count = 2;
+    int32 total_page = 3;
+    ListAllSubmissionRequest request = 4;
+}
+
+message ListAttemptRequest {
+    uint64 scenario_id = 1;    
+    int32 page_index = 2 [(validate.rules).int32 = {gte: 0}];
+    int32 page_size = 3 [(validate.rules).int32 = {gte: 1}];
+    repeated SortMethod sort_method = 4;
+}
+
+message ListAttemptResponse {
+    repeated Attempt attempts = 1;
+    int32 total_count = 2;
+    int32 total_page = 3;
+    ListAttemptRequest request = 4;
+}
+
+message GetAttemptRequest {
+    uint64 id = 1;
+}
+
+message SubmitAnswerRequest {
+    uint64 scenario_id = 1;
+    repeated SubmittedAnswer answers = 2;
+    message SubmittedAnswer {
+        uint64 question_id = 1;
+        string answer = 2;
+    }
+}
+
+message SubmitAnswerResponse {
+    Attempt attempt = 1;
+}
+
+message GetAttemptResponse {
+    Attempt attempt = 1;
+}
+
+message CreateFieldResponse {
+    Field field = 1;
+}
+
+message CreateFieldRequest {
+    string name = 1;
+}
+
+message UpdateFieldRequest {
+    uint64 id = 1;  
+    string name = 2;
+}
+
+message DeleteFieldRequest {
+    repeated uint64 ids = 1;    
+}
+
+message ListFieldRequest {
+    repeated uint64 ids = 1;
+    repeated SortMethod sort_methods = 2;
+    int32 page_index = 3 [(validate.rules).int32 = {gte: 0}];
+    int32 page_size = 4 [(validate.rules).int32 = {gte: 1}];
+    optional string search_content = 5;
+}
+
+message ListFieldResponse{
+    repeated Field fields = 1;  
+    int32 total_count = 2;
+    int32 total_page = 3;
+    ListFieldRequest request = 4;   
+}
+
+message CreateScenarioRequest {
+    string name = 1;
+    string description = 2;
+    repeated Field fields = 3;
+    repeated ScenarioQuestion questions = 4;
+}
+
+message CreateScenarioResponse {
+    Scenario scenario = 1;
+}
+
+message UpdateScenarioRequest {
+    uint64 id = 1;
+    string name = 2;
+    string description = 3;
+    repeated Field fields = 4;
+    repeated ScenarioQuestion questions = 5;
+}
+
+message ScenarioQuestion {
+    string criteria = 1;
+    string hint = 2;
+    string content = 3;   
+}
+
+message DeleteScenarioRequest {
+    repeated uint64 ids = 1;
+}
+
+message ListScenarioRequest {
+    repeated uint64 bm_ids = 1;
+    optional string search_content = 2;
+    repeated SortMethod sort_methods = 3;
+    int32 page_index = 4 [(validate.rules).int32 = {gte: 0}];   
+    int32 page_size = 5 [(validate.rules).int32 = {gte: 1}];
+    optional bool is_favorite = 6;
+    optional bool is_finished = 7;
+}
+
+message ListScenarioResponse {
+    repeated Scenario scenario = 1;
+    int32 total_count = 2;
+    int32 total_page = 3;
+    ListScenarioRequest request = 4;
+}
+
+message GetScenarioRequest {
+    uint64 id = 1;
+}
+
+message GetScenarioResponse {
+    Scenario scenario = 1; 
+}
+
+message FavoriteScenarioRequest {
+    uint64 id = 1;
 }

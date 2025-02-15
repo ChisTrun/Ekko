@@ -27,6 +27,10 @@ type Scenario struct {
 	Name string `json:"name,omitempty"`
 	// Description holds the value of the "description" field.
 	Description string `json:"description,omitempty"`
+	// Rating holds the value of the "rating" field.
+	Rating float64 `json:"rating,omitempty"`
+	// Participants holds the value of the "participants" field.
+	Participants int32 `json:"participants,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScenarioQuery when eager-loading is set.
 	Edges        ScenarioEdges `json:"edges"`
@@ -39,9 +43,13 @@ type ScenarioEdges struct {
 	Questions []*Question `json:"questions,omitempty"`
 	// Candidates holds the value of the candidates edge.
 	Candidates []*ScenarioCandidate `json:"candidates,omitempty"`
+	// Favorites holds the value of the favorites edge.
+	Favorites []*ScenarioFavorite `json:"favorites,omitempty"`
+	// Field holds the value of the field edge.
+	Field []*ScenarioField `json:"field,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [4]bool
 }
 
 // QuestionsOrErr returns the Questions value or an error if the edge
@@ -62,12 +70,32 @@ func (e ScenarioEdges) CandidatesOrErr() ([]*ScenarioCandidate, error) {
 	return nil, &NotLoadedError{edge: "candidates"}
 }
 
+// FavoritesOrErr returns the Favorites value or an error if the edge
+// was not loaded in eager-loading.
+func (e ScenarioEdges) FavoritesOrErr() ([]*ScenarioFavorite, error) {
+	if e.loadedTypes[2] {
+		return e.Favorites, nil
+	}
+	return nil, &NotLoadedError{edge: "favorites"}
+}
+
+// FieldOrErr returns the Field value or an error if the edge
+// was not loaded in eager-loading.
+func (e ScenarioEdges) FieldOrErr() ([]*ScenarioField, error) {
+	if e.loadedTypes[3] {
+		return e.Field, nil
+	}
+	return nil, &NotLoadedError{edge: "field"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Scenario) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case scenario.FieldID, scenario.FieldBmID:
+		case scenario.FieldRating:
+			values[i] = new(sql.NullFloat64)
+		case scenario.FieldID, scenario.FieldBmID, scenario.FieldParticipants:
 			values[i] = new(sql.NullInt64)
 		case scenario.FieldName, scenario.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -124,6 +152,18 @@ func (s *Scenario) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Description = value.String
 			}
+		case scenario.FieldRating:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field rating", values[i])
+			} else if value.Valid {
+				s.Rating = value.Float64
+			}
+		case scenario.FieldParticipants:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field participants", values[i])
+			} else if value.Valid {
+				s.Participants = int32(value.Int64)
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -145,6 +185,16 @@ func (s *Scenario) QueryQuestions() *QuestionQuery {
 // QueryCandidates queries the "candidates" edge of the Scenario entity.
 func (s *Scenario) QueryCandidates() *ScenarioCandidateQuery {
 	return NewScenarioClient(s.config).QueryCandidates(s)
+}
+
+// QueryFavorites queries the "favorites" edge of the Scenario entity.
+func (s *Scenario) QueryFavorites() *ScenarioFavoriteQuery {
+	return NewScenarioClient(s.config).QueryFavorites(s)
+}
+
+// QueryField queries the "field" edge of the Scenario entity.
+func (s *Scenario) QueryField() *ScenarioFieldQuery {
+	return NewScenarioClient(s.config).QueryField(s)
 }
 
 // Update returns a builder for updating this Scenario.
@@ -184,6 +234,12 @@ func (s *Scenario) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(s.Description)
+	builder.WriteString(", ")
+	builder.WriteString("rating=")
+	builder.WriteString(fmt.Sprintf("%v", s.Rating))
+	builder.WriteString(", ")
+	builder.WriteString("participants=")
+	builder.WriteString(fmt.Sprintf("%v", s.Participants))
 	builder.WriteByte(')')
 	return builder.String()
 }

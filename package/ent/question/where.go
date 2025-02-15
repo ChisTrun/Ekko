@@ -65,9 +65,9 @@ func UpdatedAt(v time.Time) predicate.Question {
 	return predicate.Question(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// SentenceID applies equality check predicate on the "sentence_id" field. It's identical to SentenceIDEQ.
-func SentenceID(v uint64) predicate.Question {
-	return predicate.Question(sql.FieldEQ(FieldSentenceID, v))
+// ScenarioID applies equality check predicate on the "scenario_id" field. It's identical to ScenarioIDEQ.
+func ScenarioID(v uint64) predicate.Question {
+	return predicate.Question(sql.FieldEQ(FieldScenarioID, v))
 }
 
 // Criteria applies equality check predicate on the "criteria" field. It's identical to CriteriaEQ.
@@ -165,24 +165,24 @@ func UpdatedAtLTE(v time.Time) predicate.Question {
 	return predicate.Question(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// SentenceIDEQ applies the EQ predicate on the "sentence_id" field.
-func SentenceIDEQ(v uint64) predicate.Question {
-	return predicate.Question(sql.FieldEQ(FieldSentenceID, v))
+// ScenarioIDEQ applies the EQ predicate on the "scenario_id" field.
+func ScenarioIDEQ(v uint64) predicate.Question {
+	return predicate.Question(sql.FieldEQ(FieldScenarioID, v))
 }
 
-// SentenceIDNEQ applies the NEQ predicate on the "sentence_id" field.
-func SentenceIDNEQ(v uint64) predicate.Question {
-	return predicate.Question(sql.FieldNEQ(FieldSentenceID, v))
+// ScenarioIDNEQ applies the NEQ predicate on the "scenario_id" field.
+func ScenarioIDNEQ(v uint64) predicate.Question {
+	return predicate.Question(sql.FieldNEQ(FieldScenarioID, v))
 }
 
-// SentenceIDIn applies the In predicate on the "sentence_id" field.
-func SentenceIDIn(vs ...uint64) predicate.Question {
-	return predicate.Question(sql.FieldIn(FieldSentenceID, vs...))
+// ScenarioIDIn applies the In predicate on the "scenario_id" field.
+func ScenarioIDIn(vs ...uint64) predicate.Question {
+	return predicate.Question(sql.FieldIn(FieldScenarioID, vs...))
 }
 
-// SentenceIDNotIn applies the NotIn predicate on the "sentence_id" field.
-func SentenceIDNotIn(vs ...uint64) predicate.Question {
-	return predicate.Question(sql.FieldNotIn(FieldSentenceID, vs...))
+// ScenarioIDNotIn applies the NotIn predicate on the "scenario_id" field.
+func ScenarioIDNotIn(vs ...uint64) predicate.Question {
+	return predicate.Question(sql.FieldNotIn(FieldScenarioID, vs...))
 }
 
 // CriteriaEQ applies the EQ predicate on the "criteria" field.

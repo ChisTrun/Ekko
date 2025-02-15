@@ -56,6 +56,30 @@ func (f ScenarioCandidateFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScenarioCandidateMutation", m)
 }
 
+// The ScenarioFavoriteFunc type is an adapter to allow the use of ordinary
+// function as ScenarioFavorite mutator.
+type ScenarioFavoriteFunc func(context.Context, *ent.ScenarioFavoriteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScenarioFavoriteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ScenarioFavoriteMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScenarioFavoriteMutation", m)
+}
+
+// The ScenarioFieldFunc type is an adapter to allow the use of ordinary
+// function as ScenarioField mutator.
+type ScenarioFieldFunc func(context.Context, *ent.ScenarioFieldMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScenarioFieldFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ScenarioFieldMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScenarioFieldMutation", m)
+}
+
 // The SubmissionAttemptFunc type is an adapter to allow the use of ordinary
 // function as SubmissionAttempt mutator.
 type SubmissionAttemptFunc func(context.Context, *ent.SubmissionAttemptMutation) (ent.Value, error)

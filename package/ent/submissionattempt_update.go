@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"ekko/package/ent/answersubmission"
 	"ekko/package/ent/predicate"
 	"ekko/package/ent/scenariocandidate"
 	"ekko/package/ent/submissionattempt"
@@ -76,6 +77,21 @@ func (sau *SubmissionAttemptUpdate) SetScenarioCandidate(s *ScenarioCandidate) *
 	return sau.SetScenarioCandidateID(s.ID)
 }
 
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by IDs.
+func (sau *SubmissionAttemptUpdate) AddAnswerIDs(ids ...uint64) *SubmissionAttemptUpdate {
+	sau.mutation.AddAnswerIDs(ids...)
+	return sau
+}
+
+// AddAnswers adds the "answers" edges to the AnswerSubmission entity.
+func (sau *SubmissionAttemptUpdate) AddAnswers(a ...*AnswerSubmission) *SubmissionAttemptUpdate {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sau.AddAnswerIDs(ids...)
+}
+
 // Mutation returns the SubmissionAttemptMutation object of the builder.
 func (sau *SubmissionAttemptUpdate) Mutation() *SubmissionAttemptMutation {
 	return sau.mutation
@@ -85,6 +101,27 @@ func (sau *SubmissionAttemptUpdate) Mutation() *SubmissionAttemptMutation {
 func (sau *SubmissionAttemptUpdate) ClearScenarioCandidate() *SubmissionAttemptUpdate {
 	sau.mutation.ClearScenarioCandidate()
 	return sau
+}
+
+// ClearAnswers clears all "answers" edges to the AnswerSubmission entity.
+func (sau *SubmissionAttemptUpdate) ClearAnswers() *SubmissionAttemptUpdate {
+	sau.mutation.ClearAnswers()
+	return sau
+}
+
+// RemoveAnswerIDs removes the "answers" edge to AnswerSubmission entities by IDs.
+func (sau *SubmissionAttemptUpdate) RemoveAnswerIDs(ids ...uint64) *SubmissionAttemptUpdate {
+	sau.mutation.RemoveAnswerIDs(ids...)
+	return sau
+}
+
+// RemoveAnswers removes "answers" edges to AnswerSubmission entities.
+func (sau *SubmissionAttemptUpdate) RemoveAnswers(a ...*AnswerSubmission) *SubmissionAttemptUpdate {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sau.RemoveAnswerIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -187,6 +224,51 @@ func (sau *SubmissionAttemptUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if sau.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := sau.mutation.RemovedAnswersIDs(); len(nodes) > 0 && !sau.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := sau.mutation.AnswersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(sau.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, sau.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -255,6 +337,21 @@ func (sauo *SubmissionAttemptUpdateOne) SetScenarioCandidate(s *ScenarioCandidat
 	return sauo.SetScenarioCandidateID(s.ID)
 }
 
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by IDs.
+func (sauo *SubmissionAttemptUpdateOne) AddAnswerIDs(ids ...uint64) *SubmissionAttemptUpdateOne {
+	sauo.mutation.AddAnswerIDs(ids...)
+	return sauo
+}
+
+// AddAnswers adds the "answers" edges to the AnswerSubmission entity.
+func (sauo *SubmissionAttemptUpdateOne) AddAnswers(a ...*AnswerSubmission) *SubmissionAttemptUpdateOne {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sauo.AddAnswerIDs(ids...)
+}
+
 // Mutation returns the SubmissionAttemptMutation object of the builder.
 func (sauo *SubmissionAttemptUpdateOne) Mutation() *SubmissionAttemptMutation {
 	return sauo.mutation
@@ -264,6 +361,27 @@ func (sauo *SubmissionAttemptUpdateOne) Mutation() *SubmissionAttemptMutation {
 func (sauo *SubmissionAttemptUpdateOne) ClearScenarioCandidate() *SubmissionAttemptUpdateOne {
 	sauo.mutation.ClearScenarioCandidate()
 	return sauo
+}
+
+// ClearAnswers clears all "answers" edges to the AnswerSubmission entity.
+func (sauo *SubmissionAttemptUpdateOne) ClearAnswers() *SubmissionAttemptUpdateOne {
+	sauo.mutation.ClearAnswers()
+	return sauo
+}
+
+// RemoveAnswerIDs removes the "answers" edge to AnswerSubmission entities by IDs.
+func (sauo *SubmissionAttemptUpdateOne) RemoveAnswerIDs(ids ...uint64) *SubmissionAttemptUpdateOne {
+	sauo.mutation.RemoveAnswerIDs(ids...)
+	return sauo
+}
+
+// RemoveAnswers removes "answers" edges to AnswerSubmission entities.
+func (sauo *SubmissionAttemptUpdateOne) RemoveAnswers(a ...*AnswerSubmission) *SubmissionAttemptUpdateOne {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sauo.RemoveAnswerIDs(ids...)
 }
 
 // Where appends a list predicates to the SubmissionAttemptUpdate builder.
@@ -389,6 +507,51 @@ func (sauo *SubmissionAttemptUpdateOne) sqlSave(ctx context.Context) (_node *Sub
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariocandidate.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if sauo.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := sauo.mutation.RemovedAnswersIDs(); len(nodes) > 0 && !sauo.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := sauo.mutation.AnswersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   submissionattempt.AnswersTable,
+			Columns: []string{submissionattempt.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

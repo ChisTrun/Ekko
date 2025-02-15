@@ -22,8 +22,8 @@ type Question struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// SentenceID holds the value of the "sentence_id" field.
-	SentenceID uint64 `json:"sentence_id,omitempty"`
+	// ScenarioID holds the value of the "scenario_id" field.
+	ScenarioID uint64 `json:"scenario_id,omitempty"`
 	// Criteria holds the value of the "criteria" field.
 	Criteria string `json:"criteria,omitempty"`
 	// Hint holds the value of the "hint" field.
@@ -61,7 +61,7 @@ func (*Question) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case question.FieldID, question.FieldSentenceID:
+		case question.FieldID, question.FieldScenarioID:
 			values[i] = new(sql.NullInt64)
 		case question.FieldCriteria, question.FieldHint, question.FieldContent:
 			values[i] = new(sql.NullString)
@@ -100,11 +100,11 @@ func (q *Question) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				q.UpdatedAt = value.Time
 			}
-		case question.FieldSentenceID:
+		case question.FieldScenarioID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field sentence_id", values[i])
+				return fmt.Errorf("unexpected type %T for field scenario_id", values[i])
 			} else if value.Valid {
-				q.SentenceID = uint64(value.Int64)
+				q.ScenarioID = uint64(value.Int64)
 			}
 		case question.FieldCriteria:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -171,8 +171,8 @@ func (q *Question) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(q.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("sentence_id=")
-	builder.WriteString(fmt.Sprintf("%v", q.SentenceID))
+	builder.WriteString("scenario_id=")
+	builder.WriteString(fmt.Sprintf("%v", q.ScenarioID))
 	builder.WriteString(", ")
 	builder.WriteString("criteria=")
 	builder.WriteString(q.Criteria)
