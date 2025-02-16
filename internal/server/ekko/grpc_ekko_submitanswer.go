@@ -6,5 +6,5 @@ import (
 )
 
 func (s *ekkoServer) SubmitAnswer(ctx context.Context, request *ekko.SubmitAnswerRequest) (*ekko.SubmitAnswerResponse, error) {
-	return nil, nil
+	return s.Feature.Submission.SubmitAnswer(ctx, request)
 }

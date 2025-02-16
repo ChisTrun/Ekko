@@ -112,6 +112,8 @@ gen_ts:
 	@for proto in $(PROTO_FILES); do \
 		protoc --ts_out=connect/ts \
 		--ts_opt=target=web\
+		-I. \
+		-I./third_party \
        $$proto; \
 	done
 

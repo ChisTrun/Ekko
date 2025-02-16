@@ -1,11 +1,10 @@
 package ekko
- 
- import (
- 	ekko "ekko/api"
- 	"context"
- )
- 
- func (s *ekkoServer) ListAllSubmission(ctx context.Context, request *ekko.ListAllSubmissionRequest) (*ekko.ListAllSubmissionResponse, error) {
- 	return nil, nil
- }
- 
+
+import (
+	"context"
+	ekko "ekko/api"
+)
+
+func (s *ekkoServer) ListAllSubmission(ctx context.Context, request *ekko.ListAllSubmissionRequest) (*ekko.ListAllSubmissionResponse, error) {
+	return s.Feature.Submission.ListAllSubmission(ctx, request)
+}

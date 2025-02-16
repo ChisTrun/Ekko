@@ -6,5 +6,5 @@ import (
 )
 
 func (s *chronobreakServer) GetScenario(ctx context.Context, request *ekko.GetScenarioRequest) (*ekko.GetScenarioResponse, error) {
-	return nil, nil
+	return s.Feature.Scenario.GetScenario(ctx, request)
 }

@@ -8,5 +8,9 @@ import (
 )
 
 func (s *ekkoServer) FavoriteScenario(ctx context.Context, request *ekko.FavoriteScenarioRequest) (*emptypb.Empty, error) {
-	return nil, nil
+	if err := s.Feature.Scenario.FavoriteScenario(ctx, request); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

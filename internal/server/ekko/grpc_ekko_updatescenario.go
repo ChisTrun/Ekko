@@ -8,5 +8,9 @@ import (
 )
 
 func (s *ekkoServer) UpdateScenario(ctx context.Context, request *ekko.UpdateScenarioRequest) (*emptypb.Empty, error) {
-	return nil, nil
+	if err := s.Feature.Scenario.UpdateScenario(ctx, request); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

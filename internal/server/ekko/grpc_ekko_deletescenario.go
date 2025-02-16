@@ -8,5 +8,9 @@ import (
 )
 
 func (s *ekkoServer) DeleteScenario(ctx context.Context, request *ekko.DeleteScenarioRequest) (*emptypb.Empty, error) {
-	return nil, nil
+	if err := s.Feature.Scenario.DeleteScenario(ctx, request); err != nil {
+		return nil, err
+	}
+
+	return &emptypb.Empty{}, nil
 }

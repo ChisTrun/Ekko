@@ -17,7 +17,7 @@ import (
 type Scenario interface {
 	Create(ctx context.Context, tx tx.Tx, ownerId uint64, req *ekko.CreateScenarioRequest) (*ent.Scenario, error)
 	Update(ctx context.Context, tx tx.Tx, bmId uint64, req *ekko.UpdateScenarioRequest) error
-	Delete(ctx context.Context, tx tx.Tx, bmId uint64, id uint64) error
+	Delete(ctx context.Context, tx tx.Tx, bmId uint64, ids []uint64) error
 	List(ctx context.Context, req *ekko.ListScenarioRequest, userId *uint64) ([]*ent.Scenario, int32, int32, error)
 	Get(ctx context.Context, req *ekko.GetScenarioRequest) (*ent.Scenario, error)
 	Favorite(ctx context.Context, userId uint64, scenarioId uint64) error
@@ -40,6 +40,7 @@ func (s *scenario) Create(ctx context.Context, tx tx.Tx, ownerId uint64, req *ek
 		SetName(req.Name).
 		SetDescription(req.Description).
 		SetDescription(req.Description).
+		AddFieldIDs(req.FieldIds...).
 		SetBmID(ownerId).
 		Save(ctx)
 	if err != nil {
@@ -85,8 +86,8 @@ func (s *scenario) Update(ctx context.Context, tx tx.Tx, bmId uint64, req *ekko.
 	return err
 }
 
-func (s *scenario) Delete(ctx context.Context, tx tx.Tx, bmId uint64, id uint64) error {
-	_, err := tx.Client().Scenario.Delete().Where(entscenario.IDIn(id), entscenario.BmID(bmId)).Exec(ctx)
+func (s *scenario) Delete(ctx context.Context, tx tx.Tx, bmId uint64, ids []uint64) error {
+	_, err := tx.Client().Scenario.Delete().Where(entscenario.IDIn(ids...), entscenario.BmID(bmId)).Exec(ctx)
 	return err
 }
 
@@ -124,6 +125,7 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 		Modify(sort).
 		Offset(int(req.PageIndex) * int(req.PageSize)).
 		Limit(int(req.PageSize)).
+		WithField().
 		All(ctx)
 	if err != nil {
 		return nil, 0, 0, err
@@ -133,7 +135,7 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 }
 
 func (s *scenario) Get(ctx context.Context, req *ekko.GetScenarioRequest) (*ent.Scenario, error) {
-	return s.ent.Scenario.Query().Where(entscenario.IDEQ(req.Id)).WithQuestions().First(ctx)
+	return s.ent.Scenario.Query().Where(entscenario.IDEQ(req.Id)).WithQuestions().WithField().First(ctx)
 }
 
 func (s *scenario) Favorite(ctx context.Context, userId uint64, scenarioId uint64) error {

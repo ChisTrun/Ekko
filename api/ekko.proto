@@ -19,7 +19,6 @@ service Ekko {
     rpc UpdateScenario (UpdateScenarioRequest) returns (google.protobuf.Empty);
     rpc DeleteScenario (DeleteScenarioRequest) returns (google.protobuf.Empty);
     rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse);
-    rpc GetScenario (GetScenarioRequest) returns (GetScenarioResponse);
     rpc FavoriteScenario (FavoriteScenarioRequest) returns (google.protobuf.Empty);
 
 
@@ -113,12 +112,10 @@ message Scenario {
     repeated Field fields = 6;
     int32 total_participant = 7;
     repeated Question questions = 8;
-    PublicationStatus publication_status = 9;   
 }
 
 message Question{
     uint64 id = 1;
-    uint64 question_id = 2; 
     string criteria =3;
     string hint = 4;
     string content = 5;
@@ -209,7 +206,7 @@ message ListFieldResponse{
 message CreateScenarioRequest {
     string name = 1;
     string description = 2;
-    repeated Field fields = 3;
+    repeated uint64 field_ids = 3;
     repeated ScenarioQuestion questions = 4;
 }
 

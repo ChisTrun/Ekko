@@ -6,5 +6,5 @@ import (
 )
 
 func (s *ekkoServer) ListAttempt(ctx context.Context, request *ekko.ListAttemptRequest) (*ekko.ListAttemptResponse, error) {
-	return nil, nil
+	return s.Feature.Submission.ListAttempt(ctx, request)
 }

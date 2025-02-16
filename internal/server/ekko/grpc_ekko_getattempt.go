@@ -6,5 +6,5 @@ import (
 )
 
 func (s *ekkoServer) GetAttempt(ctx context.Context, request *ekko.GetAttemptRequest) (*ekko.GetAttemptResponse, error) {
-	return nil, nil
+	return s.Feature.Submission.GetAttempt(ctx, request)
 }

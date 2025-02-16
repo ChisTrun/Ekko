@@ -8,6 +8,7 @@ import (
 	"ekko/internal/utils/tx"
 	"ekko/package/ent"
 	"ekko/package/ent/question"
+	"ekko/package/ent/scenario"
 	"ekko/package/ent/scenariocandidate"
 	"ekko/package/ent/submissionattempt"
 	"fmt"
@@ -15,7 +16,7 @@ import (
 
 type Submission interface {
 	Create(ctx context.Context, tx tx.Tx, candidateId uint64, req *ekko.SubmitAnswerRequest) (*ent.SubmissionAttempt, error)
-	GetAttempt(ctx context.Context, tx tx.Tx, candidateId *uint64, attemptId uint64) (*ent.SubmissionAttempt, error)
+	GetAttempt(ctx context.Context, user uint64, isBm bool, attemptId uint64) (*ent.SubmissionAttempt, error)
 	ListAttempt(ctx context.Context, candidateId uint64, req *ekko.ListAttemptRequest) ([]*ent.SubmissionAttempt, int32, int32, error)
 	ListAllSubmission(ctx context.Context, req *ekko.ListAllSubmissionRequest) ([]*ent.ScenarioCandidate, int32, int32, error)
 }
@@ -78,6 +79,10 @@ func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, r
 
 	submission.Edges.Answers = answers
 
+	if err := tx.Client().Scenario.UpdateOneID(req.ScenarioId).AddParticipants(1).Exec(ctx); err != nil {
+		return nil, err
+	}
+
 	return submission, nil
 }
 
@@ -120,15 +125,17 @@ func (s *submission) checkSubmission(ctx context.Context, scenarioId uint64, ans
 	return true, nil
 }
 
-func (s *submission) GetAttempt(ctx context.Context, tx tx.Tx, candidateId *uint64, attemptId uint64) (*ent.SubmissionAttempt, error) {
-	query := tx.Client().SubmissionAttempt.Query().Where(
+func (s *submission) GetAttempt(ctx context.Context, user uint64, isBm bool, attemptId uint64) (*ent.SubmissionAttempt, error) {
+	query := s.ent.SubmissionAttempt.Query().Where(
 		submissionattempt.ID(attemptId),
 	).WithAnswers()
-	if candidateId != nil {
-		query = query.Where(submissionattempt.HasScenarioCandidateWith(
-			scenariocandidate.CandidateID(*candidateId),
-		))
+
+	if !isBm {
+		query = query.Where(submissionattempt.HasScenarioCandidateWith(scenariocandidate.CandidateID(user)))
+	} else {
+		query = query.Where(submissionattempt.HasScenarioCandidateWith(scenariocandidate.HasScenarioWith(scenario.BmID(user))))
 	}
+
 	return query.Only(ctx)
 }
 
