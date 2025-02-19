@@ -93,10 +93,6 @@ func (s *scenario) DeleteScenario(ctx context.Context, request *ekko.DeleteScena
 }
 
 func (s *scenario) ListScenario(ctx context.Context, isAuth bool, req *ekko.ListScenarioRequest) (*ekko.ListScenarioResponse, error) {
-	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
-		return nil, err
-	}
 
 	var convertedUserId *uint64 = nil
 	if isAuth {
