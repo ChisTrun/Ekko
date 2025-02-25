@@ -34,7 +34,7 @@ func New(repo *repository.Repository, extractor extractor.Extractor) Field {
 
 func (f *field) CreateField(ctx context.Context, request *ekko.CreateFieldRequest) (*ekko.CreateFieldResponse, error) {
 	roleIds := f.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return nil, err
 	}
 
@@ -50,7 +50,7 @@ func (f *field) CreateField(ctx context.Context, request *ekko.CreateFieldReques
 
 func (f *field) UpdateField(ctx context.Context, request *ekko.UpdateFieldRequest) error {
 	roleIds := f.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return err
 	}
 
@@ -61,7 +61,7 @@ func (f *field) UpdateField(ctx context.Context, request *ekko.UpdateFieldReques
 
 func (f *field) DeleteField(ctx context.Context, request *ekko.DeleteFieldRequest) error {
 	roleIds := f.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return err
 	}
 

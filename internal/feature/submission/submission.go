@@ -121,7 +121,7 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 
 func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSubmissionRequest) (*ekko.ListAllSubmissionResponse, error) {
 	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return nil, err
 	}
 

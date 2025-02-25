@@ -36,7 +36,7 @@ func New(repo *repository.Repository, extractor extractor.Extractor) Scenario {
 
 func (s *scenario) CreateScenario(ctx context.Context, request *ekko.CreateScenarioRequest) (*ekko.CreateScenarioResponse, error) {
 	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return nil, err
 	}
 
@@ -62,7 +62,7 @@ func (s *scenario) CreateScenario(ctx context.Context, request *ekko.CreateScena
 
 func (s *scenario) UpdateScenario(ctx context.Context, request *ekko.UpdateScenarioRequest) error {
 	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return err
 	}
 
@@ -78,7 +78,7 @@ func (s *scenario) UpdateScenario(ctx context.Context, request *ekko.UpdateScena
 
 func (s *scenario) DeleteScenario(ctx context.Context, request *ekko.DeleteScenarioRequest) error {
 	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
 		return err
 	}
 
@@ -130,10 +130,6 @@ func (s *scenario) ListScenario(ctx context.Context, isAuth bool, req *ekko.List
 }
 
 func (s *scenario) GetScenario(ctx context.Context, req *ekko.GetScenarioRequest) (*ekko.GetScenarioResponse, error) {
-	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, bulbasaur.Role_ROLE_BUSINESS_MANAGER.String(), roleIds); err != nil {
-		return nil, err
-	}
 
 	entScenario, err := s.repo.Scenario.Get(ctx, req)
 	if err != nil {
