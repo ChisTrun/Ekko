@@ -5,7 +5,7 @@ import (
 	"ekko/internal/repository/question"
 	"ekko/internal/repository/scenario"
 	"ekko/internal/repository/submission"
-	"ekko/package/ent"
+	"ekko/pkg/ent"
 )
 
 type Repository struct {

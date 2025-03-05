@@ -4,8 +4,8 @@ import (
 	"context"
 	ekko "ekko/api"
 	"ekko/internal/utils/tx"
-	"ekko/package/ent"
-	entquestion "ekko/package/ent/question"
+	"ekko/pkg/ent"
+	entquestion "ekko/pkg/ent/question"
 )
 
 type Question interface {

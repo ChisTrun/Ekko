@@ -2,7 +2,7 @@ package converter
 
 import (
 	ekko "ekko/api"
-	"ekko/package/ent"
+	"ekko/pkg/ent"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )

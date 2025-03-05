@@ -2,8 +2,8 @@ package tx
 
 import (
 	"context"
-	"ekko/internal/utils/logging"
-	"ekko/package/ent"
+	"ekko/pkg/ent"
+	"ekko/pkg/logger/pkg/logging"
 
 	"go.uber.org/zap"
 )

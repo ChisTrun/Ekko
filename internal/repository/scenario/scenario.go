@@ -7,10 +7,10 @@ import (
 	"ekko/internal/utils/paging"
 	utils "ekko/internal/utils/sort"
 	"ekko/internal/utils/tx"
-	"ekko/package/ent"
-	entscenario "ekko/package/ent/scenario"
-	"ekko/package/ent/scenariocandidate"
-	"ekko/package/ent/scenariofavorite"
+	"ekko/pkg/ent"
+	entscenario "ekko/pkg/ent/scenario"
+	"ekko/pkg/ent/scenariocandidate"
+	"ekko/pkg/ent/scenariofavorite"
 	"fmt"
 )
 

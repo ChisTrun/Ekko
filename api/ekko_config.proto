@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package ekko.config;
+
+option go_package = "ekko/pkg/config;ekko";
+
+import "validate/validate.proto";
+import "logger/api/logger.proto";
+import "carbon/api/carbon.proto";
+import "redis/api/redis.proto";
+import "database/api/database.proto";
+
+message Config {
+  greyhole.carbon.Listener listener = 1 [ (validate.rules).message = {required : true} ];
+  greyhole.logger.Logger logger = 2 [ (validate.rules).message = {required : true} ];
+  greyhole.database.Database database = 3 [ (validate.rules).message = {required : true} ];
+  greyhole.redis.Redis redis = 4;
+  greyhole.carbon.Listener http_listener = 8 [ (validate.rules).message = {required : true} ];
+}
+
+
+

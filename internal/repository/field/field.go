@@ -6,8 +6,8 @@ import (
 	"ekko/internal/utils/paging"
 	utils "ekko/internal/utils/sort"
 	"ekko/internal/utils/tx"
-	"ekko/package/ent"
-	"ekko/package/ent/scenariofield"
+	"ekko/pkg/ent"
+	"ekko/pkg/ent/scenariofield"
 )
 
 type Field interface {

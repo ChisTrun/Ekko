@@ -8,8 +8,8 @@ import (
 	"ekko/internal/utils/converter"
 	"ekko/internal/utils/extractor"
 	"ekko/internal/utils/tx"
-	"ekko/package/ent"
-	bulbasaur "ekko/third_party/bulbasaur/api"
+	bulbasaur "ekko/pkg/bulbasaur/api"
+	"ekko/pkg/ent"
 	"fmt"
 	"sync"
 )
@@ -121,7 +121,7 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 
 func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSubmissionRequest) (*ekko.ListAllSubmissionResponse, error) {
 	roleIds := s.extractor.GetRoleIDs(ctx)
-	if err := checker.CheckRole(ctx, int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER), roleIds); err != nil {
+	if err := checker.CheckRole(ctx, fmt.Sprintf("%v", int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER)), roleIds); err != nil {
 		return nil, err
 	}
 

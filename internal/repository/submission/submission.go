@@ -6,11 +6,11 @@ import (
 	"ekko/internal/utils/paging"
 	utils "ekko/internal/utils/sort"
 	"ekko/internal/utils/tx"
-	"ekko/package/ent"
-	"ekko/package/ent/question"
-	"ekko/package/ent/scenario"
-	"ekko/package/ent/scenariocandidate"
-	"ekko/package/ent/submissionattempt"
+	"ekko/pkg/ent"
+	"ekko/pkg/ent/question"
+	"ekko/pkg/ent/scenario"
+	"ekko/pkg/ent/scenariocandidate"
+	"ekko/pkg/ent/submissionattempt"
 	"fmt"
 )
 
