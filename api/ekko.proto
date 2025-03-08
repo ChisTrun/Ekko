@@ -13,19 +13,19 @@ service ekko {
 
   rpc CreateField (CreateFieldRequest) returns (CreateFieldResponse)  {
     option (google.api.http) = {
-      post: "/api/field/create"
+      post: "/api/ekko/field/create"
       body: "*"
     };
   };
   rpc UpdateField (UpdateFieldRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/field/update"
+      post: "/api/ekko/field/update"
       body: "*"
     };
   };
   rpc DeleteField (DeleteFieldRequest) returns (google.protobuf.Empty)  {
     option (google.api.http) = {
-      post: "/api/field/delete"
+      post: "/api/ekko/field/delete"
       body: "*"
     };
   };
@@ -33,31 +33,31 @@ service ekko {
   // Scenario api
   rpc CreateScenario (CreateScenarioRequest) returns (CreateScenarioResponse) {
     option (google.api.http) = {
-      post: "/api/scenario/create"
+      post: "/api/ekko/scenario/create"
       body: "*"
     };
   };
   rpc UpdateScenario (UpdateScenarioRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/scenario/update"
+      post: "/api/ekko/scenario/update"
       body: "*"
     };
   };
   rpc DeleteScenario (DeleteScenarioRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/scenario/delete"
+      post: "/api/ekko/scenario/delete"
       body: "*"
     };
   };
   rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse){
     option (google.api.http) = {
-      post: "/api/scenario/auth/list"
+      post: "/api/ekko/scenario/auth/list"
       body: "*" 
     };
   };
   rpc FavoriteScenario (FavoriteScenarioRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/scenario/favorite"
+      post: "/api/ekko/scenario/favorite"
       body: "*"
     };
   };
@@ -65,19 +65,19 @@ service ekko {
   // Submission for candidate
   rpc ListAttempt (ListAttemptRequest) returns (ListAttemptResponse){
     option (google.api.http) = {
-      post: "/api/attempt/list"
+      post: "/api/ekko/attempt/list"
       body: "*"
     };
   };
   rpc GetAttempt (GetAttemptRequest) returns (GetAttemptResponse){
     option (google.api.http) = {
-      post: "/api/attempt"
+      post: "/api/ekko/attempt"
       body: "*"
     };
   };
   rpc SubmitAnswer (SubmitAnswerRequest) returns (SubmitAnswerResponse){
     option (google.api.http) = {
-      post: "/api/submit"
+      post: "/api/ekko/submit"
       body: "*"
     };
   };
@@ -85,7 +85,7 @@ service ekko {
   // Submission for bm
   rpc ListAllSubmission (ListAllSubmissionRequest) returns (ListAllSubmissionResponse){
     option (google.api.http) = {
-      post: "/api/submission/list"
+      post: "/api/ekko/submission/list"
       body: "*"
     };
   };
@@ -95,19 +95,19 @@ service ekko {
 service Chronobreak {   
   rpc ListField (ListFieldRequest) returns (ListFieldResponse){
     option (google.api.http) = {
-      post: "/api/field/list"
+      post: "/api/chronobreak/field/list"
       body: "*"
     };
   };
   rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse){
     option (google.api.http) = {
-      post: "/api/scenario/noauth/list"
+      post: "/api/chronobreak/scenario/noauth/list"
       body: "*"
     };
   };
   rpc GetScenario (GetScenarioRequest) returns (GetScenarioResponse){
     option (google.api.http) = {
-      post: "/api/scenario"
+      post: "/api/chronobreak/scenario"
       body: "*"
     };
   };
