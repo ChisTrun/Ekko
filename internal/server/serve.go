@@ -57,9 +57,14 @@ func Serve(cfg *config.Config) {
 			},
 		}),
 	)
-	service.HttpServeMux().Handle("/api/", grpcGatewayMux)
+	service.HttpServeMux().Handle("/ekko/", grpcGatewayMux)
+	service.HttpServeMux().Handle("/chronobreak/", grpcGatewayMux)
 
 	err = pb0.RegisterEkkoHandlerServer(context.Background(), grpcGatewayMux, ekkoServer)
+	if err != nil {
+		logger.Fatal("can not register http sibel server", zap.Error(err))
+	}
+	err = pb0.RegisterChronobreakHandlerServer(context.Background(), grpcGatewayMux, chronobreakServer)
 	if err != nil {
 		logger.Fatal("can not register http sibel server", zap.Error(err))
 	}

@@ -407,7 +407,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/api/ekko/field/create"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/ekko/field/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -427,7 +427,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/api/ekko/field/update"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/ekko/field/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -447,7 +447,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/api/ekko/field/delete"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/ekko/field/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -467,7 +467,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/create"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -487,7 +487,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/update"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -507,7 +507,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/delete"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -527,7 +527,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/auth/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/ekko/scenario/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -547,7 +547,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/favorite"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/favorite"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -657,7 +657,7 @@ func RegisterChronobreakHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/api/chronobreak/field/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/chronobreak/field/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -677,7 +677,7 @@ func RegisterChronobreakHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/api/chronobreak/scenario/noauth/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/noauth/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -697,7 +697,7 @@ func RegisterChronobreakHandlerServer(ctx context.Context, mux *runtime.ServeMux
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/api/chronobreak/scenario"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -755,7 +755,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/api/ekko/field/create"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/ekko/field/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -772,7 +772,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/api/ekko/field/update"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/ekko/field/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -789,7 +789,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/api/ekko/field/delete"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/ekko/field/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -806,7 +806,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/create"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -823,7 +823,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/update"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -840,7 +840,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/delete"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -857,7 +857,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/auth/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/ekko/scenario/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -874,7 +874,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/api/ekko/scenario/favorite"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/favorite"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -959,14 +959,14 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 }
 
 var (
-	pattern_Ekko_CreateField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "field", "create"}, ""))
-	pattern_Ekko_UpdateField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "field", "update"}, ""))
-	pattern_Ekko_DeleteField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "field", "delete"}, ""))
-	pattern_Ekko_CreateScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "scenario", "create"}, ""))
-	pattern_Ekko_UpdateScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "scenario", "update"}, ""))
-	pattern_Ekko_DeleteScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "scenario", "delete"}, ""))
-	pattern_Ekko_ListScenario_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "ekko", "scenario", "auth", "list"}, ""))
-	pattern_Ekko_FavoriteScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "scenario", "favorite"}, ""))
+	pattern_Ekko_CreateField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "create"}, ""))
+	pattern_Ekko_UpdateField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "update"}, ""))
+	pattern_Ekko_DeleteField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "delete"}, ""))
+	pattern_Ekko_CreateScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "create"}, ""))
+	pattern_Ekko_UpdateScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "update"}, ""))
+	pattern_Ekko_DeleteScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "delete"}, ""))
+	pattern_Ekko_ListScenario_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "list"}, ""))
+	pattern_Ekko_FavoriteScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "favorite"}, ""))
 	pattern_Ekko_ListAttempt_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "attempt", "list"}, ""))
 	pattern_Ekko_GetAttempt_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "ekko", "attempt"}, ""))
 	pattern_Ekko_SubmitAnswer_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "ekko", "submit"}, ""))
@@ -1028,7 +1028,7 @@ func RegisterChronobreakHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/api/chronobreak/field/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/chronobreak/field/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1045,7 +1045,7 @@ func RegisterChronobreakHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/api/chronobreak/scenario/noauth/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/noauth/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1062,7 +1062,7 @@ func RegisterChronobreakHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/api/chronobreak/scenario"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1079,9 +1079,9 @@ func RegisterChronobreakHandlerClient(ctx context.Context, mux *runtime.ServeMux
 }
 
 var (
-	pattern_Chronobreak_ListField_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "chronobreak", "field", "list"}, ""))
-	pattern_Chronobreak_ListScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3, 2, 4}, []string{"api", "chronobreak", "scenario", "noauth", "list"}, ""))
-	pattern_Chronobreak_GetScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "chronobreak", "scenario"}, ""))
+	pattern_Chronobreak_ListField_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"chronobreak", "field", "list"}, ""))
+	pattern_Chronobreak_ListScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"chronobreak", "scenario", "noauth", "list"}, ""))
+	pattern_Chronobreak_GetScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"chronobreak", "scenario"}, ""))
 )
 
 var (

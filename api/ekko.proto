@@ -13,19 +13,19 @@ service ekko {
 
   rpc CreateField (CreateFieldRequest) returns (CreateFieldResponse)  {
     option (google.api.http) = {
-      post: "/api/ekko/field/create"
+      post: "/ekko/field/create"
       body: "*"
     };
   };
   rpc UpdateField (UpdateFieldRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {
-      post: "/api/ekko/field/update"
+      post: "/ekko/field/update"
       body: "*"
     };
   };
   rpc DeleteField (DeleteFieldRequest) returns (google.protobuf.Empty)  {
     option (google.api.http) = {
-      post: "/api/ekko/field/delete"
+      post: "/ekko/field/delete"
       body: "*"
     };
   };
@@ -33,31 +33,31 @@ service ekko {
   // Scenario api
   rpc CreateScenario (CreateScenarioRequest) returns (CreateScenarioResponse) {
     option (google.api.http) = {
-      post: "/api/ekko/scenario/create"
+      post: "/ekko/scenario/create"
       body: "*"
     };
   };
   rpc UpdateScenario (UpdateScenarioRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/ekko/scenario/update"
+      post: "/ekko/scenario/update"
       body: "*"
     };
   };
   rpc DeleteScenario (DeleteScenarioRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/ekko/scenario/delete"
+      post: "/ekko/scenario/delete"
       body: "*"
     };
   };
   rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse){
     option (google.api.http) = {
-      post: "/api/ekko/scenario/auth/list"
+      post: "/ekko/scenario/list"
       body: "*" 
     };
   };
   rpc FavoriteScenario (FavoriteScenarioRequest) returns (google.protobuf.Empty){
     option (google.api.http) = {
-      post: "/api/ekko/scenario/favorite"
+      post: "/ekko/scenario/favorite"
       body: "*"
     };
   };
@@ -95,19 +95,19 @@ service ekko {
 service Chronobreak {   
   rpc ListField (ListFieldRequest) returns (ListFieldResponse){
     option (google.api.http) = {
-      post: "/api/chronobreak/field/list"
+      post: "/chronobreak/field/list"
       body: "*"
     };
   };
   rpc ListScenario (ListScenarioRequest) returns (ListScenarioResponse){
     option (google.api.http) = {
-      post: "/api/chronobreak/scenario/noauth/list"
+      post: "/chronobreak/scenario/noauth/list"
       body: "*"
     };
   };
   rpc GetScenario (GetScenarioRequest) returns (GetScenarioResponse){
     option (google.api.http) = {
-      post: "/api/chronobreak/scenario"
+      post: "/chronobreak/scenario"
       body: "*"
     };
   };
