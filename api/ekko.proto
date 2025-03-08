@@ -65,19 +65,19 @@ service ekko {
   // Submission for candidate
   rpc ListAttempt (ListAttemptRequest) returns (ListAttemptResponse){
     option (google.api.http) = {
-      post: "/api/ekko/attempt/list"
+      post: "/ekko/attempt/list"
       body: "*"
     };
   };
   rpc GetAttempt (GetAttemptRequest) returns (GetAttemptResponse){
     option (google.api.http) = {
-      post: "/api/ekko/attempt"
+      post: "/ekko/attempt"
       body: "*"
     };
   };
   rpc SubmitAnswer (SubmitAnswerRequest) returns (SubmitAnswerResponse){
     option (google.api.http) = {
-      post: "/api/ekko/submit"
+      post: "/ekko/submit"
       body: "*"
     };
   };
@@ -85,7 +85,7 @@ service ekko {
   // Submission for bm
   rpc ListAllSubmission (ListAllSubmissionRequest) returns (ListAllSubmissionResponse){
     option (google.api.http) = {
-      post: "/api/ekko/submission/list"
+      post: "/ekko/submission/list"
       body: "*"
     };
   };

@@ -567,7 +567,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/api/ekko/attempt/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/ekko/attempt/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -587,7 +587,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/api/ekko/attempt"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/ekko/attempt"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -607,7 +607,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/api/ekko/submit"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/ekko/submit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -627,7 +627,7 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/api/ekko/submission/list"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/ekko/submission/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -891,7 +891,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/api/ekko/attempt/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/ekko/attempt/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -908,7 +908,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/api/ekko/attempt"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/ekko/attempt"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -925,7 +925,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/api/ekko/submit"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/ekko/submit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -942,7 +942,7 @@ func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, clien
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/api/ekko/submission/list"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/ekko/submission/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -967,10 +967,10 @@ var (
 	pattern_Ekko_DeleteScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "delete"}, ""))
 	pattern_Ekko_ListScenario_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "list"}, ""))
 	pattern_Ekko_FavoriteScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "favorite"}, ""))
-	pattern_Ekko_ListAttempt_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "attempt", "list"}, ""))
-	pattern_Ekko_GetAttempt_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "ekko", "attempt"}, ""))
-	pattern_Ekko_SubmitAnswer_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"api", "ekko", "submit"}, ""))
-	pattern_Ekko_ListAllSubmission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"api", "ekko", "submission", "list"}, ""))
+	pattern_Ekko_ListAttempt_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "attempt", "list"}, ""))
+	pattern_Ekko_GetAttempt_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ekko", "attempt"}, ""))
+	pattern_Ekko_SubmitAnswer_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ekko", "submit"}, ""))
+	pattern_Ekko_ListAllSubmission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "submission", "list"}, ""))
 )
 
 var (
