@@ -343,3 +343,5 @@ message GetScenarioResponse {
 message FavoriteScenarioRequest {
   uint64 id = 1;
 }
+
+

@@ -1,0 +1,1158 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "ekko.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "ekko"
+    },
+    {
+      "name": "Chronobreak"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/chronobreak/field/list": {
+      "post": {
+        "operationId": "Chronobreak_ListField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoListFieldResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoListFieldRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Chronobreak"
+        ]
+      }
+    },
+    "/chronobreak/scenario": {
+      "post": {
+        "operationId": "Chronobreak_GetScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoGetScenarioResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoGetScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Chronobreak"
+        ]
+      }
+    },
+    "/chronobreak/scenario/noauth/list": {
+      "post": {
+        "operationId": "Chronobreak_ListScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoListScenarioResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoListScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "Chronobreak"
+        ]
+      }
+    },
+    "/ekko/attempt": {
+      "post": {
+        "operationId": "ekko_GetAttempt",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoGetAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoGetAttemptRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/attempt/list": {
+      "post": {
+        "summary": "Submission for candidate",
+        "operationId": "ekko_ListAttempt",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoListAttemptResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoListAttemptRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/field/create": {
+      "post": {
+        "operationId": "ekko_CreateField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoCreateFieldResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoCreateFieldRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/field/delete": {
+      "post": {
+        "operationId": "ekko_DeleteField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoDeleteFieldRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/field/update": {
+      "post": {
+        "operationId": "ekko_UpdateField",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoUpdateFieldRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/scenario/create": {
+      "post": {
+        "summary": "Scenario api",
+        "operationId": "ekko_CreateScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoCreateScenarioResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoCreateScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/scenario/delete": {
+      "post": {
+        "operationId": "ekko_DeleteScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoDeleteScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/scenario/favorite": {
+      "post": {
+        "operationId": "ekko_FavoriteScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoFavoriteScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/scenario/list": {
+      "post": {
+        "operationId": "ekko_ListScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoListScenarioResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoListScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/scenario/update": {
+      "post": {
+        "operationId": "ekko_UpdateScenario",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoUpdateScenarioRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/submission/list": {
+      "post": {
+        "summary": "Submission for bm",
+        "operationId": "ekko_ListAllSubmission",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoListAllSubmissionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoListAllSubmissionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    },
+    "/ekko/submit": {
+      "post": {
+        "operationId": "ekko_SubmitAnswer",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/ekkoSubmitAnswerResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/ekkoSubmitAnswerRequest"
+            }
+          }
+        ],
+        "tags": [
+          "ekko"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "SubmitAnswerRequestSubmittedAnswer": {
+      "type": "object",
+      "properties": {
+        "questionId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "answer": {
+          "type": "string"
+        }
+      }
+    },
+    "ekkoAnswer": {
+      "type": "object",
+      "properties": {
+        "questionId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "answer": {
+          "type": "string"
+        },
+        "relevance": {
+          "type": "number",
+          "format": "float"
+        },
+        "clarityCompleteness": {
+          "type": "number",
+          "format": "float"
+        },
+        "accuracy": {
+          "type": "number",
+          "format": "float"
+        },
+        "overall": {
+          "type": "number",
+          "format": "float"
+        },
+        "status": {
+          "$ref": "#/definitions/ekkoSubmissionStatus"
+        },
+        "baseData": {
+          "$ref": "#/definitions/ekkoBaseData"
+        }
+      }
+    },
+    "ekkoAttempt": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "scenarioId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoAnswer"
+          }
+        },
+        "baseData": {
+          "$ref": "#/definitions/ekkoBaseData"
+        },
+        "attemptNumber": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "ekkoBaseData": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "ekkoCreateFieldRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ekkoCreateFieldResponse": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "$ref": "#/definitions/ekkoField"
+        }
+      }
+    },
+    "ekkoCreateScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fieldIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoScenarioQuestion"
+          }
+        }
+      }
+    },
+    "ekkoCreateScenarioResponse": {
+      "type": "object",
+      "properties": {
+        "scenario": {
+          "$ref": "#/definitions/ekkoScenario"
+        }
+      }
+    },
+    "ekkoDeleteFieldRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "ekkoDeleteScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        }
+      }
+    },
+    "ekkoFavoriteScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "ekkoField": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "baseData": {
+          "$ref": "#/definitions/ekkoBaseData"
+        }
+      }
+    },
+    "ekkoGetAttemptRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "ekkoGetAttemptResponse": {
+      "type": "object",
+      "properties": {
+        "attempt": {
+          "$ref": "#/definitions/ekkoAttempt"
+        }
+      }
+    },
+    "ekkoGetScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        }
+      }
+    },
+    "ekkoGetScenarioResponse": {
+      "type": "object",
+      "properties": {
+        "scenario": {
+          "$ref": "#/definitions/ekkoScenario"
+        }
+      }
+    },
+    "ekkoListAllSubmissionRequest": {
+      "type": "object",
+      "properties": {
+        "scenarioId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "pageIndex": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sortMethod": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoSortMethod"
+          }
+        }
+      }
+    },
+    "ekkoListAllSubmissionResponse": {
+      "type": "object",
+      "properties": {
+        "submissions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoSubmission"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "request": {
+          "$ref": "#/definitions/ekkoListAllSubmissionRequest"
+        }
+      }
+    },
+    "ekkoListAttemptRequest": {
+      "type": "object",
+      "properties": {
+        "scenarioId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "pageIndex": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "sortMethod": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoSortMethod"
+          }
+        }
+      }
+    },
+    "ekkoListAttemptResponse": {
+      "type": "object",
+      "properties": {
+        "attempts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoAttempt"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "request": {
+          "$ref": "#/definitions/ekkoListAttemptRequest"
+        }
+      }
+    },
+    "ekkoListFieldRequest": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "sortMethods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoSortMethod"
+          }
+        },
+        "pageIndex": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "searchContent": {
+          "type": "string"
+        }
+      }
+    },
+    "ekkoListFieldResponse": {
+      "type": "object",
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoField"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "request": {
+          "$ref": "#/definitions/ekkoListFieldRequest"
+        }
+      }
+    },
+    "ekkoListScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "bmIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "format": "uint64"
+          }
+        },
+        "searchContent": {
+          "type": "string"
+        },
+        "sortMethods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoSortMethod"
+          }
+        },
+        "pageIndex": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "isFavorite": {
+          "type": "boolean"
+        },
+        "isFinished": {
+          "type": "boolean"
+        }
+      }
+    },
+    "ekkoListScenarioResponse": {
+      "type": "object",
+      "properties": {
+        "scenario": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoScenario"
+          }
+        },
+        "totalCount": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "totalPage": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "request": {
+          "$ref": "#/definitions/ekkoListScenarioRequest"
+        }
+      }
+    },
+    "ekkoQuestion": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "criteria": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        },
+        "baseData": {
+          "$ref": "#/definitions/ekkoBaseData"
+        }
+      }
+    },
+    "ekkoScenario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "baseData": {
+          "$ref": "#/definitions/ekkoBaseData"
+        },
+        "rating": {
+          "type": "number",
+          "format": "float"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoField"
+          }
+        },
+        "totalParticipant": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoQuestion"
+          }
+        }
+      }
+    },
+    "ekkoScenarioQuestion": {
+      "type": "object",
+      "properties": {
+        "criteria": {
+          "type": "string"
+        },
+        "hint": {
+          "type": "string"
+        },
+        "content": {
+          "type": "string"
+        }
+      }
+    },
+    "ekkoSortMethod": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/ekkoSortType"
+        }
+      }
+    },
+    "ekkoSortType": {
+      "type": "string",
+      "enum": [
+        "SORT_TYPE_UNKNOWN",
+        "SORT_TYPE_ASC",
+        "SORT_TYPE_DESC"
+      ],
+      "default": "SORT_TYPE_UNKNOWN"
+    },
+    "ekkoSubmission": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "scenarioId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "candidateId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "attempts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoAttempt"
+          }
+        }
+      }
+    },
+    "ekkoSubmissionStatus": {
+      "type": "string",
+      "enum": [
+        "SUBMISSION_STATUS_UNKNOWN",
+        "SUBMISSION_STATUS_IN_PROGRESS",
+        "SUBMISSION_STATUS_FAILED",
+        "SUBMISSION_STATUS_SUCCESS"
+      ],
+      "default": "SUBMISSION_STATUS_UNKNOWN"
+    },
+    "ekkoSubmitAnswerRequest": {
+      "type": "object",
+      "properties": {
+        "scenarioId": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "answers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/SubmitAnswerRequestSubmittedAnswer"
+          }
+        }
+      }
+    },
+    "ekkoSubmitAnswerResponse": {
+      "type": "object",
+      "properties": {
+        "attempt": {
+          "$ref": "#/definitions/ekkoAttempt"
+        }
+      }
+    },
+    "ekkoUpdateFieldRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "ekkoUpdateScenarioRequest": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uint64"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "fields": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoField"
+          }
+        },
+        "questions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/ekkoScenarioQuestion"
+          }
+        }
+      }
+    },
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    }
+  }
+}

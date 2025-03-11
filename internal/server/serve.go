@@ -6,9 +6,12 @@ import (
 	"ekko/pkg/ent"
 	"ekko/pkg/ent/migrate"
 	mykit "ekko/pkg/mykit/pkg/api"
+	"net/http"
+	"strings"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"go.uber.org/zap"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/protobuf/encoding/protojson"
 
@@ -19,6 +22,20 @@ import (
 	"ekko/internal/server/ekko"
 	config "ekko/pkg/config"
 )
+
+func customMetadataAnnotator(ctx context.Context, req *http.Request) metadata.MD {
+	md := metadata.MD{}
+
+	// Map tất cả các header có prefix "x-" vào metadata
+	for name, values := range req.Header {
+		lowerName := strings.ToLower(name)
+		if strings.HasPrefix(lowerName, "x-") {
+			md.Append(lowerName, values...)
+		}
+	}
+
+	return md
+}
 
 // Serve ...
 func Serve(cfg *config.Config) {
@@ -49,6 +66,7 @@ func Serve(cfg *config.Config) {
 	chronobreakServer := chronobreak.NewServer(feature)
 
 	grpcGatewayMux := runtime.NewServeMux(
+		runtime.WithMetadata(customMetadataAnnotator),
 		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
 			MarshalOptions: protojson.MarshalOptions{
 				UseProtoNames:   true,
