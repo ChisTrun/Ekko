@@ -50,23 +50,19 @@ func (sfu *ScenarioFieldUpdate) SetNillableName(s *string) *ScenarioFieldUpdate 
 	return sfu
 }
 
-// SetSenariosID sets the "senarios" edge to the Scenario entity by ID.
-func (sfu *ScenarioFieldUpdate) SetSenariosID(id uint64) *ScenarioFieldUpdate {
-	sfu.mutation.SetSenariosID(id)
+// AddSenarioIDs adds the "senarios" edge to the Scenario entity by IDs.
+func (sfu *ScenarioFieldUpdate) AddSenarioIDs(ids ...uint64) *ScenarioFieldUpdate {
+	sfu.mutation.AddSenarioIDs(ids...)
 	return sfu
 }
 
-// SetNillableSenariosID sets the "senarios" edge to the Scenario entity by ID if the given value is not nil.
-func (sfu *ScenarioFieldUpdate) SetNillableSenariosID(id *uint64) *ScenarioFieldUpdate {
-	if id != nil {
-		sfu = sfu.SetSenariosID(*id)
+// AddSenarios adds the "senarios" edges to the Scenario entity.
+func (sfu *ScenarioFieldUpdate) AddSenarios(s ...*Scenario) *ScenarioFieldUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return sfu
-}
-
-// SetSenarios sets the "senarios" edge to the Scenario entity.
-func (sfu *ScenarioFieldUpdate) SetSenarios(s *Scenario) *ScenarioFieldUpdate {
-	return sfu.SetSenariosID(s.ID)
+	return sfu.AddSenarioIDs(ids...)
 }
 
 // Mutation returns the ScenarioFieldMutation object of the builder.
@@ -74,10 +70,25 @@ func (sfu *ScenarioFieldUpdate) Mutation() *ScenarioFieldMutation {
 	return sfu.mutation
 }
 
-// ClearSenarios clears the "senarios" edge to the Scenario entity.
+// ClearSenarios clears all "senarios" edges to the Scenario entity.
 func (sfu *ScenarioFieldUpdate) ClearSenarios() *ScenarioFieldUpdate {
 	sfu.mutation.ClearSenarios()
 	return sfu
+}
+
+// RemoveSenarioIDs removes the "senarios" edge to Scenario entities by IDs.
+func (sfu *ScenarioFieldUpdate) RemoveSenarioIDs(ids ...uint64) *ScenarioFieldUpdate {
+	sfu.mutation.RemoveSenarioIDs(ids...)
+	return sfu
+}
+
+// RemoveSenarios removes "senarios" edges to Scenario entities.
+func (sfu *ScenarioFieldUpdate) RemoveSenarios(s ...*Scenario) *ScenarioFieldUpdate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return sfu.RemoveSenarioIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -139,10 +150,10 @@ func (sfu *ScenarioFieldUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if sfu.mutation.SenariosCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   scenariofield.SenariosTable,
-			Columns: []string{scenariofield.SenariosColumn},
+			Columns: scenariofield.SenariosPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
@@ -150,12 +161,28 @@ func (sfu *ScenarioFieldUpdate) sqlSave(ctx context.Context) (n int, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := sfu.mutation.SenariosIDs(); len(nodes) > 0 {
+	if nodes := sfu.mutation.RemovedSenariosIDs(); len(nodes) > 0 && !sfu.mutation.SenariosCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   scenariofield.SenariosTable,
-			Columns: []string{scenariofield.SenariosColumn},
+			Columns: scenariofield.SenariosPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := sfu.mutation.SenariosIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   scenariofield.SenariosTable,
+			Columns: scenariofield.SenariosPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
@@ -208,23 +235,19 @@ func (sfuo *ScenarioFieldUpdateOne) SetNillableName(s *string) *ScenarioFieldUpd
 	return sfuo
 }
 
-// SetSenariosID sets the "senarios" edge to the Scenario entity by ID.
-func (sfuo *ScenarioFieldUpdateOne) SetSenariosID(id uint64) *ScenarioFieldUpdateOne {
-	sfuo.mutation.SetSenariosID(id)
+// AddSenarioIDs adds the "senarios" edge to the Scenario entity by IDs.
+func (sfuo *ScenarioFieldUpdateOne) AddSenarioIDs(ids ...uint64) *ScenarioFieldUpdateOne {
+	sfuo.mutation.AddSenarioIDs(ids...)
 	return sfuo
 }
 
-// SetNillableSenariosID sets the "senarios" edge to the Scenario entity by ID if the given value is not nil.
-func (sfuo *ScenarioFieldUpdateOne) SetNillableSenariosID(id *uint64) *ScenarioFieldUpdateOne {
-	if id != nil {
-		sfuo = sfuo.SetSenariosID(*id)
+// AddSenarios adds the "senarios" edges to the Scenario entity.
+func (sfuo *ScenarioFieldUpdateOne) AddSenarios(s ...*Scenario) *ScenarioFieldUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return sfuo
-}
-
-// SetSenarios sets the "senarios" edge to the Scenario entity.
-func (sfuo *ScenarioFieldUpdateOne) SetSenarios(s *Scenario) *ScenarioFieldUpdateOne {
-	return sfuo.SetSenariosID(s.ID)
+	return sfuo.AddSenarioIDs(ids...)
 }
 
 // Mutation returns the ScenarioFieldMutation object of the builder.
@@ -232,10 +255,25 @@ func (sfuo *ScenarioFieldUpdateOne) Mutation() *ScenarioFieldMutation {
 	return sfuo.mutation
 }
 
-// ClearSenarios clears the "senarios" edge to the Scenario entity.
+// ClearSenarios clears all "senarios" edges to the Scenario entity.
 func (sfuo *ScenarioFieldUpdateOne) ClearSenarios() *ScenarioFieldUpdateOne {
 	sfuo.mutation.ClearSenarios()
 	return sfuo
+}
+
+// RemoveSenarioIDs removes the "senarios" edge to Scenario entities by IDs.
+func (sfuo *ScenarioFieldUpdateOne) RemoveSenarioIDs(ids ...uint64) *ScenarioFieldUpdateOne {
+	sfuo.mutation.RemoveSenarioIDs(ids...)
+	return sfuo
+}
+
+// RemoveSenarios removes "senarios" edges to Scenario entities.
+func (sfuo *ScenarioFieldUpdateOne) RemoveSenarios(s ...*Scenario) *ScenarioFieldUpdateOne {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return sfuo.RemoveSenarioIDs(ids...)
 }
 
 // Where appends a list predicates to the ScenarioFieldUpdate builder.
@@ -327,10 +365,10 @@ func (sfuo *ScenarioFieldUpdateOne) sqlSave(ctx context.Context) (_node *Scenari
 	}
 	if sfuo.mutation.SenariosCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   scenariofield.SenariosTable,
-			Columns: []string{scenariofield.SenariosColumn},
+			Columns: scenariofield.SenariosPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
@@ -338,12 +376,28 @@ func (sfuo *ScenarioFieldUpdateOne) sqlSave(ctx context.Context) (_node *Scenari
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := sfuo.mutation.SenariosIDs(); len(nodes) > 0 {
+	if nodes := sfuo.mutation.RemovedSenariosIDs(); len(nodes) > 0 && !sfuo.mutation.SenariosCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   scenariofield.SenariosTable,
-			Columns: []string{scenariofield.SenariosColumn},
+			Columns: scenariofield.SenariosPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := sfuo.mutation.SenariosIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   scenariofield.SenariosTable,
+			Columns: scenariofield.SenariosPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),

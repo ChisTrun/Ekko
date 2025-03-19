@@ -28,6 +28,7 @@ const (
 	Ekko_DeleteScenario_FullMethodName    = "/ekko.ekko/DeleteScenario"
 	Ekko_ListScenario_FullMethodName      = "/ekko.ekko/ListScenario"
 	Ekko_FavoriteScenario_FullMethodName  = "/ekko.ekko/FavoriteScenario"
+	Ekko_RatingScenario_FullMethodName    = "/ekko.ekko/RatingScenario"
 	Ekko_ListAttempt_FullMethodName       = "/ekko.ekko/ListAttempt"
 	Ekko_GetAttempt_FullMethodName        = "/ekko.ekko/GetAttempt"
 	Ekko_SubmitAnswer_FullMethodName      = "/ekko.ekko/SubmitAnswer"
@@ -47,6 +48,7 @@ type EkkoClient interface {
 	DeleteScenario(ctx context.Context, in *DeleteScenarioRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ListScenario(ctx context.Context, in *ListScenarioRequest, opts ...grpc.CallOption) (*ListScenarioResponse, error)
 	FavoriteScenario(ctx context.Context, in *FavoriteScenarioRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RatingScenario(ctx context.Context, in *RatingScenarioRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// Submission for candidate
 	ListAttempt(ctx context.Context, in *ListAttemptRequest, opts ...grpc.CallOption) (*ListAttemptResponse, error)
 	GetAttempt(ctx context.Context, in *GetAttemptRequest, opts ...grpc.CallOption) (*GetAttemptResponse, error)
@@ -143,6 +145,16 @@ func (c *ekkoClient) FavoriteScenario(ctx context.Context, in *FavoriteScenarioR
 	return out, nil
 }
 
+func (c *ekkoClient) RatingScenario(ctx context.Context, in *RatingScenarioRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, Ekko_RatingScenario_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *ekkoClient) ListAttempt(ctx context.Context, in *ListAttemptRequest, opts ...grpc.CallOption) (*ListAttemptResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListAttemptResponse)
@@ -196,6 +208,7 @@ type EkkoServer interface {
 	DeleteScenario(context.Context, *DeleteScenarioRequest) (*emptypb.Empty, error)
 	ListScenario(context.Context, *ListScenarioRequest) (*ListScenarioResponse, error)
 	FavoriteScenario(context.Context, *FavoriteScenarioRequest) (*emptypb.Empty, error)
+	RatingScenario(context.Context, *RatingScenarioRequest) (*emptypb.Empty, error)
 	// Submission for candidate
 	ListAttempt(context.Context, *ListAttemptRequest) (*ListAttemptResponse, error)
 	GetAttempt(context.Context, *GetAttemptRequest) (*GetAttemptResponse, error)
@@ -235,6 +248,9 @@ func (UnimplementedEkkoServer) ListScenario(context.Context, *ListScenarioReques
 }
 func (UnimplementedEkkoServer) FavoriteScenario(context.Context, *FavoriteScenarioRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FavoriteScenario not implemented")
+}
+func (UnimplementedEkkoServer) RatingScenario(context.Context, *RatingScenarioRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RatingScenario not implemented")
 }
 func (UnimplementedEkkoServer) ListAttempt(context.Context, *ListAttemptRequest) (*ListAttemptResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListAttempt not implemented")
@@ -413,6 +429,24 @@ func _Ekko_FavoriteScenario_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Ekko_RatingScenario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RatingScenarioRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EkkoServer).RatingScenario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Ekko_RatingScenario_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EkkoServer).RatingScenario(ctx, req.(*RatingScenarioRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Ekko_ListAttempt_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListAttemptRequest)
 	if err := dec(in); err != nil {
@@ -523,6 +557,10 @@ var Ekko_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "FavoriteScenario",
 			Handler:    _Ekko_FavoriteScenario_Handler,
+		},
+		{
+			MethodName: "RatingScenario",
+			Handler:    _Ekko_RatingScenario_Handler,
 		},
 		{
 			MethodName: "ListAttempt",

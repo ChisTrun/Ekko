@@ -10,6 +10,7 @@ import (
 	"ekko/internal/utils/tx"
 	bulbasaur "ekko/pkg/bulbasaur/api"
 	"ekko/pkg/ent"
+	"ekko/pkg/logger/pkg/logging"
 	"fmt"
 	"sync"
 )
@@ -102,6 +103,7 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 
 	userId, err := s.extractor.GetUserID(ctx)
 	if err != nil {
+		logging.Logger(ctx).Error(fmt.Sprintf("failed to get user id: %v", err))
 		return nil, err
 	}
 
@@ -111,6 +113,7 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 		attempt, err = s.repo.Submission.Create(ctx, tx, uint64(userId), req)
 		return err
 	}); txErr != nil {
+		logging.Logger(ctx).Error(fmt.Sprintf("failed to submit answer: %v", txErr))
 		return nil, txErr
 	}
 

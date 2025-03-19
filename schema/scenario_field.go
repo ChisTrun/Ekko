@@ -24,6 +24,6 @@ func (ScenarioField) Fields() []ent.Field {
 
 func (ScenarioField) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("senarios", Scenario.Type).Unique(),
+		edge.To("senarios", Scenario.Type),
 	}
 }

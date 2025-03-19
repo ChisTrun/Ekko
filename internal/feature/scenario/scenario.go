@@ -21,6 +21,7 @@ type Scenario interface {
 	ListScenario(ctx context.Context, isAuth bool, req *ekko.ListScenarioRequest) (*ekko.ListScenarioResponse, error)
 	GetScenario(ctx context.Context, req *ekko.GetScenarioRequest) (*ekko.GetScenarioResponse, error)
 	FavoriteScenario(ctx context.Context, req *ekko.FavoriteScenarioRequest) error
+	RatingScenario(ctx context.Context, req *ekko.RatingScenarioRequest) error
 }
 
 type scenario struct {
@@ -150,4 +151,8 @@ func (s *scenario) FavoriteScenario(ctx context.Context, req *ekko.FavoriteScena
 	}
 
 	return s.repo.Scenario.Favorite(ctx, uint64(userId), req.GetId())
+}
+
+func (s *scenario) RatingScenario(ctx context.Context, req *ekko.RatingScenarioRequest) error {
+	return s.repo.Scenario.Rating(ctx, req.GetId(), float64(req.GetRating()))
 }

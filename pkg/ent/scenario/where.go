@@ -85,6 +85,11 @@ func Rating(v float64) predicate.Scenario {
 	return predicate.Scenario(sql.FieldEQ(FieldRating, v))
 }
 
+// TotalRating applies equality check predicate on the "total_rating" field. It's identical to TotalRatingEQ.
+func TotalRating(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldEQ(FieldTotalRating, v))
+}
+
 // Participants applies equality check predicate on the "participants" field. It's identical to ParticipantsEQ.
 func Participants(v int32) predicate.Scenario {
 	return predicate.Scenario(sql.FieldEQ(FieldParticipants, v))
@@ -380,6 +385,46 @@ func RatingLTE(v float64) predicate.Scenario {
 	return predicate.Scenario(sql.FieldLTE(FieldRating, v))
 }
 
+// TotalRatingEQ applies the EQ predicate on the "total_rating" field.
+func TotalRatingEQ(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldEQ(FieldTotalRating, v))
+}
+
+// TotalRatingNEQ applies the NEQ predicate on the "total_rating" field.
+func TotalRatingNEQ(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldNEQ(FieldTotalRating, v))
+}
+
+// TotalRatingIn applies the In predicate on the "total_rating" field.
+func TotalRatingIn(vs ...int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldIn(FieldTotalRating, vs...))
+}
+
+// TotalRatingNotIn applies the NotIn predicate on the "total_rating" field.
+func TotalRatingNotIn(vs ...int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldNotIn(FieldTotalRating, vs...))
+}
+
+// TotalRatingGT applies the GT predicate on the "total_rating" field.
+func TotalRatingGT(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldGT(FieldTotalRating, v))
+}
+
+// TotalRatingGTE applies the GTE predicate on the "total_rating" field.
+func TotalRatingGTE(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldGTE(FieldTotalRating, v))
+}
+
+// TotalRatingLT applies the LT predicate on the "total_rating" field.
+func TotalRatingLT(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldLT(FieldTotalRating, v))
+}
+
+// TotalRatingLTE applies the LTE predicate on the "total_rating" field.
+func TotalRatingLTE(v int32) predicate.Scenario {
+	return predicate.Scenario(sql.FieldLTE(FieldTotalRating, v))
+}
+
 // ParticipantsEQ applies the EQ predicate on the "participants" field.
 func ParticipantsEQ(v int32) predicate.Scenario {
 	return predicate.Scenario(sql.FieldEQ(FieldParticipants, v))
@@ -494,7 +539,7 @@ func HasField() predicate.Scenario {
 	return predicate.Scenario(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, FieldTable, FieldColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, FieldTable, FieldPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -83,8 +83,12 @@ func init() {
 	scenarioDescRating := scenarioFields[3].Descriptor()
 	// scenario.DefaultRating holds the default value on creation for the rating field.
 	scenario.DefaultRating = scenarioDescRating.Default.(float64)
+	// scenarioDescTotalRating is the schema descriptor for total_rating field.
+	scenarioDescTotalRating := scenarioFields[4].Descriptor()
+	// scenario.DefaultTotalRating holds the default value on creation for the total_rating field.
+	scenario.DefaultTotalRating = scenarioDescTotalRating.Default.(int32)
 	// scenarioDescParticipants is the schema descriptor for participants field.
-	scenarioDescParticipants := scenarioFields[4].Descriptor()
+	scenarioDescParticipants := scenarioFields[5].Descriptor()
 	// scenario.DefaultParticipants holds the default value on creation for the participants field.
 	scenario.DefaultParticipants = scenarioDescParticipants.Default.(int32)
 	scenariocandidateMixin := schema.ScenarioCandidate{}.Mixin()

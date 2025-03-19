@@ -109,6 +109,27 @@ func (su *ScenarioUpdate) AddRating(f float64) *ScenarioUpdate {
 	return su
 }
 
+// SetTotalRating sets the "total_rating" field.
+func (su *ScenarioUpdate) SetTotalRating(i int32) *ScenarioUpdate {
+	su.mutation.ResetTotalRating()
+	su.mutation.SetTotalRating(i)
+	return su
+}
+
+// SetNillableTotalRating sets the "total_rating" field if the given value is not nil.
+func (su *ScenarioUpdate) SetNillableTotalRating(i *int32) *ScenarioUpdate {
+	if i != nil {
+		su.SetTotalRating(*i)
+	}
+	return su
+}
+
+// AddTotalRating adds i to the "total_rating" field.
+func (su *ScenarioUpdate) AddTotalRating(i int32) *ScenarioUpdate {
+	su.mutation.AddTotalRating(i)
+	return su
+}
+
 // SetParticipants sets the "participants" field.
 func (su *ScenarioUpdate) SetParticipants(i int32) *ScenarioUpdate {
 	su.mutation.ResetParticipants()
@@ -351,6 +372,12 @@ func (su *ScenarioUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.AddedRating(); ok {
 		_spec.AddField(scenario.FieldRating, field.TypeFloat64, value)
 	}
+	if value, ok := su.mutation.TotalRating(); ok {
+		_spec.SetField(scenario.FieldTotalRating, field.TypeInt32, value)
+	}
+	if value, ok := su.mutation.AddedTotalRating(); ok {
+		_spec.AddField(scenario.FieldTotalRating, field.TypeInt32, value)
+	}
 	if value, ok := su.mutation.Participants(); ok {
 		_spec.SetField(scenario.FieldParticipants, field.TypeInt32, value)
 	}
@@ -494,10 +521,10 @@ func (su *ScenarioUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.FieldEdgeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
@@ -507,10 +534,10 @@ func (su *ScenarioUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := su.mutation.RemovedFieldIDs(); len(nodes) > 0 && !su.mutation.FieldEdgeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
@@ -523,10 +550,10 @@ func (su *ScenarioUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := su.mutation.FieldIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
@@ -632,6 +659,27 @@ func (suo *ScenarioUpdateOne) SetNillableRating(f *float64) *ScenarioUpdateOne {
 // AddRating adds f to the "rating" field.
 func (suo *ScenarioUpdateOne) AddRating(f float64) *ScenarioUpdateOne {
 	suo.mutation.AddRating(f)
+	return suo
+}
+
+// SetTotalRating sets the "total_rating" field.
+func (suo *ScenarioUpdateOne) SetTotalRating(i int32) *ScenarioUpdateOne {
+	suo.mutation.ResetTotalRating()
+	suo.mutation.SetTotalRating(i)
+	return suo
+}
+
+// SetNillableTotalRating sets the "total_rating" field if the given value is not nil.
+func (suo *ScenarioUpdateOne) SetNillableTotalRating(i *int32) *ScenarioUpdateOne {
+	if i != nil {
+		suo.SetTotalRating(*i)
+	}
+	return suo
+}
+
+// AddTotalRating adds i to the "total_rating" field.
+func (suo *ScenarioUpdateOne) AddTotalRating(i int32) *ScenarioUpdateOne {
+	suo.mutation.AddTotalRating(i)
 	return suo
 }
 
@@ -907,6 +955,12 @@ func (suo *ScenarioUpdateOne) sqlSave(ctx context.Context) (_node *Scenario, err
 	if value, ok := suo.mutation.AddedRating(); ok {
 		_spec.AddField(scenario.FieldRating, field.TypeFloat64, value)
 	}
+	if value, ok := suo.mutation.TotalRating(); ok {
+		_spec.SetField(scenario.FieldTotalRating, field.TypeInt32, value)
+	}
+	if value, ok := suo.mutation.AddedTotalRating(); ok {
+		_spec.AddField(scenario.FieldTotalRating, field.TypeInt32, value)
+	}
 	if value, ok := suo.mutation.Participants(); ok {
 		_spec.SetField(scenario.FieldParticipants, field.TypeInt32, value)
 	}
@@ -1050,10 +1104,10 @@ func (suo *ScenarioUpdateOne) sqlSave(ctx context.Context) (_node *Scenario, err
 	}
 	if suo.mutation.FieldEdgeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
@@ -1063,10 +1117,10 @@ func (suo *ScenarioUpdateOne) sqlSave(ctx context.Context) (_node *Scenario, err
 	}
 	if nodes := suo.mutation.RemovedFieldIDs(); len(nodes) > 0 && !suo.mutation.FieldEdgeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
@@ -1079,10 +1133,10 @@ func (suo *ScenarioUpdateOne) sqlSave(ctx context.Context) (_node *Scenario, err
 	}
 	if nodes := suo.mutation.FieldIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),

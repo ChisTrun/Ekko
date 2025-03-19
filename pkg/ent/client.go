@@ -718,7 +718,7 @@ func (c *ScenarioClient) QueryField(s *Scenario) *ScenarioFieldQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(scenario.Table, scenario.FieldID, id),
 			sqlgraph.To(scenariofield.Table, scenariofield.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, scenario.FieldTable, scenario.FieldColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, scenario.FieldTable, scenario.FieldPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -1181,7 +1181,7 @@ func (c *ScenarioFieldClient) QuerySenarios(sf *ScenarioField) *ScenarioQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(scenariofield.Table, scenariofield.FieldID, id),
 			sqlgraph.To(scenario.Table, scenario.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, scenariofield.SenariosTable, scenariofield.SenariosColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, scenariofield.SenariosTable, scenariofield.SenariosPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(sf.driver.Dialect(), step)
 		return fromV, nil

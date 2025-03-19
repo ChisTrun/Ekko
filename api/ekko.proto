@@ -61,6 +61,12 @@ service ekko {
       body: "*"
     };
   };
+  rpc RatingScenario (RatingScenarioRequest) returns (google.protobuf.Empty){
+    option (google.api.http) = {
+      post: "/ekko/scenario/rating"
+      body: "*"
+    };
+  };
 
   // Submission for candidate
   rpc ListAttempt (ListAttemptRequest) returns (ListAttemptResponse){
@@ -323,6 +329,7 @@ message ListScenarioRequest {
   int32 page_size = 5 [(validate.rules).int32 = {gte: 1}];
   optional bool is_favorite = 6;
   optional bool is_finished = 7;
+  repeated uint64 field_ids = 8;
 }
 
 message ListScenarioResponse {
@@ -344,4 +351,7 @@ message FavoriteScenarioRequest {
   uint64 id = 1;
 }
 
-
+message RatingScenarioRequest {
+  uint64 id = 1;
+  float rating = 2 [(validate.rules).float = {gte: 0, lte: 5}];
+}

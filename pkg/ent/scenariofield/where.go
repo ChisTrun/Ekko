@@ -220,7 +220,7 @@ func HasSenarios() predicate.ScenarioField {
 	return predicate.ScenarioField(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SenariosTable, SenariosColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, SenariosTable, SenariosPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

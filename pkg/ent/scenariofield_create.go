@@ -63,23 +63,19 @@ func (sfc *ScenarioFieldCreate) SetID(u uint64) *ScenarioFieldCreate {
 	return sfc
 }
 
-// SetSenariosID sets the "senarios" edge to the Scenario entity by ID.
-func (sfc *ScenarioFieldCreate) SetSenariosID(id uint64) *ScenarioFieldCreate {
-	sfc.mutation.SetSenariosID(id)
+// AddSenarioIDs adds the "senarios" edge to the Scenario entity by IDs.
+func (sfc *ScenarioFieldCreate) AddSenarioIDs(ids ...uint64) *ScenarioFieldCreate {
+	sfc.mutation.AddSenarioIDs(ids...)
 	return sfc
 }
 
-// SetNillableSenariosID sets the "senarios" edge to the Scenario entity by ID if the given value is not nil.
-func (sfc *ScenarioFieldCreate) SetNillableSenariosID(id *uint64) *ScenarioFieldCreate {
-	if id != nil {
-		sfc = sfc.SetSenariosID(*id)
+// AddSenarios adds the "senarios" edges to the Scenario entity.
+func (sfc *ScenarioFieldCreate) AddSenarios(s ...*Scenario) *ScenarioFieldCreate {
+	ids := make([]uint64, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return sfc
-}
-
-// SetSenarios sets the "senarios" edge to the Scenario entity.
-func (sfc *ScenarioFieldCreate) SetSenarios(s *Scenario) *ScenarioFieldCreate {
-	return sfc.SetSenariosID(s.ID)
+	return sfc.AddSenarioIDs(ids...)
 }
 
 // Mutation returns the ScenarioFieldMutation object of the builder.
@@ -185,10 +181,10 @@ func (sfc *ScenarioFieldCreate) createSpec() (*ScenarioField, *sqlgraph.CreateSp
 	}
 	if nodes := sfc.mutation.SenariosIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   scenariofield.SenariosTable,
-			Columns: []string{scenariofield.SenariosColumn},
+			Columns: scenariofield.SenariosPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
@@ -197,7 +193,6 @@ func (sfc *ScenarioFieldCreate) createSpec() (*ScenarioField, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.scenario_field_senarios = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

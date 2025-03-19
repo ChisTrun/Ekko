@@ -86,6 +86,20 @@ func (sc *ScenarioCreate) SetNillableRating(f *float64) *ScenarioCreate {
 	return sc
 }
 
+// SetTotalRating sets the "total_rating" field.
+func (sc *ScenarioCreate) SetTotalRating(i int32) *ScenarioCreate {
+	sc.mutation.SetTotalRating(i)
+	return sc
+}
+
+// SetNillableTotalRating sets the "total_rating" field if the given value is not nil.
+func (sc *ScenarioCreate) SetNillableTotalRating(i *int32) *ScenarioCreate {
+	if i != nil {
+		sc.SetTotalRating(*i)
+	}
+	return sc
+}
+
 // SetParticipants sets the "participants" field.
 func (sc *ScenarioCreate) SetParticipants(i int32) *ScenarioCreate {
 	sc.mutation.SetParticipants(i)
@@ -213,6 +227,10 @@ func (sc *ScenarioCreate) defaults() {
 		v := scenario.DefaultRating
 		sc.mutation.SetRating(v)
 	}
+	if _, ok := sc.mutation.TotalRating(); !ok {
+		v := scenario.DefaultTotalRating
+		sc.mutation.SetTotalRating(v)
+	}
 	if _, ok := sc.mutation.Participants(); !ok {
 		v := scenario.DefaultParticipants
 		sc.mutation.SetParticipants(v)
@@ -238,6 +256,9 @@ func (sc *ScenarioCreate) check() error {
 	}
 	if _, ok := sc.mutation.Rating(); !ok {
 		return &ValidationError{Name: "rating", err: errors.New(`ent: missing required field "Scenario.rating"`)}
+	}
+	if _, ok := sc.mutation.TotalRating(); !ok {
+		return &ValidationError{Name: "total_rating", err: errors.New(`ent: missing required field "Scenario.total_rating"`)}
 	}
 	if _, ok := sc.mutation.Participants(); !ok {
 		return &ValidationError{Name: "participants", err: errors.New(`ent: missing required field "Scenario.participants"`)}
@@ -299,6 +320,10 @@ func (sc *ScenarioCreate) createSpec() (*Scenario, *sqlgraph.CreateSpec) {
 		_spec.SetField(scenario.FieldRating, field.TypeFloat64, value)
 		_node.Rating = value
 	}
+	if value, ok := sc.mutation.TotalRating(); ok {
+		_spec.SetField(scenario.FieldTotalRating, field.TypeInt32, value)
+		_node.TotalRating = value
+	}
 	if value, ok := sc.mutation.Participants(); ok {
 		_spec.SetField(scenario.FieldParticipants, field.TypeInt32, value)
 		_node.Participants = value
@@ -353,10 +378,10 @@ func (sc *ScenarioCreate) createSpec() (*Scenario, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.FieldIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   scenario.FieldTable,
-			Columns: []string{scenario.FieldColumn},
+			Columns: scenario.FieldPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenariofield.FieldID, field.TypeUint64),
@@ -488,6 +513,24 @@ func (u *ScenarioUpsert) UpdateRating() *ScenarioUpsert {
 // AddRating adds v to the "rating" field.
 func (u *ScenarioUpsert) AddRating(v float64) *ScenarioUpsert {
 	u.Add(scenario.FieldRating, v)
+	return u
+}
+
+// SetTotalRating sets the "total_rating" field.
+func (u *ScenarioUpsert) SetTotalRating(v int32) *ScenarioUpsert {
+	u.Set(scenario.FieldTotalRating, v)
+	return u
+}
+
+// UpdateTotalRating sets the "total_rating" field to the value that was provided on create.
+func (u *ScenarioUpsert) UpdateTotalRating() *ScenarioUpsert {
+	u.SetExcluded(scenario.FieldTotalRating)
+	return u
+}
+
+// AddTotalRating adds v to the "total_rating" field.
+func (u *ScenarioUpsert) AddTotalRating(v int32) *ScenarioUpsert {
+	u.Add(scenario.FieldTotalRating, v)
 	return u
 }
 
@@ -641,6 +684,27 @@ func (u *ScenarioUpsertOne) AddRating(v float64) *ScenarioUpsertOne {
 func (u *ScenarioUpsertOne) UpdateRating() *ScenarioUpsertOne {
 	return u.Update(func(s *ScenarioUpsert) {
 		s.UpdateRating()
+	})
+}
+
+// SetTotalRating sets the "total_rating" field.
+func (u *ScenarioUpsertOne) SetTotalRating(v int32) *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.SetTotalRating(v)
+	})
+}
+
+// AddTotalRating adds v to the "total_rating" field.
+func (u *ScenarioUpsertOne) AddTotalRating(v int32) *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.AddTotalRating(v)
+	})
+}
+
+// UpdateTotalRating sets the "total_rating" field to the value that was provided on create.
+func (u *ScenarioUpsertOne) UpdateTotalRating() *ScenarioUpsertOne {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.UpdateTotalRating()
 	})
 }
 
@@ -963,6 +1027,27 @@ func (u *ScenarioUpsertBulk) AddRating(v float64) *ScenarioUpsertBulk {
 func (u *ScenarioUpsertBulk) UpdateRating() *ScenarioUpsertBulk {
 	return u.Update(func(s *ScenarioUpsert) {
 		s.UpdateRating()
+	})
+}
+
+// SetTotalRating sets the "total_rating" field.
+func (u *ScenarioUpsertBulk) SetTotalRating(v int32) *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.SetTotalRating(v)
+	})
+}
+
+// AddTotalRating adds v to the "total_rating" field.
+func (u *ScenarioUpsertBulk) AddTotalRating(v int32) *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.AddTotalRating(v)
+	})
+}
+
+// UpdateTotalRating sets the "total_rating" field to the value that was provided on create.
+func (u *ScenarioUpsertBulk) UpdateTotalRating() *ScenarioUpsertBulk {
+	return u.Update(func(s *ScenarioUpsert) {
+		s.UpdateTotalRating()
 	})
 }
 

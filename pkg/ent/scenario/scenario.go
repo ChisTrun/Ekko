@@ -26,6 +26,8 @@ const (
 	FieldDescription = "description"
 	// FieldRating holds the string denoting the rating field in the database.
 	FieldRating = "rating"
+	// FieldTotalRating holds the string denoting the total_rating field in the database.
+	FieldTotalRating = "total_rating"
 	// FieldParticipants holds the string denoting the participants field in the database.
 	FieldParticipants = "participants"
 	// EdgeQuestions holds the string denoting the questions edge name in mutations.
@@ -59,13 +61,11 @@ const (
 	FavoritesInverseTable = "scenario_favorites"
 	// FavoritesColumn is the table column denoting the favorites relation/edge.
 	FavoritesColumn = "scenario_id"
-	// FieldTable is the table that holds the field relation/edge.
-	FieldTable = "scenario_fields"
+	// FieldTable is the table that holds the field relation/edge. The primary key declared below.
+	FieldTable = "scenario_field_senarios"
 	// FieldInverseTable is the table name for the ScenarioField entity.
 	// It exists in this package in order to avoid circular dependency with the "scenariofield" package.
 	FieldInverseTable = "scenario_fields"
-	// FieldColumn is the table column denoting the field relation/edge.
-	FieldColumn = "scenario_field_senarios"
 )
 
 // Columns holds all SQL columns for scenario fields.
@@ -77,8 +77,15 @@ var Columns = []string{
 	FieldName,
 	FieldDescription,
 	FieldRating,
+	FieldTotalRating,
 	FieldParticipants,
 }
+
+var (
+	// FieldPrimaryKey and FieldColumn2 are the table columns denoting the
+	// primary key for the field relation (M2M).
+	FieldPrimaryKey = []string{"scenario_field_id", "scenario_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -99,6 +106,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultRating holds the default value on creation for the "rating" field.
 	DefaultRating float64
+	// DefaultTotalRating holds the default value on creation for the "total_rating" field.
+	DefaultTotalRating int32
 	// DefaultParticipants holds the default value on creation for the "participants" field.
 	DefaultParticipants int32
 )
@@ -139,6 +148,11 @@ func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 // ByRating orders the results by the rating field.
 func ByRating(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRating, opts...).ToFunc()
+}
+
+// ByTotalRating orders the results by the total_rating field.
+func ByTotalRating(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTotalRating, opts...).ToFunc()
 }
 
 // ByParticipants orders the results by the participants field.
@@ -226,6 +240,6 @@ func newFieldStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(FieldInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, FieldTable, FieldColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, FieldTable, FieldPrimaryKey...),
 	)
 }

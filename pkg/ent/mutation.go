@@ -1786,6 +1786,8 @@ type ScenarioMutation struct {
 	description       *string
 	rating            *float64
 	addrating         *float64
+	total_rating      *int32
+	addtotal_rating   *int32
 	participants      *int32
 	addparticipants   *int32
 	clearedFields     map[string]struct{}
@@ -2166,6 +2168,62 @@ func (m *ScenarioMutation) ResetRating() {
 	m.addrating = nil
 }
 
+// SetTotalRating sets the "total_rating" field.
+func (m *ScenarioMutation) SetTotalRating(i int32) {
+	m.total_rating = &i
+	m.addtotal_rating = nil
+}
+
+// TotalRating returns the value of the "total_rating" field in the mutation.
+func (m *ScenarioMutation) TotalRating() (r int32, exists bool) {
+	v := m.total_rating
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTotalRating returns the old "total_rating" field's value of the Scenario entity.
+// If the Scenario object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScenarioMutation) OldTotalRating(ctx context.Context) (v int32, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTotalRating is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTotalRating requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTotalRating: %w", err)
+	}
+	return oldValue.TotalRating, nil
+}
+
+// AddTotalRating adds i to the "total_rating" field.
+func (m *ScenarioMutation) AddTotalRating(i int32) {
+	if m.addtotal_rating != nil {
+		*m.addtotal_rating += i
+	} else {
+		m.addtotal_rating = &i
+	}
+}
+
+// AddedTotalRating returns the value that was added to the "total_rating" field in this mutation.
+func (m *ScenarioMutation) AddedTotalRating() (r int32, exists bool) {
+	v := m.addtotal_rating
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetTotalRating resets all changes to the "total_rating" field.
+func (m *ScenarioMutation) ResetTotalRating() {
+	m.total_rating = nil
+	m.addtotal_rating = nil
+}
+
 // SetParticipants sets the "participants" field.
 func (m *ScenarioMutation) SetParticipants(i int32) {
 	m.participants = &i
@@ -2472,7 +2530,7 @@ func (m *ScenarioMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ScenarioMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, scenario.FieldCreatedAt)
 	}
@@ -2490,6 +2548,9 @@ func (m *ScenarioMutation) Fields() []string {
 	}
 	if m.rating != nil {
 		fields = append(fields, scenario.FieldRating)
+	}
+	if m.total_rating != nil {
+		fields = append(fields, scenario.FieldTotalRating)
 	}
 	if m.participants != nil {
 		fields = append(fields, scenario.FieldParticipants)
@@ -2514,6 +2575,8 @@ func (m *ScenarioMutation) Field(name string) (ent.Value, bool) {
 		return m.Description()
 	case scenario.FieldRating:
 		return m.Rating()
+	case scenario.FieldTotalRating:
+		return m.TotalRating()
 	case scenario.FieldParticipants:
 		return m.Participants()
 	}
@@ -2537,6 +2600,8 @@ func (m *ScenarioMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldDescription(ctx)
 	case scenario.FieldRating:
 		return m.OldRating(ctx)
+	case scenario.FieldTotalRating:
+		return m.OldTotalRating(ctx)
 	case scenario.FieldParticipants:
 		return m.OldParticipants(ctx)
 	}
@@ -2590,6 +2655,13 @@ func (m *ScenarioMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRating(v)
 		return nil
+	case scenario.FieldTotalRating:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTotalRating(v)
+		return nil
 	case scenario.FieldParticipants:
 		v, ok := value.(int32)
 		if !ok {
@@ -2611,6 +2683,9 @@ func (m *ScenarioMutation) AddedFields() []string {
 	if m.addrating != nil {
 		fields = append(fields, scenario.FieldRating)
 	}
+	if m.addtotal_rating != nil {
+		fields = append(fields, scenario.FieldTotalRating)
+	}
 	if m.addparticipants != nil {
 		fields = append(fields, scenario.FieldParticipants)
 	}
@@ -2626,6 +2701,8 @@ func (m *ScenarioMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedBmID()
 	case scenario.FieldRating:
 		return m.AddedRating()
+	case scenario.FieldTotalRating:
+		return m.AddedTotalRating()
 	case scenario.FieldParticipants:
 		return m.AddedParticipants()
 	}
@@ -2650,6 +2727,13 @@ func (m *ScenarioMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddRating(v)
+		return nil
+	case scenario.FieldTotalRating:
+		v, ok := value.(int32)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTotalRating(v)
 		return nil
 	case scenario.FieldParticipants:
 		v, ok := value.(int32)
@@ -2702,6 +2786,9 @@ func (m *ScenarioMutation) ResetField(name string) error {
 		return nil
 	case scenario.FieldRating:
 		m.ResetRating()
+		return nil
+	case scenario.FieldTotalRating:
+		m.ResetTotalRating()
 		return nil
 	case scenario.FieldParticipants:
 		m.ResetParticipants()
@@ -4148,7 +4235,8 @@ type ScenarioFieldMutation struct {
 	updated_at      *time.Time
 	name            *string
 	clearedFields   map[string]struct{}
-	senarios        *uint64
+	senarios        map[uint64]struct{}
+	removedsenarios map[uint64]struct{}
 	clearedsenarios bool
 	done            bool
 	oldValue        func(context.Context) (*ScenarioField, error)
@@ -4367,9 +4455,14 @@ func (m *ScenarioFieldMutation) ResetName() {
 	m.name = nil
 }
 
-// SetSenariosID sets the "senarios" edge to the Scenario entity by id.
-func (m *ScenarioFieldMutation) SetSenariosID(id uint64) {
-	m.senarios = &id
+// AddSenarioIDs adds the "senarios" edge to the Scenario entity by ids.
+func (m *ScenarioFieldMutation) AddSenarioIDs(ids ...uint64) {
+	if m.senarios == nil {
+		m.senarios = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.senarios[ids[i]] = struct{}{}
+	}
 }
 
 // ClearSenarios clears the "senarios" edge to the Scenario entity.
@@ -4382,20 +4475,29 @@ func (m *ScenarioFieldMutation) SenariosCleared() bool {
 	return m.clearedsenarios
 }
 
-// SenariosID returns the "senarios" edge ID in the mutation.
-func (m *ScenarioFieldMutation) SenariosID() (id uint64, exists bool) {
-	if m.senarios != nil {
-		return *m.senarios, true
+// RemoveSenarioIDs removes the "senarios" edge to the Scenario entity by IDs.
+func (m *ScenarioFieldMutation) RemoveSenarioIDs(ids ...uint64) {
+	if m.removedsenarios == nil {
+		m.removedsenarios = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.senarios, ids[i])
+		m.removedsenarios[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSenarios returns the removed IDs of the "senarios" edge to the Scenario entity.
+func (m *ScenarioFieldMutation) RemovedSenariosIDs() (ids []uint64) {
+	for id := range m.removedsenarios {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // SenariosIDs returns the "senarios" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SenariosID instead. It exists only for internal usage by the builders.
 func (m *ScenarioFieldMutation) SenariosIDs() (ids []uint64) {
-	if id := m.senarios; id != nil {
-		ids = append(ids, *id)
+	for id := range m.senarios {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -4404,6 +4506,7 @@ func (m *ScenarioFieldMutation) SenariosIDs() (ids []uint64) {
 func (m *ScenarioFieldMutation) ResetSenarios() {
 	m.senarios = nil
 	m.clearedsenarios = false
+	m.removedsenarios = nil
 }
 
 // Where appends a list predicates to the ScenarioFieldMutation builder.
@@ -4585,9 +4688,11 @@ func (m *ScenarioFieldMutation) AddedEdges() []string {
 func (m *ScenarioFieldMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case scenariofield.EdgeSenarios:
-		if id := m.senarios; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.senarios))
+		for id := range m.senarios {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
@@ -4595,12 +4700,23 @@ func (m *ScenarioFieldMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ScenarioFieldMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
+	if m.removedsenarios != nil {
+		edges = append(edges, scenariofield.EdgeSenarios)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ScenarioFieldMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case scenariofield.EdgeSenarios:
+		ids := make([]ent.Value, 0, len(m.removedsenarios))
+		for id := range m.removedsenarios {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
@@ -4627,9 +4743,6 @@ func (m *ScenarioFieldMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ScenarioFieldMutation) ClearEdge(name string) error {
 	switch name {
-	case scenariofield.EdgeSenarios:
-		m.ClearSenarios()
-		return nil
 	}
 	return fmt.Errorf("unknown ScenarioField unique edge %s", name)
 }

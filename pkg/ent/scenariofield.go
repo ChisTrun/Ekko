@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"ekko/pkg/ent/scenario"
 	"ekko/pkg/ent/scenariofield"
 	"fmt"
 	"strings"
@@ -26,27 +25,24 @@ type ScenarioField struct {
 	Name string `json:"name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScenarioFieldQuery when eager-loading is set.
-	Edges                   ScenarioFieldEdges `json:"edges"`
-	scenario_field_senarios *uint64
-	selectValues            sql.SelectValues
+	Edges        ScenarioFieldEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ScenarioFieldEdges holds the relations/edges for other nodes in the graph.
 type ScenarioFieldEdges struct {
 	// Senarios holds the value of the senarios edge.
-	Senarios *Scenario `json:"senarios,omitempty"`
+	Senarios []*Scenario `json:"senarios,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
 // SenariosOrErr returns the Senarios value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ScenarioFieldEdges) SenariosOrErr() (*Scenario, error) {
-	if e.Senarios != nil {
+// was not loaded in eager-loading.
+func (e ScenarioFieldEdges) SenariosOrErr() ([]*Scenario, error) {
+	if e.loadedTypes[0] {
 		return e.Senarios, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: scenario.Label}
 	}
 	return nil, &NotLoadedError{edge: "senarios"}
 }
@@ -62,8 +58,6 @@ func (*ScenarioField) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case scenariofield.FieldCreatedAt, scenariofield.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case scenariofield.ForeignKeys[0]: // scenario_field_senarios
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -102,13 +96,6 @@ func (sf *ScenarioField) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				sf.Name = value.String
-			}
-		case scenariofield.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field scenario_field_senarios", value)
-			} else if value.Valid {
-				sf.scenario_field_senarios = new(uint64)
-				*sf.scenario_field_senarios = uint64(value.Int64)
 			}
 		default:
 			sf.selectValues.Set(columns[i], values[i])

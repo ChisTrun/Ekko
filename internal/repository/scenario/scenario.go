@@ -11,7 +11,9 @@ import (
 	entscenario "ekko/pkg/ent/scenario"
 	"ekko/pkg/ent/scenariocandidate"
 	"ekko/pkg/ent/scenariofavorite"
+	"ekko/pkg/ent/scenariofield"
 	"fmt"
+	"sync"
 )
 
 type Scenario interface {
@@ -21,17 +23,20 @@ type Scenario interface {
 	List(ctx context.Context, req *ekko.ListScenarioRequest, userId *uint64) ([]*ent.Scenario, int32, int32, error)
 	Get(ctx context.Context, req *ekko.GetScenarioRequest) (*ent.Scenario, error)
 	Favorite(ctx context.Context, userId uint64, scenarioId uint64) error
+	Rating(ctx context.Context, id uint64, rating float64) error
 }
 
 type scenario struct {
 	ent      *ent.Client
 	question question.Question
+	mux      *sync.Mutex
 }
 
 func New(ent *ent.Client, question question.Question) Scenario {
 	return &scenario{
 		ent:      ent,
 		question: question,
+		mux:      &sync.Mutex{},
 	}
 }
 
@@ -104,6 +109,10 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 			entscenario.DescriptionContainsFold(*req.SearchContent)))
 	}
 
+	if len(req.FieldIds) > 0 {
+		query = query.Where(entscenario.HasFieldWith(scenariofield.IDIn(req.FieldIds...)))
+	}
+
 	if userId != nil {
 		if req.IsFavorite != nil && *req.IsFavorite {
 			query = query.Where(entscenario.HasFavoritesWith(scenariofavorite.UserID(*userId)))
@@ -153,4 +162,18 @@ func (s *scenario) Favorite(ctx context.Context, userId uint64, scenarioId uint6
 		SetUserID(userId).
 		SetScenarioID(scenarioId).
 		Exec(ctx)
+}
+
+func (s *scenario) Rating(ctx context.Context, id uint64, rating float64) error {
+	s.mux.Lock()
+	defer s.mux.Unlock()
+	return tx.WithTransaction(ctx, s.ent, func(ctx context.Context, tx tx.Tx) error {
+		foundedScenario, err := tx.Client().Scenario.Query().Where(entscenario.IDEQ(id)).ForUpdate().Only(ctx)
+		if err != nil {
+			return err
+		}
+
+		newRating := (foundedScenario.Rating*float64(foundedScenario.TotalRating) + rating) / float64(foundedScenario.TotalRating+1)
+		return foundedScenario.Update().SetRating(newRating).AddTotalRating(1).Exec(ctx)
+	})
 }

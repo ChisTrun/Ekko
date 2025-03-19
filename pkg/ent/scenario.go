@@ -29,6 +29,8 @@ type Scenario struct {
 	Description string `json:"description,omitempty"`
 	// Rating holds the value of the "rating" field.
 	Rating float64 `json:"rating,omitempty"`
+	// TotalRating holds the value of the "total_rating" field.
+	TotalRating int32 `json:"total_rating,omitempty"`
 	// Participants holds the value of the "participants" field.
 	Participants int32 `json:"participants,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -95,7 +97,7 @@ func (*Scenario) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case scenario.FieldRating:
 			values[i] = new(sql.NullFloat64)
-		case scenario.FieldID, scenario.FieldBmID, scenario.FieldParticipants:
+		case scenario.FieldID, scenario.FieldBmID, scenario.FieldTotalRating, scenario.FieldParticipants:
 			values[i] = new(sql.NullInt64)
 		case scenario.FieldName, scenario.FieldDescription:
 			values[i] = new(sql.NullString)
@@ -157,6 +159,12 @@ func (s *Scenario) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field rating", values[i])
 			} else if value.Valid {
 				s.Rating = value.Float64
+			}
+		case scenario.FieldTotalRating:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field total_rating", values[i])
+			} else if value.Valid {
+				s.TotalRating = int32(value.Int64)
 			}
 		case scenario.FieldParticipants:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -237,6 +245,9 @@ func (s *Scenario) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("rating=")
 	builder.WriteString(fmt.Sprintf("%v", s.Rating))
+	builder.WriteString(", ")
+	builder.WriteString("total_rating=")
+	builder.WriteString(fmt.Sprintf("%v", s.TotalRating))
 	builder.WriteString(", ")
 	builder.WriteString("participants=")
 	builder.WriteString(fmt.Sprintf("%v", s.Participants))

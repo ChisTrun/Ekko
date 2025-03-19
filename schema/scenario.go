@@ -23,6 +23,7 @@ func (Scenario) Fields() []ent.Field {
 		field.String("name"),
 		field.Text("description"),
 		field.Float("rating").Default(0),
+		field.Int32("total_rating").Default(0),
 		field.Int32("participants").Default(0),
 	}
 }

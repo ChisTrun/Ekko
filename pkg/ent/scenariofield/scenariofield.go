@@ -24,13 +24,11 @@ const (
 	EdgeSenarios = "senarios"
 	// Table holds the table name of the scenariofield in the database.
 	Table = "scenario_fields"
-	// SenariosTable is the table that holds the senarios relation/edge.
-	SenariosTable = "scenario_fields"
+	// SenariosTable is the table that holds the senarios relation/edge. The primary key declared below.
+	SenariosTable = "scenario_field_senarios"
 	// SenariosInverseTable is the table name for the Scenario entity.
 	// It exists in this package in order to avoid circular dependency with the "scenario" package.
 	SenariosInverseTable = "scenarios"
-	// SenariosColumn is the table column denoting the senarios relation/edge.
-	SenariosColumn = "scenario_field_senarios"
 )
 
 // Columns holds all SQL columns for scenariofield fields.
@@ -41,21 +39,16 @@ var Columns = []string{
 	FieldName,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "scenario_fields"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"scenario_field_senarios",
-}
+var (
+	// SenariosPrimaryKey and SenariosColumn2 are the table columns denoting the
+	// primary key for the senarios relation (M2M).
+	SenariosPrimaryKey = []string{"scenario_field_id", "scenario_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -94,16 +87,23 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// BySenariosField orders the results by senarios field.
-func BySenariosField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySenariosCount orders the results by senarios count.
+func BySenariosCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSenariosStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newSenariosStep(), opts...)
+	}
+}
+
+// BySenarios orders the results by senarios terms.
+func BySenarios(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSenariosStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newSenariosStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SenariosInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, SenariosTable, SenariosColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, SenariosTable, SenariosPrimaryKey...),
 	)
 }

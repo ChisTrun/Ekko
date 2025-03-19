@@ -149,7 +149,7 @@ func (sq *ScenarioQuery) QueryField() *ScenarioFieldQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(scenario.Table, scenario.FieldID, selector),
 			sqlgraph.To(scenariofield.Table, scenariofield.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, scenario.FieldTable, scenario.FieldColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, scenario.FieldTable, scenario.FieldPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -632,33 +632,63 @@ func (sq *ScenarioQuery) loadFavorites(ctx context.Context, query *ScenarioFavor
 	return nil
 }
 func (sq *ScenarioQuery) loadField(ctx context.Context, query *ScenarioFieldQuery, nodes []*Scenario, init func(*Scenario), assign func(*Scenario, *ScenarioField)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[uint64]*Scenario)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[uint64]*Scenario)
+	nids := make(map[uint64]map[*Scenario]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.ScenarioField(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(scenario.FieldColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(scenario.FieldTable)
+		s.Join(joinT).On(s.C(scenariofield.FieldID), joinT.C(scenario.FieldPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(scenario.FieldPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(scenario.FieldPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := uint64(values[0].(*sql.NullInt64).Int64)
+				inValue := uint64(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Scenario]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ScenarioField](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.scenario_field_senarios
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "scenario_field_senarios" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "scenario_field_senarios" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "field" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }
