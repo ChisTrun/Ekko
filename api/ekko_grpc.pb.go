@@ -20,19 +20,19 @@ import (
 const _ = grpc.SupportPackageIsVersion8
 
 const (
-	Ekko_CreateField_FullMethodName       = "/ekko.ekko/CreateField"
-	Ekko_UpdateField_FullMethodName       = "/ekko.ekko/UpdateField"
-	Ekko_DeleteField_FullMethodName       = "/ekko.ekko/DeleteField"
-	Ekko_CreateScenario_FullMethodName    = "/ekko.ekko/CreateScenario"
-	Ekko_UpdateScenario_FullMethodName    = "/ekko.ekko/UpdateScenario"
-	Ekko_DeleteScenario_FullMethodName    = "/ekko.ekko/DeleteScenario"
-	Ekko_ListScenario_FullMethodName      = "/ekko.ekko/ListScenario"
-	Ekko_FavoriteScenario_FullMethodName  = "/ekko.ekko/FavoriteScenario"
-	Ekko_RatingScenario_FullMethodName    = "/ekko.ekko/RatingScenario"
-	Ekko_ListAttempt_FullMethodName       = "/ekko.ekko/ListAttempt"
-	Ekko_GetAttempt_FullMethodName        = "/ekko.ekko/GetAttempt"
-	Ekko_SubmitAnswer_FullMethodName      = "/ekko.ekko/SubmitAnswer"
-	Ekko_ListAllSubmission_FullMethodName = "/ekko.ekko/ListAllSubmission"
+	Ekko_CreateField_FullMethodName       = "/ekko.Ekko/CreateField"
+	Ekko_UpdateField_FullMethodName       = "/ekko.Ekko/UpdateField"
+	Ekko_DeleteField_FullMethodName       = "/ekko.Ekko/DeleteField"
+	Ekko_CreateScenario_FullMethodName    = "/ekko.Ekko/CreateScenario"
+	Ekko_UpdateScenario_FullMethodName    = "/ekko.Ekko/UpdateScenario"
+	Ekko_DeleteScenario_FullMethodName    = "/ekko.Ekko/DeleteScenario"
+	Ekko_ListScenario_FullMethodName      = "/ekko.Ekko/ListScenario"
+	Ekko_FavoriteScenario_FullMethodName  = "/ekko.Ekko/FavoriteScenario"
+	Ekko_RatingScenario_FullMethodName    = "/ekko.Ekko/RatingScenario"
+	Ekko_ListAttempt_FullMethodName       = "/ekko.Ekko/ListAttempt"
+	Ekko_GetAttempt_FullMethodName        = "/ekko.Ekko/GetAttempt"
+	Ekko_SubmitAnswer_FullMethodName      = "/ekko.Ekko/SubmitAnswer"
+	Ekko_ListAllSubmission_FullMethodName = "/ekko.Ekko/ListAllSubmission"
 )
 
 // EkkoClient is the client API for Ekko service.
@@ -512,7 +512,7 @@ func _Ekko_ListAllSubmission_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Ekko_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ekko.ekko",
+	ServiceName: "ekko.Ekko",
 	HandlerType: (*EkkoServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

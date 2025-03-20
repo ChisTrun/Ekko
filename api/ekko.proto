@@ -9,7 +9,7 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
 
-service ekko {
+service Ekko {
 
   rpc CreateField (CreateFieldRequest) returns (CreateFieldResponse)  {
     option (google.api.http) = {

@@ -2739,7 +2739,7 @@ var file_ekko_api_ekko_proto_rawDesc = []byte{
 	0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x44, 0x52, 0x41, 0x46, 0x54, 0x10, 0x01, 0x12, 0x20,
 	0x0a, 0x1c, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x43, 0x41, 0x54, 0x49, 0x4f, 0x4e, 0x5f, 0x53, 0x54,
 	0x41, 0x54, 0x55, 0x53, 0x5f, 0x50, 0x55, 0x42, 0x4c, 0x49, 0x53, 0x48, 0x45, 0x44, 0x10, 0x02,
-	0x32, 0xbf, 0x0a, 0x0a, 0x04, 0x65, 0x6b, 0x6b, 0x6f, 0x12, 0x61, 0x0a, 0x0b, 0x43, 0x72, 0x65,
+	0x32, 0xbf, 0x0a, 0x0a, 0x04, 0x45, 0x6b, 0x6b, 0x6f, 0x12, 0x61, 0x0a, 0x0b, 0x43, 0x72, 0x65,
 	0x61, 0x74, 0x65, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x12, 0x18, 0x2e, 0x65, 0x6b, 0x6b, 0x6f, 0x2e,
 	0x43, 0x72, 0x65, 0x61, 0x74, 0x65, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x52, 0x65, 0x71, 0x75, 0x65,
 	0x73, 0x74, 0x1a, 0x19, 0x2e, 0x65, 0x6b, 0x6b, 0x6f, 0x2e, 0x43, 0x72, 0x65, 0x61, 0x74, 0x65,
@@ -2940,35 +2940,35 @@ var file_ekko_api_ekko_proto_depIdxs = []int32{
 	11, // 31: ekko.ListScenarioResponse.scenario:type_name -> ekko.Scenario
 	32, // 32: ekko.ListScenarioResponse.request:type_name -> ekko.ListScenarioRequest
 	11, // 33: ekko.GetScenarioResponse.scenario:type_name -> ekko.Scenario
-	22, // 34: ekko.ekko.CreateField:input_type -> ekko.CreateFieldRequest
-	23, // 35: ekko.ekko.UpdateField:input_type -> ekko.UpdateFieldRequest
-	24, // 36: ekko.ekko.DeleteField:input_type -> ekko.DeleteFieldRequest
-	27, // 37: ekko.ekko.CreateScenario:input_type -> ekko.CreateScenarioRequest
-	29, // 38: ekko.ekko.UpdateScenario:input_type -> ekko.UpdateScenarioRequest
-	31, // 39: ekko.ekko.DeleteScenario:input_type -> ekko.DeleteScenarioRequest
-	32, // 40: ekko.ekko.ListScenario:input_type -> ekko.ListScenarioRequest
-	36, // 41: ekko.ekko.FavoriteScenario:input_type -> ekko.FavoriteScenarioRequest
-	37, // 42: ekko.ekko.RatingScenario:input_type -> ekko.RatingScenarioRequest
-	15, // 43: ekko.ekko.ListAttempt:input_type -> ekko.ListAttemptRequest
-	17, // 44: ekko.ekko.GetAttempt:input_type -> ekko.GetAttemptRequest
-	18, // 45: ekko.ekko.SubmitAnswer:input_type -> ekko.SubmitAnswerRequest
-	13, // 46: ekko.ekko.ListAllSubmission:input_type -> ekko.ListAllSubmissionRequest
+	22, // 34: ekko.Ekko.CreateField:input_type -> ekko.CreateFieldRequest
+	23, // 35: ekko.Ekko.UpdateField:input_type -> ekko.UpdateFieldRequest
+	24, // 36: ekko.Ekko.DeleteField:input_type -> ekko.DeleteFieldRequest
+	27, // 37: ekko.Ekko.CreateScenario:input_type -> ekko.CreateScenarioRequest
+	29, // 38: ekko.Ekko.UpdateScenario:input_type -> ekko.UpdateScenarioRequest
+	31, // 39: ekko.Ekko.DeleteScenario:input_type -> ekko.DeleteScenarioRequest
+	32, // 40: ekko.Ekko.ListScenario:input_type -> ekko.ListScenarioRequest
+	36, // 41: ekko.Ekko.FavoriteScenario:input_type -> ekko.FavoriteScenarioRequest
+	37, // 42: ekko.Ekko.RatingScenario:input_type -> ekko.RatingScenarioRequest
+	15, // 43: ekko.Ekko.ListAttempt:input_type -> ekko.ListAttemptRequest
+	17, // 44: ekko.Ekko.GetAttempt:input_type -> ekko.GetAttemptRequest
+	18, // 45: ekko.Ekko.SubmitAnswer:input_type -> ekko.SubmitAnswerRequest
+	13, // 46: ekko.Ekko.ListAllSubmission:input_type -> ekko.ListAllSubmissionRequest
 	25, // 47: ekko.Chronobreak.ListField:input_type -> ekko.ListFieldRequest
 	32, // 48: ekko.Chronobreak.ListScenario:input_type -> ekko.ListScenarioRequest
 	34, // 49: ekko.Chronobreak.GetScenario:input_type -> ekko.GetScenarioRequest
-	21, // 50: ekko.ekko.CreateField:output_type -> ekko.CreateFieldResponse
-	40, // 51: ekko.ekko.UpdateField:output_type -> google.protobuf.Empty
-	40, // 52: ekko.ekko.DeleteField:output_type -> google.protobuf.Empty
-	28, // 53: ekko.ekko.CreateScenario:output_type -> ekko.CreateScenarioResponse
-	40, // 54: ekko.ekko.UpdateScenario:output_type -> google.protobuf.Empty
-	40, // 55: ekko.ekko.DeleteScenario:output_type -> google.protobuf.Empty
-	33, // 56: ekko.ekko.ListScenario:output_type -> ekko.ListScenarioResponse
-	40, // 57: ekko.ekko.FavoriteScenario:output_type -> google.protobuf.Empty
-	40, // 58: ekko.ekko.RatingScenario:output_type -> google.protobuf.Empty
-	16, // 59: ekko.ekko.ListAttempt:output_type -> ekko.ListAttemptResponse
-	20, // 60: ekko.ekko.GetAttempt:output_type -> ekko.GetAttemptResponse
-	19, // 61: ekko.ekko.SubmitAnswer:output_type -> ekko.SubmitAnswerResponse
-	14, // 62: ekko.ekko.ListAllSubmission:output_type -> ekko.ListAllSubmissionResponse
+	21, // 50: ekko.Ekko.CreateField:output_type -> ekko.CreateFieldResponse
+	40, // 51: ekko.Ekko.UpdateField:output_type -> google.protobuf.Empty
+	40, // 52: ekko.Ekko.DeleteField:output_type -> google.protobuf.Empty
+	28, // 53: ekko.Ekko.CreateScenario:output_type -> ekko.CreateScenarioResponse
+	40, // 54: ekko.Ekko.UpdateScenario:output_type -> google.protobuf.Empty
+	40, // 55: ekko.Ekko.DeleteScenario:output_type -> google.protobuf.Empty
+	33, // 56: ekko.Ekko.ListScenario:output_type -> ekko.ListScenarioResponse
+	40, // 57: ekko.Ekko.FavoriteScenario:output_type -> google.protobuf.Empty
+	40, // 58: ekko.Ekko.RatingScenario:output_type -> google.protobuf.Empty
+	16, // 59: ekko.Ekko.ListAttempt:output_type -> ekko.ListAttemptResponse
+	20, // 60: ekko.Ekko.GetAttempt:output_type -> ekko.GetAttemptResponse
+	19, // 61: ekko.Ekko.SubmitAnswer:output_type -> ekko.SubmitAnswerResponse
+	14, // 62: ekko.Ekko.ListAllSubmission:output_type -> ekko.ListAllSubmissionResponse
 	26, // 63: ekko.Chronobreak.ListField:output_type -> ekko.ListFieldResponse
 	33, // 64: ekko.Chronobreak.ListScenario:output_type -> ekko.ListScenarioResponse
 	35, // 65: ekko.Chronobreak.GetScenario:output_type -> ekko.GetScenarioResponse
