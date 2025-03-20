@@ -2,10 +2,11 @@ package submission
 
 import (
 	ekko "ekko/api"
+	"encoding/json"
 	"fmt"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -25,7 +26,16 @@ func TestMain(t *testing.T) {
 		MinParticipant: new(int32),
 	}
 
-	data := proto.MarshalTextString(req)
+	data, err := protojson.Marshal(req)
+	if err != nil {
+		t.Fatal("Lỗi khi serialize protobuf thành JSON:", err)
+	}
 
 	fmt.Println(string(data))
+
+	// Nếu muốn in ra JSON format đẹp hơn:
+	var prettyJSON map[string]interface{}
+	json.Unmarshal(data, &prettyJSON)
+	prettyData, _ := json.MarshalIndent(prettyJSON, "", "  ")
+	fmt.Println(string(prettyData))
 }

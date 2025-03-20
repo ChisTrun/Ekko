@@ -172,7 +172,7 @@ func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSub
 		if req.From.AsTime().After(req.To.AsTime()) {
 			return nil, 0, 0, errors.New("invalid time")
 		}
-		query = query.Where(scenariocandidate.CreatedAt(req.From.AsTime()), scenariocandidate.CreatedAt(req.To.AsTime()))
+		query = query.Where(scenariocandidate.CreatedAtGTE(req.From.AsTime()), scenariocandidate.CreatedAtLTE(req.To.AsTime()))
 	}
 
 	sort, err := utils.GetSort(submissionattempt.Columns, submissionattempt.Table, req.SortMethod)

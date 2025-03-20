@@ -111,7 +111,7 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 		if req.From.AsTime().After(req.To.AsTime()) {
 			return nil, 0, 0, errors.New("invalid time")
 		}
-		query = query.Where(entscenario.CreatedAt(req.From.AsTime()), entscenario.CreatedAt(req.To.AsTime()))
+		query = query.Where(entscenario.CreatedAtGTE(req.From.AsTime()), entscenario.CreatedAtLTE(req.To.AsTime()))
 	}
 
 	if len(req.BmIds) > 0 {
