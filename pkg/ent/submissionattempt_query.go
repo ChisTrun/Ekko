@@ -304,9 +304,8 @@ func (saq *SubmissionAttemptQuery) Clone() *SubmissionAttemptQuery {
 		withScenarioCandidate: saq.withScenarioCandidate.Clone(),
 		withAnswers:           saq.withAnswers.Clone(),
 		// clone intermediate query.
-		sql:       saq.sql.Clone(),
-		path:      saq.path,
-		modifiers: append([]func(*sql.Selector){}, saq.modifiers...),
+		sql:  saq.sql.Clone(),
+		path: saq.path,
 	}
 }
 

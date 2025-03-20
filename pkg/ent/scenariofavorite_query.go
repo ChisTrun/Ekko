@@ -278,9 +278,8 @@ func (sfq *ScenarioFavoriteQuery) Clone() *ScenarioFavoriteQuery {
 		predicates:  append([]predicate.ScenarioFavorite{}, sfq.predicates...),
 		withSenario: sfq.withSenario.Clone(),
 		// clone intermediate query.
-		sql:       sfq.sql.Clone(),
-		path:      sfq.path,
-		modifiers: append([]func(*sql.Selector){}, sfq.modifiers...),
+		sql:  sfq.sql.Clone(),
+		path: sfq.path,
 	}
 }
 

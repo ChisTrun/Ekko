@@ -187,7 +187,9 @@ func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSub
 		Modify(sort).
 		Offset(int(req.PageIndex) * int(req.PageSize)).
 		Limit(int(req.PageSize)).
-		WithAttempts().
+		WithAttempts(func(saq *ent.SubmissionAttemptQuery) {
+			saq.WithScenarioCandidate()
+		}).
 		All(ctx)
 	if err != nil {
 		return nil, 0, 0, err

@@ -278,9 +278,8 @@ func (asq *AnswerSubmissionQuery) Clone() *AnswerSubmissionQuery {
 		predicates:            append([]predicate.AnswerSubmission{}, asq.predicates...),
 		withSubmissionAttempt: asq.withSubmissionAttempt.Clone(),
 		// clone intermediate query.
-		sql:       asq.sql.Clone(),
-		path:      asq.path,
-		modifiers: append([]func(*sql.Selector){}, asq.modifiers...),
+		sql:  asq.sql.Clone(),
+		path: asq.path,
 	}
 }
 

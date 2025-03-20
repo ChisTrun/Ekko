@@ -279,9 +279,8 @@ func (sfq *ScenarioFieldQuery) Clone() *ScenarioFieldQuery {
 		predicates:   append([]predicate.ScenarioField{}, sfq.predicates...),
 		withSenarios: sfq.withSenarios.Clone(),
 		// clone intermediate query.
-		sql:       sfq.sql.Clone(),
-		path:      sfq.path,
-		modifiers: append([]func(*sql.Selector){}, sfq.modifiers...),
+		sql:  sfq.sql.Clone(),
+		path: sfq.path,
 	}
 }
 

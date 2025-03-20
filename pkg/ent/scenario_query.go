@@ -354,9 +354,8 @@ func (sq *ScenarioQuery) Clone() *ScenarioQuery {
 		withFavorites:  sq.withFavorites.Clone(),
 		withField:      sq.withField.Clone(),
 		// clone intermediate query.
-		sql:       sq.sql.Clone(),
-		path:      sq.path,
-		modifiers: append([]func(*sql.Selector){}, sq.modifiers...),
+		sql:  sq.sql.Clone(),
+		path: sq.path,
 	}
 }
 

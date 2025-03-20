@@ -304,9 +304,8 @@ func (scq *ScenarioCandidateQuery) Clone() *ScenarioCandidateQuery {
 		withScenario: scq.withScenario.Clone(),
 		withAttempts: scq.withAttempts.Clone(),
 		// clone intermediate query.
-		sql:       scq.sql.Clone(),
-		path:      scq.path,
-		modifiers: append([]func(*sql.Selector){}, scq.modifiers...),
+		sql:  scq.sql.Clone(),
+		path: scq.path,
 	}
 }
 

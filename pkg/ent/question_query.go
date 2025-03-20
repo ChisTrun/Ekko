@@ -278,9 +278,8 @@ func (qq *QuestionQuery) Clone() *QuestionQuery {
 		predicates:   append([]predicate.Question{}, qq.predicates...),
 		withScenario: qq.withScenario.Clone(),
 		// clone intermediate query.
-		sql:       qq.sql.Clone(),
-		path:      qq.path,
-		modifiers: append([]func(*sql.Selector){}, qq.modifiers...),
+		sql:  qq.sql.Clone(),
+		path: qq.path,
 	}
 }
 
