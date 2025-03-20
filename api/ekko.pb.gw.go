@@ -10,7 +10,6 @@ package ekko
 
 import (
 	"context"
-	"errors"
 	"io"
 	"net/http"
 
@@ -25,665 +24,873 @@ import (
 )
 
 // Suppress "imported and not used" errors
-var (
-	_ codes.Code
-	_ io.Reader
-	_ status.Status
-	_ = errors.New
-	_ = runtime.String
-	_ = utilities.NewDoubleArray
-	_ = metadata.Join
-)
+var _ codes.Code
+var _ io.Reader
+var _ status.Status
+var _ = runtime.String
+var _ = utilities.NewDoubleArray
+var _ = metadata.Join
 
 func request_Ekko_CreateField_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq CreateFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq CreateFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.CreateField(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_CreateField_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq CreateFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq CreateFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.CreateField(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_UpdateField_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq UpdateFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.UpdateField(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_UpdateField_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq UpdateFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.UpdateField(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_DeleteField_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq DeleteFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq DeleteFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.DeleteField(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_DeleteField_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq DeleteFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq DeleteFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.DeleteField(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_CreateScenario_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq CreateScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq CreateScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.CreateScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_CreateScenario_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq CreateScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq CreateScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.CreateScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_UpdateScenario_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq UpdateScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.UpdateScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_UpdateScenario_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq UpdateScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq UpdateScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.UpdateScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_DeleteScenario_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq DeleteScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq DeleteScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.DeleteScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_DeleteScenario_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq DeleteScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq DeleteScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.DeleteScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_ListScenario_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.ListScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_ListScenario_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.ListScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_FavoriteScenario_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq FavoriteScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq FavoriteScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.FavoriteScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_FavoriteScenario_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq FavoriteScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq FavoriteScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.FavoriteScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_RatingScenario_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq RatingScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq RatingScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.RatingScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_RatingScenario_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq RatingScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq RatingScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.RatingScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_ListAttempt_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListAttemptRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListAttemptRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.ListAttempt(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_ListAttempt_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListAttemptRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListAttemptRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.ListAttempt(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_GetAttempt_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetAttemptRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq GetAttemptRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.GetAttempt(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_GetAttempt_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetAttemptRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq GetAttemptRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.GetAttempt(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_SubmitAnswer_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq SubmitAnswerRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq SubmitAnswerRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.SubmitAnswer(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_SubmitAnswer_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq SubmitAnswerRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq SubmitAnswerRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.SubmitAnswer(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Ekko_ListAllSubmission_0(ctx context.Context, marshaler runtime.Marshaler, client EkkoClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListAllSubmissionRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListAllSubmissionRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.ListAllSubmission(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Ekko_ListAllSubmission_0(ctx context.Context, marshaler runtime.Marshaler, server EkkoServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListAllSubmissionRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListAllSubmissionRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.ListAllSubmission(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Chronobreak_ListField_0(ctx context.Context, marshaler runtime.Marshaler, client ChronobreakClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.ListField(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Chronobreak_ListField_0(ctx context.Context, marshaler runtime.Marshaler, server ChronobreakServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListFieldRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListFieldRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.ListField(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Chronobreak_ListScenario_0(ctx context.Context, marshaler runtime.Marshaler, client ChronobreakClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.ListScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Chronobreak_ListScenario_0(ctx context.Context, marshaler runtime.Marshaler, server ChronobreakServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq ListScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq ListScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.ListScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 func request_Chronobreak_GetScenario_0(ctx context.Context, marshaler runtime.Marshaler, client ChronobreakClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq GetScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := client.GetScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_Chronobreak_GetScenario_0(ctx context.Context, marshaler runtime.Marshaler, server ChronobreakServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
-	var (
-		protoReq GetScenarioRequest
-		metadata runtime.ServerMetadata
-	)
-	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+	var protoReq GetScenarioRequest
+	var metadata runtime.ServerMetadata
+
+	newReader, berr := utilities.IOReaderFactory(req.Body)
+	if berr != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", berr)
+	}
+	if err := marshaler.NewDecoder(newReader()).Decode(&protoReq); err != nil && err != io.EOF {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
+
 	msg, err := server.GetScenario(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 // RegisterEkkoHandlerServer registers the http handlers for service Ekko to "mux".
 // UnaryRPC     :call EkkoServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterEkkoHandlerFromEndpoint instead.
-// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, server EkkoServer) error {
-	mux.Handle(http.MethodPost, pattern_Ekko_CreateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_CreateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/ekko/field/create"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/ekko/field/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_CreateField_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_CreateField_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_CreateField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_CreateField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_UpdateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_UpdateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/ekko/field/update"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/ekko/field/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_UpdateField_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_UpdateField_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_UpdateField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_UpdateField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_DeleteField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_DeleteField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/ekko/field/delete"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/ekko/field/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_DeleteField_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_DeleteField_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_DeleteField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_DeleteField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_CreateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_CreateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/create"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_CreateScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_CreateScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_CreateScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_CreateScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_UpdateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_UpdateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/update"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_UpdateScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_UpdateScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_UpdateScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_UpdateScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_DeleteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_DeleteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/delete"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_DeleteScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_DeleteScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_DeleteScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_DeleteScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/ekko/scenario/list"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/ekko/scenario/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_ListScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_ListScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_ListScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_ListScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_FavoriteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_FavoriteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/favorite"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/favorite"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_FavoriteScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_FavoriteScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_FavoriteScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_FavoriteScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_RatingScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_RatingScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/RatingScenario", runtime.WithHTTPPathPattern("/ekko/scenario/rating"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/RatingScenario", runtime.WithHTTPPathPattern("/ekko/scenario/rating"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_RatingScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_RatingScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_RatingScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_RatingScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_ListAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_ListAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/ekko/attempt/list"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/ekko/attempt/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_ListAttempt_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_ListAttempt_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_ListAttempt_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_ListAttempt_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_GetAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_GetAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/ekko/attempt"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/ekko/attempt"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_GetAttempt_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_GetAttempt_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_GetAttempt_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_GetAttempt_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_SubmitAnswer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_SubmitAnswer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/ekko/submit"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/ekko/submit"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_SubmitAnswer_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_SubmitAnswer_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_SubmitAnswer_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_SubmitAnswer_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_ListAllSubmission_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_ListAllSubmission_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/ekko/submission/list"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/ekko/submission/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Ekko_ListAllSubmission_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Ekko_ListAllSubmission_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_ListAllSubmission_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_ListAllSubmission_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	return nil
@@ -693,67 +900,78 @@ func RegisterEkkoHandlerServer(ctx context.Context, mux *runtime.ServeMux, serve
 // UnaryRPC     :call ChronobreakServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterChronobreakHandlerFromEndpoint instead.
-// GRPC interceptors will not work for this type of registration. To use interceptors, you must use the "runtime.WithMiddlewares" option in the "runtime.NewServeMux" call.
 func RegisterChronobreakHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ChronobreakServer) error {
-	mux.Handle(http.MethodPost, pattern_Chronobreak_ListField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Chronobreak_ListField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/chronobreak/field/list"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/chronobreak/field/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Chronobreak_ListField_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Chronobreak_ListField_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Chronobreak_ListField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Chronobreak_ListField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Chronobreak_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Chronobreak_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/noauth/list"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/noauth/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Chronobreak_ListScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Chronobreak_ListScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Chronobreak_ListScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Chronobreak_ListScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Chronobreak_GetScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Chronobreak_GetScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario"))
+		var err error
+		ctx, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := local_request_Chronobreak_GetScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		resp, md, err := local_request_Chronobreak_GetScenario_0(ctx, inboundMarshaler, server, req, pathParams)
 		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Chronobreak_GetScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Chronobreak_GetScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	return nil
@@ -762,24 +980,25 @@ func RegisterChronobreakHandlerServer(ctx context.Context, mux *runtime.ServeMux
 // RegisterEkkoHandlerFromEndpoint is same as RegisterEkkoHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterEkkoHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.NewClient(endpoint, opts...)
+	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
+
 	return RegisterEkkoHandler(ctx, mux, conn)
 }
 
@@ -793,285 +1012,363 @@ func RegisterEkkoHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.
 // to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "EkkoClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "EkkoClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "EkkoClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+// "EkkoClient" to call the correct interceptors.
 func RegisterEkkoHandlerClient(ctx context.Context, mux *runtime.ServeMux, client EkkoClient) error {
-	mux.Handle(http.MethodPost, pattern_Ekko_CreateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_CreateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/ekko/field/create"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateField", runtime.WithHTTPPathPattern("/ekko/field/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_CreateField_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_CreateField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Ekko_UpdateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/ekko/field/update"))
+		resp, md, err := request_Ekko_CreateField_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_UpdateField_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_UpdateField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_CreateField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_DeleteField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_UpdateField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/ekko/field/delete"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateField", runtime.WithHTTPPathPattern("/ekko/field/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_DeleteField_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_DeleteField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Ekko_CreateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/create"))
+		resp, md, err := request_Ekko_UpdateField_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_CreateScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_CreateScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_UpdateField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_UpdateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_DeleteField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/update"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteField", runtime.WithHTTPPathPattern("/ekko/field/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_UpdateScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_UpdateScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Ekko_DeleteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/delete"))
+		resp, md, err := request_Ekko_DeleteField_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_DeleteScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_DeleteScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_DeleteField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_CreateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/ekko/scenario/list"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/CreateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/create"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_ListScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_ListScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Ekko_FavoriteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/favorite"))
+		resp, md, err := request_Ekko_CreateScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_FavoriteScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_FavoriteScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_CreateScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_RatingScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_UpdateScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/RatingScenario", runtime.WithHTTPPathPattern("/ekko/scenario/rating"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/UpdateScenario", runtime.WithHTTPPathPattern("/ekko/scenario/update"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_RatingScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_RatingScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Ekko_ListAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/ekko/attempt/list"))
+		resp, md, err := request_Ekko_UpdateScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_ListAttempt_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_ListAttempt_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_UpdateScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_GetAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_DeleteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/ekko/attempt"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/DeleteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/delete"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_GetAttempt_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_GetAttempt_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Ekko_SubmitAnswer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/ekko/submit"))
+		resp, md, err := request_Ekko_DeleteScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_SubmitAnswer_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Ekko_SubmitAnswer_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_DeleteScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Ekko_ListAllSubmission_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Ekko_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/ekko/submission/list"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListScenario", runtime.WithHTTPPathPattern("/ekko/scenario/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Ekko_ListAllSubmission_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		resp, md, err := request_Ekko_ListScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Ekko_ListAllSubmission_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Ekko_ListScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
+
+	mux.Handle("POST", pattern_Ekko_FavoriteScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/FavoriteScenario", runtime.WithHTTPPathPattern("/ekko/scenario/favorite"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ekko_FavoriteScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ekko_FavoriteScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_Ekko_RatingScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/RatingScenario", runtime.WithHTTPPathPattern("/ekko/scenario/rating"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ekko_RatingScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ekko_RatingScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_Ekko_ListAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAttempt", runtime.WithHTTPPathPattern("/ekko/attempt/list"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ekko_ListAttempt_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ekko_ListAttempt_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_Ekko_GetAttempt_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/GetAttempt", runtime.WithHTTPPathPattern("/ekko/attempt"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ekko_GetAttempt_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ekko_GetAttempt_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_Ekko_SubmitAnswer_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/SubmitAnswer", runtime.WithHTTPPathPattern("/ekko/submit"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ekko_SubmitAnswer_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ekko_SubmitAnswer_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("POST", pattern_Ekko_ListAllSubmission_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Ekko/ListAllSubmission", runtime.WithHTTPPathPattern("/ekko/submission/list"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Ekko_ListAllSubmission_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Ekko_ListAllSubmission_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
 var (
-	pattern_Ekko_CreateField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "create"}, ""))
-	pattern_Ekko_UpdateField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "update"}, ""))
-	pattern_Ekko_DeleteField_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "delete"}, ""))
-	pattern_Ekko_CreateScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "create"}, ""))
-	pattern_Ekko_UpdateScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "update"}, ""))
-	pattern_Ekko_DeleteScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "delete"}, ""))
-	pattern_Ekko_ListScenario_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "list"}, ""))
-	pattern_Ekko_FavoriteScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "favorite"}, ""))
-	pattern_Ekko_RatingScenario_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "rating"}, ""))
-	pattern_Ekko_ListAttempt_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "attempt", "list"}, ""))
-	pattern_Ekko_GetAttempt_0        = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ekko", "attempt"}, ""))
-	pattern_Ekko_SubmitAnswer_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ekko", "submit"}, ""))
+	pattern_Ekko_CreateField_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "create"}, ""))
+
+	pattern_Ekko_UpdateField_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "update"}, ""))
+
+	pattern_Ekko_DeleteField_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "field", "delete"}, ""))
+
+	pattern_Ekko_CreateScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "create"}, ""))
+
+	pattern_Ekko_UpdateScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "update"}, ""))
+
+	pattern_Ekko_DeleteScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "delete"}, ""))
+
+	pattern_Ekko_ListScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "list"}, ""))
+
+	pattern_Ekko_FavoriteScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "favorite"}, ""))
+
+	pattern_Ekko_RatingScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "scenario", "rating"}, ""))
+
+	pattern_Ekko_ListAttempt_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "attempt", "list"}, ""))
+
+	pattern_Ekko_GetAttempt_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ekko", "attempt"}, ""))
+
+	pattern_Ekko_SubmitAnswer_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"ekko", "submit"}, ""))
+
 	pattern_Ekko_ListAllSubmission_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"ekko", "submission", "list"}, ""))
 )
 
 var (
-	forward_Ekko_CreateField_0       = runtime.ForwardResponseMessage
-	forward_Ekko_UpdateField_0       = runtime.ForwardResponseMessage
-	forward_Ekko_DeleteField_0       = runtime.ForwardResponseMessage
-	forward_Ekko_CreateScenario_0    = runtime.ForwardResponseMessage
-	forward_Ekko_UpdateScenario_0    = runtime.ForwardResponseMessage
-	forward_Ekko_DeleteScenario_0    = runtime.ForwardResponseMessage
-	forward_Ekko_ListScenario_0      = runtime.ForwardResponseMessage
-	forward_Ekko_FavoriteScenario_0  = runtime.ForwardResponseMessage
-	forward_Ekko_RatingScenario_0    = runtime.ForwardResponseMessage
-	forward_Ekko_ListAttempt_0       = runtime.ForwardResponseMessage
-	forward_Ekko_GetAttempt_0        = runtime.ForwardResponseMessage
-	forward_Ekko_SubmitAnswer_0      = runtime.ForwardResponseMessage
+	forward_Ekko_CreateField_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_UpdateField_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_DeleteField_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_CreateScenario_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_UpdateScenario_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_DeleteScenario_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_ListScenario_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_FavoriteScenario_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_RatingScenario_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_ListAttempt_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_GetAttempt_0 = runtime.ForwardResponseMessage
+
+	forward_Ekko_SubmitAnswer_0 = runtime.ForwardResponseMessage
+
 	forward_Ekko_ListAllSubmission_0 = runtime.ForwardResponseMessage
 )
 
 // RegisterChronobreakHandlerFromEndpoint is same as RegisterChronobreakHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterChronobreakHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string, opts []grpc.DialOption) (err error) {
-	conn, err := grpc.NewClient(endpoint, opts...)
+	conn, err := grpc.Dial(endpoint, opts...)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err != nil {
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 			return
 		}
 		go func() {
 			<-ctx.Done()
 			if cerr := conn.Close(); cerr != nil {
-				grpclog.Errorf("Failed to close conn to %s: %v", endpoint, cerr)
+				grpclog.Infof("Failed to close conn to %s: %v", endpoint, cerr)
 			}
 		}()
 	}()
+
 	return RegisterChronobreakHandler(ctx, mux, conn)
 }
 
@@ -1085,70 +1382,87 @@ func RegisterChronobreakHandler(ctx context.Context, mux *runtime.ServeMux, conn
 // to "mux". The handlers forward requests to the grpc endpoint over the given implementation of "ChronobreakClient".
 // Note: the gRPC framework executes interceptors within the gRPC handler. If the passed in "ChronobreakClient"
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
-// "ChronobreakClient" to call the correct interceptors. This client ignores the HTTP middlewares.
+// "ChronobreakClient" to call the correct interceptors.
 func RegisterChronobreakHandlerClient(ctx context.Context, mux *runtime.ServeMux, client ChronobreakClient) error {
-	mux.Handle(http.MethodPost, pattern_Chronobreak_ListField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Chronobreak_ListField_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/chronobreak/field/list"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListField", runtime.WithHTTPPathPattern("/chronobreak/field/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Chronobreak_ListField_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Chronobreak_ListField_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
-	})
-	mux.Handle(http.MethodPost, pattern_Chronobreak_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		ctx, cancel := context.WithCancel(req.Context())
-		defer cancel()
-		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/noauth/list"))
+		resp, md, err := request_Chronobreak_ListField_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Chronobreak_ListScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
-		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
-			return
-		}
-		forward_Chronobreak_ListScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Chronobreak_ListField_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
-	mux.Handle(http.MethodPost, pattern_Chronobreak_GetScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+
+	mux.Handle("POST", pattern_Chronobreak_ListScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario"))
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/ListScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/noauth/list"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_Chronobreak_GetScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
-		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		resp, md, err := request_Chronobreak_ListScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
-			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		forward_Chronobreak_GetScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+		forward_Chronobreak_ListScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
+
+	mux.Handle("POST", pattern_Chronobreak_GetScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		var err error
+		ctx, err = runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/GetScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Chronobreak_GetScenario_0(ctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Chronobreak_GetScenario_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	return nil
 }
 
 var (
-	pattern_Chronobreak_ListField_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"chronobreak", "field", "list"}, ""))
+	pattern_Chronobreak_ListField_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"chronobreak", "field", "list"}, ""))
+
 	pattern_Chronobreak_ListScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"chronobreak", "scenario", "noauth", "list"}, ""))
-	pattern_Chronobreak_GetScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"chronobreak", "scenario"}, ""))
+
+	pattern_Chronobreak_GetScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"chronobreak", "scenario"}, ""))
 )
 
 var (
-	forward_Chronobreak_ListField_0    = runtime.ForwardResponseMessage
+	forward_Chronobreak_ListField_0 = runtime.ForwardResponseMessage
+
 	forward_Chronobreak_ListScenario_0 = runtime.ForwardResponseMessage
-	forward_Chronobreak_GetScenario_0  = runtime.ForwardResponseMessage
+
+	forward_Chronobreak_GetScenario_0 = runtime.ForwardResponseMessage
 )
