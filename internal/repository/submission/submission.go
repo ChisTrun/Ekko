@@ -11,6 +11,7 @@ import (
 	"ekko/pkg/ent/scenario"
 	"ekko/pkg/ent/scenariocandidate"
 	"ekko/pkg/ent/submissionattempt"
+	"errors"
 	"fmt"
 )
 
@@ -78,6 +79,7 @@ func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, r
 	}
 
 	submission.Edges.Answers = answers
+	submission.Edges.ScenarioCandidate = scenarioCandidate
 
 	if err := tx.Client().Scenario.UpdateOneID(req.ScenarioId).AddParticipants(1).Exec(ctx); err != nil {
 		return nil, err
@@ -162,6 +164,15 @@ func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSub
 	query := s.ent.ScenarioCandidate.Query().Where(
 		scenariocandidate.ScenarioID(req.ScenarioId),
 	)
+
+	if (req.From == nil && req.To != nil) || (req.From != nil && req.To == nil) {
+		return nil, 0, 0, errors.New("invalid time")
+	} else if req.From != nil {
+		if req.From.AsTime().After(req.To.AsTime()) {
+			return nil, 0, 0, errors.New("invalid time")
+		}
+		query = query.Where(scenariocandidate.CreatedAt(req.From.AsTime()), scenariocandidate.CreatedAt(req.To.AsTime()))
+	}
 
 	sort, err := utils.GetSort(submissionattempt.Columns, submissionattempt.Table, req.SortMethod)
 	if err != nil {

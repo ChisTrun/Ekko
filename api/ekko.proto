@@ -77,7 +77,7 @@ service Ekko {
   };
   rpc GetAttempt (GetAttemptRequest) returns (GetAttemptResponse){
     option (google.api.http) = {
-      post: "/ekko/attempt"
+      post: "/ekko/attempt/get"
       body: "*"
     };
   };
@@ -216,6 +216,8 @@ message ListAllSubmissionRequest {
   int32 page_index = 2 [(validate.rules).int32 = {gte: 0}];
   int32 page_size = 3 [(validate.rules).int32 = {gte: 1}];
   repeated SortMethod sort_method = 4;
+  google.protobuf.Timestamp from = 5;
+  google.protobuf.Timestamp to = 6;
 }
 
 message ListAllSubmissionResponse {
@@ -307,7 +309,7 @@ message UpdateScenarioRequest {
   uint64 id = 1;
   string name = 2;
   string description = 3;
-  repeated Field fields = 4;
+  repeated uint64 field_ids = 4;
   repeated ScenarioQuestion questions = 5;
 }
 
@@ -330,6 +332,10 @@ message ListScenarioRequest {
   optional bool is_favorite = 6;
   optional bool is_finished = 7;
   repeated uint64 field_ids = 8;
+  google.protobuf.Timestamp from = 9;
+  google.protobuf.Timestamp to = 10;
+  optional float min_rating = 11;
+  optional int32 min_participant = 12;  
 }
 
 message ListScenarioResponse {

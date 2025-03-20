@@ -12,6 +12,7 @@ import (
 	"ekko/pkg/ent/scenariocandidate"
 	"ekko/pkg/ent/scenariofavorite"
 	"ekko/pkg/ent/scenariofield"
+	"errors"
 	"fmt"
 	"sync"
 )
@@ -80,7 +81,12 @@ func (s *scenario) Update(ctx context.Context, tx tx.Tx, bmId uint64, req *ekko.
 		return fmt.Errorf("could not update scenario with candidates")
 	}
 
-	if err := scenario.Update().
+	query := scenario.Update()
+	if len(req.FieldIds) > 0 {
+		query = query.ClearFieldEdge().AddFieldIDs(req.FieldIds...)
+	}
+
+	if err := query.
 		SetName(req.Name).
 		SetDescription(req.Description).Exec(ctx); err != nil {
 		return err
@@ -99,6 +105,15 @@ func (s *scenario) Delete(ctx context.Context, tx tx.Tx, bmId uint64, ids []uint
 func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, userId *uint64) ([]*ent.Scenario, int32, int32, error) {
 	query := s.ent.Scenario.Query()
 
+	if (req.From == nil && req.To != nil) || (req.From != nil && req.To == nil) {
+		return nil, 0, 0, errors.New("invalid time")
+	} else if req.From != nil {
+		if req.From.AsTime().After(req.To.AsTime()) {
+			return nil, 0, 0, errors.New("invalid time")
+		}
+		query = query.Where(entscenario.CreatedAt(req.From.AsTime()), entscenario.CreatedAt(req.To.AsTime()))
+	}
+
 	if len(req.BmIds) > 0 {
 		query = query.Where(entscenario.BmIDIn(req.BmIds...))
 	}
@@ -111,6 +126,14 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 
 	if len(req.FieldIds) > 0 {
 		query = query.Where(entscenario.HasFieldWith(scenariofield.IDIn(req.FieldIds...)))
+	}
+
+	if req.MinParticipant != nil {
+		query = query.Where(entscenario.ParticipantsGTE(*req.MinParticipant))
+	}
+
+	if req.MinRating != nil {
+		query = query.Where(entscenario.RatingGTE(float64(*req.MinRating)))
 	}
 
 	if userId != nil {
