@@ -122,7 +122,7 @@ func (s *submission) checkSubmission(ctx context.Context, scenarioId uint64, ans
 func (s *submission) GetAttempt(ctx context.Context, user uint64, isBm bool, attemptId uint64) (*ent.SubmissionAttempt, error) {
 	query := s.ent.SubmissionAttempt.Query().Where(
 		submissionattempt.ID(attemptId),
-	).WithAnswers()
+	).WithAnswers().WithScenarioCandidate()
 
 	if !isBm {
 		query = query.Where(submissionattempt.HasScenarioCandidateWith(scenariocandidate.CandidateID(user)))
@@ -153,6 +153,7 @@ func (s *submission) ListAttempt(ctx context.Context, candidateId uint64, req *e
 		Modify(sort).
 		Offset(int(req.PageIndex) * int(req.PageSize)).
 		Limit(int(req.PageSize)).
+		WithScenarioCandidate().
 		All(ctx)
 	if err != nil {
 		return nil, 0, 0, err
