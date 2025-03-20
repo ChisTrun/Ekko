@@ -87,20 +87,12 @@ func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, r
 }
 
 func (s *submission) getAvailableAttemptNumber(ctx context.Context, scenarioId, candidateId uint64) (int32, error) {
-	n, err := s.ent.SubmissionAttempt.Query().Where(
+	n, _ := s.ent.SubmissionAttempt.Query().Where(
 		submissionattempt.HasScenarioCandidateWith(
 			scenariocandidate.ScenarioID(scenarioId),
 			scenariocandidate.CandidateID(candidateId)),
 	).Aggregate(ent.Max(submissionattempt.FieldAttemptNumber)).
 		Int(ctx)
-
-	if err != nil {
-		if ent.IsNotFound(err) {
-			n = 0
-		} else {
-			return -1, err
-		}
-	}
 
 	return int32(n + 1), nil
 }
