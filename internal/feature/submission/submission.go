@@ -76,9 +76,9 @@ func (s *submission) GetAttempt(ctx context.Context, req *ekko.GetAttemptRequest
 	}
 
 	switch roleIds[0] {
-	case bulbasaur.Role_ROLE_BUSINESS_MANAGER.String():
+	case fmt.Sprintf("%v", int32(bulbasaur.Role_ROLE_BUSINESS_MANAGER)):
 		isBm = true
-	case bulbasaur.Role_ROLE_CANDIDATE.String():
+	case fmt.Sprintf("%v", int32(bulbasaur.Role_ROLE_CANDIDATE)):
 		isBm = false
 	default:
 		return nil, fmt.Errorf("invalid role")
