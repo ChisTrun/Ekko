@@ -10,8 +10,10 @@ jobs:
   notify-sysops:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Source Repo
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: Get latest tag
         id: get_tag
