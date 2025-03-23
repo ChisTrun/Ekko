@@ -1,0 +1,47 @@
+name: Notify SysOps Repo
+
+on:
+  push:
+    tags:
+      - "*" # Trigger khi có bất kỳ tag mới nào
+
+jobs:
+  notify-sysops:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract repo name & tag
+        run: |
+          REPO_NAME=$(basename $GITHUB_REPOSITORY)
+          echo "REPO_NAME=${REPO_NAME}" >> $GITHUB_ENV
+          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Checkout SysOps Repo
+        run: |
+          git clone https://${{ secrets.PERSONAL_ACCESS_TOKEN }}@github.com/ChisTrun/sysops-skillsharp.git
+          cd sysops-skillsharp
+          git config --global user.name "ChisTrun"
+          git config --global user.email "vochitrung.pst@gmail.com"
+
+      - name: Create Branch & Update Dockerfile
+        run: |
+          cd sysops-skillsharp
+          BRANCH_NAME="update-${{ env.REPO_NAME }}-${{ env.TAG }}"
+          git checkout -b $BRANCH_NAME
+
+          # Cập nhật Dockerfile của service tương ứng
+          sed -i "s|\(FROM .*:\)[^ ]*|\1${{ env.TAG }}|g" backend/${{ env.REPO_NAME }}/build/Dockerfile
+          git add .
+          git commit -m "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}"
+          git push origin $BRANCH_NAME
+
+      - name: Create Pull Request
+        run: |
+          cd sysops-skillsharp
+          gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
+          gh pr create --title "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}" \
+                      --body "Automated PR to update ${{ env.REPO_NAME }} image version to ${{ env.TAG }}" \
+                      --base main \
+                      --head $BRANCH_NAME \
+                      --repo ChisTrun/sysops-skillsharp
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
