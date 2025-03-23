@@ -44,8 +44,8 @@ jobs:
             minor=$(echo "$TAG_WITHOUT_V" | cut -d '.' -f2)
             patch=$(echo "$TAG_WITHOUT_V" | cut -d '.' -f3)
 
-            # Tăng patch lên 10
-            patch=$((patch + 10))
+            # Tăng patch lên 1
+            patch=$((patch + 1))
 
             # Nếu patch vượt 10, tăng minor lên 1 và reset patch về 0
             if [ "$patch" -ge 10 ]; then

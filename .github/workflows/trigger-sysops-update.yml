@@ -17,7 +17,8 @@ jobs:
         id: get_tag
         run: |
           TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
-          echo "TAG=${TAG}" >> $GITHUB_ENV
+          echo "Latest tag: $TAG"
+          echo "::set-output name=tag::$TAG"
 
       - name: Extract repo name
         run: |
@@ -34,14 +35,21 @@ jobs:
       - name: Create Branch & Update Dockerfile
         run: |
           cd sysops-skillsharp
-          BRANCH_NAME="update-${{ env.REPO_NAME }}-${{ env.TAG }}"
-          git checkout -b $BRANCH_NAME
+          BRANCH_NAME="update-${{ env.REPO_NAME }}-${{ steps.get_tag.outputs.tag }}"
+
+          # Kiểm tra nếu branch đã tồn tại thì checkout, nếu chưa thì tạo mới
+          if git ls-remote --heads origin $BRANCH_NAME | grep $BRANCH_NAME; then
+            git checkout $BRANCH_NAME
+            git pull --rebase origin $BRANCH_NAME
+          else
+            git checkout -b $BRANCH_NAME
+          fi
 
           # Cập nhật Dockerfile của service tương ứng
-          sed -i "s|\(FROM .*:\)[^ ]*|\1${{ env.TAG }}|g" backend/${{ env.REPO_NAME }}/build/Dockerfile
+          sed -i "s|\(FROM .*:\)[^ ]*|\1${{ steps.get_tag.outputs.tag }}|g" backend/${{ env.REPO_NAME }}/build/Dockerfile
 
           git add .
-          git commit -m "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}"
+          git commit -m "Update ${{ env.REPO_NAME }} to tag ${{ steps.get_tag.outputs.tag }}"
           git push origin $BRANCH_NAME
 
       - name: Create Pull Request
@@ -49,8 +57,8 @@ jobs:
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           cd sysops-skillsharp
-          gh pr create --title "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}" \
-                      --body "Automated PR to update ${{ env.REPO_NAME }} image version to ${{ env.TAG }}" \
+          gh pr create --title "Update ${{ env.REPO_NAME }} to tag ${{ steps.get_tag.outputs.tag }}" \
+                      --body "Automated PR to update ${{ env.REPO_NAME }} image version to ${{ steps.get_tag.outputs.tag }}" \
                       --base main \
                       --head $BRANCH_NAME \
                       --repo ChisTrun/sysops-skillsharp
