@@ -1,9 +1,10 @@
 name: Notify SysOps Repo
 
 on:
-  push:
-    tags:
-      - "*" # Trigger khi có bất kỳ tag mới nào
+  workflow_run:
+    workflows: ["create tag", "Build and Push Docker Image"]
+    types:
+      - completed
 
 jobs:
   notify-sysops:
