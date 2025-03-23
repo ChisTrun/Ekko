@@ -59,8 +59,8 @@ jobs:
           GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           cd sysops-skillsharp
-          gh pr create --title "Update ${{ env.REPO_NAME }} to tag ${{ steps.get_tag.outputs.tag }}" \
-                      --body "Automated PR to update ${{ env.REPO_NAME }} image version to ${{ steps.get_tag.outputs.tag }}" \
+          gh pr create --title "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}" \
+                      --body "Automated PR to update ${{ env.REPO_NAME }} image version to ${{ env.TAG }}" \
                       --base main \
-                      --head $BRANCH_NAME \
-                      --repo ChisTrun/sysops-skillsharp
+                      --head "$BRANCH_NAME" \
+                      --repo "ChisTrun/sysops-skillsharp"
