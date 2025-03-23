@@ -10,11 +10,19 @@ jobs:
   notify-sysops:
     runs-on: ubuntu-latest
     steps:
-      - name: Extract repo name & tag
+      - name: Checkout Source Repo
+        uses: actions/checkout@v4
+
+      - name: Get latest tag
+        id: get_tag
+        run: |
+          TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "TAG=${TAG}" >> $GITHUB_ENV
+
+      - name: Extract repo name
         run: |
           REPO_NAME=$(basename $GITHUB_REPOSITORY)
           echo "REPO_NAME=${REPO_NAME}" >> $GITHUB_ENV
-          echo "TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
 
       - name: Checkout SysOps Repo
         run: |
@@ -31,18 +39,18 @@ jobs:
 
           # Cập nhật Dockerfile của service tương ứng
           sed -i "s|\(FROM .*:\)[^ ]*|\1${{ env.TAG }}|g" backend/${{ env.REPO_NAME }}/build/Dockerfile
+
           git add .
           git commit -m "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}"
           git push origin $BRANCH_NAME
 
       - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         run: |
           cd sysops-skillsharp
-          gh auth login --with-token <<< "${{ secrets.PERSONAL_ACCESS_TOKEN }}"
           gh pr create --title "Update ${{ env.REPO_NAME }} to tag ${{ env.TAG }}" \
                       --body "Automated PR to update ${{ env.REPO_NAME }} image version to ${{ env.TAG }}" \
                       --base main \
                       --head $BRANCH_NAME \
                       --repo ChisTrun/sysops-skillsharp
-        env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
