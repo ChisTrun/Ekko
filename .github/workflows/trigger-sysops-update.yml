@@ -2,7 +2,7 @@ name: Notify SysOps Repo
 
 on:
   workflow_run:
-    workflows: ["create tag", "Build and Push Docker Image"]
+    workflows: ["create tag"]
     types:
       - completed
 
