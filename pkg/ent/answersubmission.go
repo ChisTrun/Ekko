@@ -5,6 +5,7 @@ package ent
 import (
 	ekko "ekko/api"
 	"ekko/pkg/ent/answersubmission"
+	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/submissionattempt"
 	"fmt"
 	"strings"
@@ -49,9 +50,11 @@ type AnswerSubmission struct {
 type AnswerSubmissionEdges struct {
 	// SubmissionAttempt holds the value of the submission_attempt edge.
 	SubmissionAttempt *SubmissionAttempt `json:"submission_attempt,omitempty"`
+	// Question holds the value of the question edge.
+	Question *Question `json:"question,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // SubmissionAttemptOrErr returns the SubmissionAttempt value or an error if the edge
@@ -63,6 +66,17 @@ func (e AnswerSubmissionEdges) SubmissionAttemptOrErr() (*SubmissionAttempt, err
 		return nil, &NotFoundError{label: submissionattempt.Label}
 	}
 	return nil, &NotLoadedError{edge: "submission_attempt"}
+}
+
+// QuestionOrErr returns the Question value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AnswerSubmissionEdges) QuestionOrErr() (*Question, error) {
+	if e.Question != nil {
+		return e.Question, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: question.Label}
+	}
+	return nil, &NotLoadedError{edge: "question"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -175,6 +189,11 @@ func (as *AnswerSubmission) Value(name string) (ent.Value, error) {
 // QuerySubmissionAttempt queries the "submission_attempt" edge of the AnswerSubmission entity.
 func (as *AnswerSubmission) QuerySubmissionAttempt() *SubmissionAttemptQuery {
 	return NewAnswerSubmissionClient(as.config).QuerySubmissionAttempt(as)
+}
+
+// QueryQuestion queries the "question" edge of the AnswerSubmission entity.
+func (as *AnswerSubmission) QueryQuestion() *QuestionQuery {
+	return NewAnswerSubmissionClient(as.config).QueryQuestion(as)
 }
 
 // Update returns a builder for updating this AnswerSubmission.

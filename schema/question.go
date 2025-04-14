@@ -32,5 +32,6 @@ func (Question) Edges() []ent.Edge {
 			Field("scenario_id").
 			Required().
 			Unique(),
+		edge.To("answers", AnswerSubmission.Type),
 	}
 }

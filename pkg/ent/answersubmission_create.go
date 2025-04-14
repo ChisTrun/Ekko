@@ -6,6 +6,7 @@ import (
 	"context"
 	ekko "ekko/api"
 	"ekko/pkg/ent/answersubmission"
+	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/submissionattempt"
 	"errors"
 	"fmt"
@@ -143,6 +144,11 @@ func (asc *AnswerSubmissionCreate) SetSubmissionAttempt(s *SubmissionAttempt) *A
 	return asc.SetSubmissionAttemptID(s.ID)
 }
 
+// SetQuestion sets the "question" edge to the Question entity.
+func (asc *AnswerSubmissionCreate) SetQuestion(q *Question) *AnswerSubmissionCreate {
+	return asc.SetQuestionID(q.ID)
+}
+
 // Mutation returns the AnswerSubmissionMutation object of the builder.
 func (asc *AnswerSubmissionCreate) Mutation() *AnswerSubmissionMutation {
 	return asc.mutation
@@ -239,6 +245,9 @@ func (asc *AnswerSubmissionCreate) check() error {
 	if len(asc.mutation.SubmissionAttemptIDs()) == 0 {
 		return &ValidationError{Name: "submission_attempt", err: errors.New(`ent: missing required edge "AnswerSubmission.submission_attempt"`)}
 	}
+	if len(asc.mutation.QuestionIDs()) == 0 {
+		return &ValidationError{Name: "question", err: errors.New(`ent: missing required edge "AnswerSubmission.question"`)}
+	}
 	return nil
 }
 
@@ -280,10 +289,6 @@ func (asc *AnswerSubmissionCreate) createSpec() (*AnswerSubmission, *sqlgraph.Cr
 		_spec.SetField(answersubmission.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := asc.mutation.QuestionID(); ok {
-		_spec.SetField(answersubmission.FieldQuestionID, field.TypeUint64, value)
-		_node.QuestionID = value
-	}
 	if value, ok := asc.mutation.Answer(); ok {
 		_spec.SetField(answersubmission.FieldAnswer, field.TypeString, value)
 		_node.Answer = value
@@ -323,6 +328,23 @@ func (asc *AnswerSubmissionCreate) createSpec() (*AnswerSubmission, *sqlgraph.Cr
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.SubmissionAttemptID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := asc.mutation.QuestionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.QuestionTable,
+			Columns: []string{answersubmission.QuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.QuestionID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -410,12 +432,6 @@ func (u *AnswerSubmissionUpsert) SetQuestionID(v uint64) *AnswerSubmissionUpsert
 // UpdateQuestionID sets the "question_id" field to the value that was provided on create.
 func (u *AnswerSubmissionUpsert) UpdateQuestionID() *AnswerSubmissionUpsert {
 	u.SetExcluded(answersubmission.FieldQuestionID)
-	return u
-}
-
-// AddQuestionID adds v to the "question_id" field.
-func (u *AnswerSubmissionUpsert) AddQuestionID(v uint64) *AnswerSubmissionUpsert {
-	u.Add(answersubmission.FieldQuestionID, v)
 	return u
 }
 
@@ -604,13 +620,6 @@ func (u *AnswerSubmissionUpsertOne) UpdateSubmissionAttemptID() *AnswerSubmissio
 func (u *AnswerSubmissionUpsertOne) SetQuestionID(v uint64) *AnswerSubmissionUpsertOne {
 	return u.Update(func(s *AnswerSubmissionUpsert) {
 		s.SetQuestionID(v)
-	})
-}
-
-// AddQuestionID adds v to the "question_id" field.
-func (u *AnswerSubmissionUpsertOne) AddQuestionID(v uint64) *AnswerSubmissionUpsertOne {
-	return u.Update(func(s *AnswerSubmissionUpsert) {
-		s.AddQuestionID(v)
 	})
 }
 
@@ -989,13 +998,6 @@ func (u *AnswerSubmissionUpsertBulk) UpdateSubmissionAttemptID() *AnswerSubmissi
 func (u *AnswerSubmissionUpsertBulk) SetQuestionID(v uint64) *AnswerSubmissionUpsertBulk {
 	return u.Update(func(s *AnswerSubmissionUpsert) {
 		s.SetQuestionID(v)
-	})
-}
-
-// AddQuestionID adds v to the "question_id" field.
-func (u *AnswerSubmissionUpsertBulk) AddQuestionID(v uint64) *AnswerSubmissionUpsertBulk {
-	return u.Update(func(s *AnswerSubmissionUpsert) {
-		s.AddQuestionID(v)
 	})
 }
 

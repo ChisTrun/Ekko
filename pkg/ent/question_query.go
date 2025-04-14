@@ -4,6 +4,8 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
+	"ekko/pkg/ent/answersubmission"
 	"ekko/pkg/ent/predicate"
 	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/scenario"
@@ -25,6 +27,7 @@ type QuestionQuery struct {
 	inters       []Interceptor
 	predicates   []predicate.Question
 	withScenario *ScenarioQuery
+	withAnswers  *AnswerSubmissionQuery
 	modifiers    []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -77,6 +80,28 @@ func (qq *QuestionQuery) QueryScenario() *ScenarioQuery {
 			sqlgraph.From(question.Table, question.FieldID, selector),
 			sqlgraph.To(scenario.Table, scenario.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, question.ScenarioTable, question.ScenarioColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(qq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAnswers chains the current query on the "answers" edge.
+func (qq *QuestionQuery) QueryAnswers() *AnswerSubmissionQuery {
+	query := (&AnswerSubmissionClient{config: qq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := qq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := qq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(question.Table, question.FieldID, selector),
+			sqlgraph.To(answersubmission.Table, answersubmission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, question.AnswersTable, question.AnswersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(qq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,6 +302,7 @@ func (qq *QuestionQuery) Clone() *QuestionQuery {
 		inters:       append([]Interceptor{}, qq.inters...),
 		predicates:   append([]predicate.Question{}, qq.predicates...),
 		withScenario: qq.withScenario.Clone(),
+		withAnswers:  qq.withAnswers.Clone(),
 		// clone intermediate query.
 		sql:  qq.sql.Clone(),
 		path: qq.path,
@@ -291,6 +317,17 @@ func (qq *QuestionQuery) WithScenario(opts ...func(*ScenarioQuery)) *QuestionQue
 		opt(query)
 	}
 	qq.withScenario = query
+	return qq
+}
+
+// WithAnswers tells the query-builder to eager-load the nodes that are connected to
+// the "answers" edge. The optional arguments are used to configure the query builder of the edge.
+func (qq *QuestionQuery) WithAnswers(opts ...func(*AnswerSubmissionQuery)) *QuestionQuery {
+	query := (&AnswerSubmissionClient{config: qq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	qq.withAnswers = query
 	return qq
 }
 
@@ -372,8 +409,9 @@ func (qq *QuestionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Que
 	var (
 		nodes       = []*Question{}
 		_spec       = qq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			qq.withScenario != nil,
+			qq.withAnswers != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -400,6 +438,13 @@ func (qq *QuestionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Que
 	if query := qq.withScenario; query != nil {
 		if err := qq.loadScenario(ctx, query, nodes, nil,
 			func(n *Question, e *Scenario) { n.Edges.Scenario = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := qq.withAnswers; query != nil {
+		if err := qq.loadAnswers(ctx, query, nodes,
+			func(n *Question) { n.Edges.Answers = []*AnswerSubmission{} },
+			func(n *Question, e *AnswerSubmission) { n.Edges.Answers = append(n.Edges.Answers, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -432,6 +477,36 @@ func (qq *QuestionQuery) loadScenario(ctx context.Context, query *ScenarioQuery,
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (qq *QuestionQuery) loadAnswers(ctx context.Context, query *AnswerSubmissionQuery, nodes []*Question, init func(*Question), assign func(*Question, *AnswerSubmission)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*Question)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(answersubmission.FieldQuestionID)
+	}
+	query.Where(predicate.AnswerSubmission(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(question.AnswersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.QuestionID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "question_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"ekko/pkg/ent/answersubmission"
 	"ekko/pkg/ent/predicate"
 	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/scenario"
@@ -97,6 +98,21 @@ func (qu *QuestionUpdate) SetScenario(s *Scenario) *QuestionUpdate {
 	return qu.SetScenarioID(s.ID)
 }
 
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by IDs.
+func (qu *QuestionUpdate) AddAnswerIDs(ids ...uint64) *QuestionUpdate {
+	qu.mutation.AddAnswerIDs(ids...)
+	return qu
+}
+
+// AddAnswers adds the "answers" edges to the AnswerSubmission entity.
+func (qu *QuestionUpdate) AddAnswers(a ...*AnswerSubmission) *QuestionUpdate {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return qu.AddAnswerIDs(ids...)
+}
+
 // Mutation returns the QuestionMutation object of the builder.
 func (qu *QuestionUpdate) Mutation() *QuestionMutation {
 	return qu.mutation
@@ -106,6 +122,27 @@ func (qu *QuestionUpdate) Mutation() *QuestionMutation {
 func (qu *QuestionUpdate) ClearScenario() *QuestionUpdate {
 	qu.mutation.ClearScenario()
 	return qu
+}
+
+// ClearAnswers clears all "answers" edges to the AnswerSubmission entity.
+func (qu *QuestionUpdate) ClearAnswers() *QuestionUpdate {
+	qu.mutation.ClearAnswers()
+	return qu
+}
+
+// RemoveAnswerIDs removes the "answers" edge to AnswerSubmission entities by IDs.
+func (qu *QuestionUpdate) RemoveAnswerIDs(ids ...uint64) *QuestionUpdate {
+	qu.mutation.RemoveAnswerIDs(ids...)
+	return qu
+}
+
+// RemoveAnswers removes "answers" edges to AnswerSubmission entities.
+func (qu *QuestionUpdate) RemoveAnswers(a ...*AnswerSubmission) *QuestionUpdate {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return qu.RemoveAnswerIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -211,6 +248,51 @@ func (qu *QuestionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if qu.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := qu.mutation.RemovedAnswersIDs(); len(nodes) > 0 && !qu.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := qu.mutation.AnswersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(qu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, qu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -300,6 +382,21 @@ func (quo *QuestionUpdateOne) SetScenario(s *Scenario) *QuestionUpdateOne {
 	return quo.SetScenarioID(s.ID)
 }
 
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by IDs.
+func (quo *QuestionUpdateOne) AddAnswerIDs(ids ...uint64) *QuestionUpdateOne {
+	quo.mutation.AddAnswerIDs(ids...)
+	return quo
+}
+
+// AddAnswers adds the "answers" edges to the AnswerSubmission entity.
+func (quo *QuestionUpdateOne) AddAnswers(a ...*AnswerSubmission) *QuestionUpdateOne {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return quo.AddAnswerIDs(ids...)
+}
+
 // Mutation returns the QuestionMutation object of the builder.
 func (quo *QuestionUpdateOne) Mutation() *QuestionMutation {
 	return quo.mutation
@@ -309,6 +406,27 @@ func (quo *QuestionUpdateOne) Mutation() *QuestionMutation {
 func (quo *QuestionUpdateOne) ClearScenario() *QuestionUpdateOne {
 	quo.mutation.ClearScenario()
 	return quo
+}
+
+// ClearAnswers clears all "answers" edges to the AnswerSubmission entity.
+func (quo *QuestionUpdateOne) ClearAnswers() *QuestionUpdateOne {
+	quo.mutation.ClearAnswers()
+	return quo
+}
+
+// RemoveAnswerIDs removes the "answers" edge to AnswerSubmission entities by IDs.
+func (quo *QuestionUpdateOne) RemoveAnswerIDs(ids ...uint64) *QuestionUpdateOne {
+	quo.mutation.RemoveAnswerIDs(ids...)
+	return quo
+}
+
+// RemoveAnswers removes "answers" edges to AnswerSubmission entities.
+func (quo *QuestionUpdateOne) RemoveAnswers(a ...*AnswerSubmission) *QuestionUpdateOne {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return quo.RemoveAnswerIDs(ids...)
 }
 
 // Where appends a list predicates to the QuestionUpdate builder.
@@ -437,6 +555,51 @@ func (quo *QuestionUpdateOne) sqlSave(ctx context.Context) (_node *Question, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(scenario.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if quo.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := quo.mutation.RemovedAnswersIDs(); len(nodes) > 0 && !quo.mutation.AnswersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := quo.mutation.AnswersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

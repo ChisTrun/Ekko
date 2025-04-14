@@ -34,5 +34,6 @@ func (AnswerSubmission) Fields() []ent.Field {
 func (AnswerSubmission) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("submission_attempt", SubmissionAttempt.Type).Ref("answers").Field("submission_attempt_id").Unique().Required(),
+		edge.From("question", Question.Type).Ref("answers").Field("question_id").Unique().Required(),
 	}
 }

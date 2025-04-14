@@ -48,8 +48,6 @@ type AnswerSubmissionMutation struct {
 	id                        *uint64
 	created_at                *time.Time
 	updated_at                *time.Time
-	question_id               *uint64
-	addquestion_id            *int64
 	answer                    *string
 	relevance                 *float64
 	addrelevance              *float64
@@ -64,6 +62,8 @@ type AnswerSubmissionMutation struct {
 	clearedFields             map[string]struct{}
 	submission_attempt        *uint64
 	clearedsubmission_attempt bool
+	question                  *uint64
+	clearedquestion           bool
 	done                      bool
 	oldValue                  func(context.Context) (*AnswerSubmission, error)
 	predicates                []predicate.AnswerSubmission
@@ -283,13 +283,12 @@ func (m *AnswerSubmissionMutation) ResetSubmissionAttemptID() {
 
 // SetQuestionID sets the "question_id" field.
 func (m *AnswerSubmissionMutation) SetQuestionID(u uint64) {
-	m.question_id = &u
-	m.addquestion_id = nil
+	m.question = &u
 }
 
 // QuestionID returns the value of the "question_id" field in the mutation.
 func (m *AnswerSubmissionMutation) QuestionID() (r uint64, exists bool) {
-	v := m.question_id
+	v := m.question
 	if v == nil {
 		return
 	}
@@ -313,28 +312,9 @@ func (m *AnswerSubmissionMutation) OldQuestionID(ctx context.Context) (v uint64,
 	return oldValue.QuestionID, nil
 }
 
-// AddQuestionID adds u to the "question_id" field.
-func (m *AnswerSubmissionMutation) AddQuestionID(u int64) {
-	if m.addquestion_id != nil {
-		*m.addquestion_id += u
-	} else {
-		m.addquestion_id = &u
-	}
-}
-
-// AddedQuestionID returns the value that was added to the "question_id" field in this mutation.
-func (m *AnswerSubmissionMutation) AddedQuestionID() (r int64, exists bool) {
-	v := m.addquestion_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetQuestionID resets all changes to the "question_id" field.
 func (m *AnswerSubmissionMutation) ResetQuestionID() {
-	m.question_id = nil
-	m.addquestion_id = nil
+	m.question = nil
 }
 
 // SetAnswer sets the "answer" field.
@@ -680,6 +660,33 @@ func (m *AnswerSubmissionMutation) ResetSubmissionAttempt() {
 	m.clearedsubmission_attempt = false
 }
 
+// ClearQuestion clears the "question" edge to the Question entity.
+func (m *AnswerSubmissionMutation) ClearQuestion() {
+	m.clearedquestion = true
+	m.clearedFields[answersubmission.FieldQuestionID] = struct{}{}
+}
+
+// QuestionCleared reports if the "question" edge to the Question entity was cleared.
+func (m *AnswerSubmissionMutation) QuestionCleared() bool {
+	return m.clearedquestion
+}
+
+// QuestionIDs returns the "question" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// QuestionID instead. It exists only for internal usage by the builders.
+func (m *AnswerSubmissionMutation) QuestionIDs() (ids []uint64) {
+	if id := m.question; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetQuestion resets all changes to the "question" edge.
+func (m *AnswerSubmissionMutation) ResetQuestion() {
+	m.question = nil
+	m.clearedquestion = false
+}
+
 // Where appends a list predicates to the AnswerSubmissionMutation builder.
 func (m *AnswerSubmissionMutation) Where(ps ...predicate.AnswerSubmission) {
 	m.predicates = append(m.predicates, ps...)
@@ -724,7 +731,7 @@ func (m *AnswerSubmissionMutation) Fields() []string {
 	if m.submission_attempt != nil {
 		fields = append(fields, answersubmission.FieldSubmissionAttemptID)
 	}
-	if m.question_id != nil {
+	if m.question != nil {
 		fields = append(fields, answersubmission.FieldQuestionID)
 	}
 	if m.answer != nil {
@@ -889,9 +896,6 @@ func (m *AnswerSubmissionMutation) SetField(name string, value ent.Value) error 
 // this mutation.
 func (m *AnswerSubmissionMutation) AddedFields() []string {
 	var fields []string
-	if m.addquestion_id != nil {
-		fields = append(fields, answersubmission.FieldQuestionID)
-	}
 	if m.addrelevance != nil {
 		fields = append(fields, answersubmission.FieldRelevance)
 	}
@@ -915,8 +919,6 @@ func (m *AnswerSubmissionMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *AnswerSubmissionMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case answersubmission.FieldQuestionID:
-		return m.AddedQuestionID()
 	case answersubmission.FieldRelevance:
 		return m.AddedRelevance()
 	case answersubmission.FieldClarityCompleteness:
@@ -936,13 +938,6 @@ func (m *AnswerSubmissionMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *AnswerSubmissionMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case answersubmission.FieldQuestionID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddQuestionID(v)
-		return nil
 	case answersubmission.FieldRelevance:
 		v, ok := value.(float64)
 		if !ok {
@@ -1041,9 +1036,12 @@ func (m *AnswerSubmissionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AnswerSubmissionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.submission_attempt != nil {
 		edges = append(edges, answersubmission.EdgeSubmissionAttempt)
+	}
+	if m.question != nil {
+		edges = append(edges, answersubmission.EdgeQuestion)
 	}
 	return edges
 }
@@ -1056,13 +1054,17 @@ func (m *AnswerSubmissionMutation) AddedIDs(name string) []ent.Value {
 		if id := m.submission_attempt; id != nil {
 			return []ent.Value{*id}
 		}
+	case answersubmission.EdgeQuestion:
+		if id := m.question; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AnswerSubmissionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -1074,9 +1076,12 @@ func (m *AnswerSubmissionMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AnswerSubmissionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedsubmission_attempt {
 		edges = append(edges, answersubmission.EdgeSubmissionAttempt)
+	}
+	if m.clearedquestion {
+		edges = append(edges, answersubmission.EdgeQuestion)
 	}
 	return edges
 }
@@ -1087,6 +1092,8 @@ func (m *AnswerSubmissionMutation) EdgeCleared(name string) bool {
 	switch name {
 	case answersubmission.EdgeSubmissionAttempt:
 		return m.clearedsubmission_attempt
+	case answersubmission.EdgeQuestion:
+		return m.clearedquestion
 	}
 	return false
 }
@@ -1098,6 +1105,9 @@ func (m *AnswerSubmissionMutation) ClearEdge(name string) error {
 	case answersubmission.EdgeSubmissionAttempt:
 		m.ClearSubmissionAttempt()
 		return nil
+	case answersubmission.EdgeQuestion:
+		m.ClearQuestion()
+		return nil
 	}
 	return fmt.Errorf("unknown AnswerSubmission unique edge %s", name)
 }
@@ -1108,6 +1118,9 @@ func (m *AnswerSubmissionMutation) ResetEdge(name string) error {
 	switch name {
 	case answersubmission.EdgeSubmissionAttempt:
 		m.ResetSubmissionAttempt()
+		return nil
+	case answersubmission.EdgeQuestion:
+		m.ResetQuestion()
 		return nil
 	}
 	return fmt.Errorf("unknown AnswerSubmission edge %s", name)
@@ -1127,6 +1140,9 @@ type QuestionMutation struct {
 	clearedFields   map[string]struct{}
 	scenario        *uint64
 	clearedscenario bool
+	answers         map[uint64]struct{}
+	removedanswers  map[uint64]struct{}
+	clearedanswers  bool
 	done            bool
 	oldValue        func(context.Context) (*Question, error)
 	predicates      []predicate.Question
@@ -1479,6 +1495,60 @@ func (m *QuestionMutation) ResetScenario() {
 	m.clearedscenario = false
 }
 
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by ids.
+func (m *QuestionMutation) AddAnswerIDs(ids ...uint64) {
+	if m.answers == nil {
+		m.answers = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.answers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAnswers clears the "answers" edge to the AnswerSubmission entity.
+func (m *QuestionMutation) ClearAnswers() {
+	m.clearedanswers = true
+}
+
+// AnswersCleared reports if the "answers" edge to the AnswerSubmission entity was cleared.
+func (m *QuestionMutation) AnswersCleared() bool {
+	return m.clearedanswers
+}
+
+// RemoveAnswerIDs removes the "answers" edge to the AnswerSubmission entity by IDs.
+func (m *QuestionMutation) RemoveAnswerIDs(ids ...uint64) {
+	if m.removedanswers == nil {
+		m.removedanswers = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.answers, ids[i])
+		m.removedanswers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAnswers returns the removed IDs of the "answers" edge to the AnswerSubmission entity.
+func (m *QuestionMutation) RemovedAnswersIDs() (ids []uint64) {
+	for id := range m.removedanswers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AnswersIDs returns the "answers" edge IDs in the mutation.
+func (m *QuestionMutation) AnswersIDs() (ids []uint64) {
+	for id := range m.answers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAnswers resets all changes to the "answers" edge.
+func (m *QuestionMutation) ResetAnswers() {
+	m.answers = nil
+	m.clearedanswers = false
+	m.removedanswers = nil
+}
+
 // Where appends a list predicates to the QuestionMutation builder.
 func (m *QuestionMutation) Where(ps ...predicate.Question) {
 	m.predicates = append(m.predicates, ps...)
@@ -1700,9 +1770,12 @@ func (m *QuestionMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *QuestionMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.scenario != nil {
 		edges = append(edges, question.EdgeScenario)
+	}
+	if m.answers != nil {
+		edges = append(edges, question.EdgeAnswers)
 	}
 	return edges
 }
@@ -1715,27 +1788,47 @@ func (m *QuestionMutation) AddedIDs(name string) []ent.Value {
 		if id := m.scenario; id != nil {
 			return []ent.Value{*id}
 		}
+	case question.EdgeAnswers:
+		ids := make([]ent.Value, 0, len(m.answers))
+		for id := range m.answers {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *QuestionMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedanswers != nil {
+		edges = append(edges, question.EdgeAnswers)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *QuestionMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case question.EdgeAnswers:
+		ids := make([]ent.Value, 0, len(m.removedanswers))
+		for id := range m.removedanswers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *QuestionMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedscenario {
 		edges = append(edges, question.EdgeScenario)
+	}
+	if m.clearedanswers {
+		edges = append(edges, question.EdgeAnswers)
 	}
 	return edges
 }
@@ -1746,6 +1839,8 @@ func (m *QuestionMutation) EdgeCleared(name string) bool {
 	switch name {
 	case question.EdgeScenario:
 		return m.clearedscenario
+	case question.EdgeAnswers:
+		return m.clearedanswers
 	}
 	return false
 }
@@ -1767,6 +1862,9 @@ func (m *QuestionMutation) ResetEdge(name string) error {
 	switch name {
 	case question.EdgeScenario:
 		m.ResetScenario()
+		return nil
+	case question.EdgeAnswers:
+		m.ResetAnswers()
 		return nil
 	}
 	return fmt.Errorf("unknown Question edge %s", name)

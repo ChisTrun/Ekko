@@ -6,6 +6,7 @@ import (
 	"context"
 	"ekko/pkg/ent/answersubmission"
 	"ekko/pkg/ent/predicate"
+	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/submissionattempt"
 	"fmt"
 	"math"
@@ -25,6 +26,7 @@ type AnswerSubmissionQuery struct {
 	inters                []Interceptor
 	predicates            []predicate.AnswerSubmission
 	withSubmissionAttempt *SubmissionAttemptQuery
+	withQuestion          *QuestionQuery
 	modifiers             []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -77,6 +79,28 @@ func (asq *AnswerSubmissionQuery) QuerySubmissionAttempt() *SubmissionAttemptQue
 			sqlgraph.From(answersubmission.Table, answersubmission.FieldID, selector),
 			sqlgraph.To(submissionattempt.Table, submissionattempt.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, answersubmission.SubmissionAttemptTable, answersubmission.SubmissionAttemptColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryQuestion chains the current query on the "question" edge.
+func (asq *AnswerSubmissionQuery) QueryQuestion() *QuestionQuery {
+	query := (&QuestionClient{config: asq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := asq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := asq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(answersubmission.Table, answersubmission.FieldID, selector),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, answersubmission.QuestionTable, answersubmission.QuestionColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
 		return fromU, nil
@@ -277,6 +301,7 @@ func (asq *AnswerSubmissionQuery) Clone() *AnswerSubmissionQuery {
 		inters:                append([]Interceptor{}, asq.inters...),
 		predicates:            append([]predicate.AnswerSubmission{}, asq.predicates...),
 		withSubmissionAttempt: asq.withSubmissionAttempt.Clone(),
+		withQuestion:          asq.withQuestion.Clone(),
 		// clone intermediate query.
 		sql:  asq.sql.Clone(),
 		path: asq.path,
@@ -291,6 +316,17 @@ func (asq *AnswerSubmissionQuery) WithSubmissionAttempt(opts ...func(*Submission
 		opt(query)
 	}
 	asq.withSubmissionAttempt = query
+	return asq
+}
+
+// WithQuestion tells the query-builder to eager-load the nodes that are connected to
+// the "question" edge. The optional arguments are used to configure the query builder of the edge.
+func (asq *AnswerSubmissionQuery) WithQuestion(opts ...func(*QuestionQuery)) *AnswerSubmissionQuery {
+	query := (&QuestionClient{config: asq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	asq.withQuestion = query
 	return asq
 }
 
@@ -372,8 +408,9 @@ func (asq *AnswerSubmissionQuery) sqlAll(ctx context.Context, hooks ...queryHook
 	var (
 		nodes       = []*AnswerSubmission{}
 		_spec       = asq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			asq.withSubmissionAttempt != nil,
+			asq.withQuestion != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -403,6 +440,12 @@ func (asq *AnswerSubmissionQuery) sqlAll(ctx context.Context, hooks ...queryHook
 			return nil, err
 		}
 	}
+	if query := asq.withQuestion; query != nil {
+		if err := asq.loadQuestion(ctx, query, nodes, nil,
+			func(n *AnswerSubmission, e *Question) { n.Edges.Question = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -428,6 +471,35 @@ func (asq *AnswerSubmissionQuery) loadSubmissionAttempt(ctx context.Context, que
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "submission_attempt_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (asq *AnswerSubmissionQuery) loadQuestion(ctx context.Context, query *QuestionQuery, nodes []*AnswerSubmission, init func(*AnswerSubmission), assign func(*AnswerSubmission, *Question)) error {
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*AnswerSubmission)
+	for i := range nodes {
+		fk := nodes[i].QuestionID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(question.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "question_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -466,6 +538,9 @@ func (asq *AnswerSubmissionQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if asq.withSubmissionAttempt != nil {
 			_spec.Node.AddColumnOnce(answersubmission.FieldSubmissionAttemptID)
+		}
+		if asq.withQuestion != nil {
+			_spec.Node.AddColumnOnce(answersubmission.FieldQuestionID)
 		}
 	}
 	if ps := asq.predicates; len(ps) > 0 {

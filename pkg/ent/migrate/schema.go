@@ -13,13 +13,13 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "question_id", Type: field.TypeUint64},
 		{Name: "answer", Type: field.TypeString, Size: 2147483647},
 		{Name: "relevance", Type: field.TypeFloat64, Default: 0},
 		{Name: "clarity_completeness", Type: field.TypeFloat64, Default: 0},
 		{Name: "accuracy", Type: field.TypeFloat64, Default: 0},
 		{Name: "overall", Type: field.TypeFloat64, Default: 0},
 		{Name: "status", Type: field.TypeInt32},
+		{Name: "question_id", Type: field.TypeUint64},
 		{Name: "submission_attempt_id", Type: field.TypeUint64},
 	}
 	// AnswerSubmissionsTable holds the schema information for the "answer_submissions" table.
@@ -28,6 +28,12 @@ var (
 		Columns:    AnswerSubmissionsColumns,
 		PrimaryKey: []*schema.Column{AnswerSubmissionsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "answer_submissions_questions_answers",
+				Columns:    []*schema.Column{AnswerSubmissionsColumns[9]},
+				RefColumns: []*schema.Column{QuestionsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
 			{
 				Symbol:     "answer_submissions_submission_attempts_answers",
 				Columns:    []*schema.Column{AnswerSubmissionsColumns[10]},
@@ -203,7 +209,8 @@ var (
 )
 
 func init() {
-	AnswerSubmissionsTable.ForeignKeys[0].RefTable = SubmissionAttemptsTable
+	AnswerSubmissionsTable.ForeignKeys[0].RefTable = QuestionsTable
+	AnswerSubmissionsTable.ForeignKeys[1].RefTable = SubmissionAttemptsTable
 	QuestionsTable.ForeignKeys[0].RefTable = ScenariosTable
 	ScenarioCandidatesTable.ForeignKeys[0].RefTable = ScenariosTable
 	ScenarioFavoritesTable.ForeignKeys[0].RefTable = ScenariosTable

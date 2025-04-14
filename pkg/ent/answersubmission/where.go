@@ -227,26 +227,6 @@ func QuestionIDNotIn(vs ...uint64) predicate.AnswerSubmission {
 	return predicate.AnswerSubmission(sql.FieldNotIn(FieldQuestionID, vs...))
 }
 
-// QuestionIDGT applies the GT predicate on the "question_id" field.
-func QuestionIDGT(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldGT(FieldQuestionID, v))
-}
-
-// QuestionIDGTE applies the GTE predicate on the "question_id" field.
-func QuestionIDGTE(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldGTE(FieldQuestionID, v))
-}
-
-// QuestionIDLT applies the LT predicate on the "question_id" field.
-func QuestionIDLT(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldLT(FieldQuestionID, v))
-}
-
-// QuestionIDLTE applies the LTE predicate on the "question_id" field.
-func QuestionIDLTE(v uint64) predicate.AnswerSubmission {
-	return predicate.AnswerSubmission(sql.FieldLTE(FieldQuestionID, v))
-}
-
 // AnswerEQ applies the EQ predicate on the "answer" field.
 func AnswerEQ(v string) predicate.AnswerSubmission {
 	return predicate.AnswerSubmission(sql.FieldEQ(FieldAnswer, v))
@@ -541,6 +521,29 @@ func HasSubmissionAttempt() predicate.AnswerSubmission {
 func HasSubmissionAttemptWith(preds ...predicate.SubmissionAttempt) predicate.AnswerSubmission {
 	return predicate.AnswerSubmission(func(s *sql.Selector) {
 		step := newSubmissionAttemptStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasQuestion applies the HasEdge predicate on the "question" edge.
+func HasQuestion() predicate.AnswerSubmission {
+	return predicate.AnswerSubmission(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, QuestionTable, QuestionColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasQuestionWith applies the HasEdge predicate on the "question" edge with a given conditions (other predicates).
+func HasQuestionWith(preds ...predicate.Question) predicate.AnswerSubmission {
+	return predicate.AnswerSubmission(func(s *sql.Selector) {
+		step := newQuestionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

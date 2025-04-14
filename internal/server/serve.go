@@ -17,6 +17,7 @@ import (
 
 	pb0 "ekko/api"
 	"ekko/internal/feature"
+	"ekko/internal/rabbit"
 	"ekko/internal/repository"
 	"ekko/internal/server/chronobreak"
 	"ekko/internal/server/ekko"
@@ -58,7 +59,11 @@ func Serve(cfg *config.Config) {
 		logger.Fatal("can not init my database", zap.Error(err))
 	}
 
+	rabbitMQ := rabbit.New(cfg.Rabbitmq)
+
 	repo := repository.New(ent)
+
+	go rabbitMQ.Consume(context.Background(), repo.Submission.ReceiveResponse)
 
 	feature := feature.New(repo)
 

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"ekko/pkg/ent/answersubmission"
 	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/scenario"
 	"errors"
@@ -84,6 +85,21 @@ func (qc *QuestionCreate) SetID(u uint64) *QuestionCreate {
 // SetScenario sets the "scenario" edge to the Scenario entity.
 func (qc *QuestionCreate) SetScenario(s *Scenario) *QuestionCreate {
 	return qc.SetScenarioID(s.ID)
+}
+
+// AddAnswerIDs adds the "answers" edge to the AnswerSubmission entity by IDs.
+func (qc *QuestionCreate) AddAnswerIDs(ids ...uint64) *QuestionCreate {
+	qc.mutation.AddAnswerIDs(ids...)
+	return qc
+}
+
+// AddAnswers adds the "answers" edges to the AnswerSubmission entity.
+func (qc *QuestionCreate) AddAnswers(a ...*AnswerSubmission) *QuestionCreate {
+	ids := make([]uint64, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return qc.AddAnswerIDs(ids...)
 }
 
 // Mutation returns the QuestionMutation object of the builder.
@@ -222,6 +238,22 @@ func (qc *QuestionCreate) createSpec() (*Question, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ScenarioID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := qc.mutation.AnswersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   question.AnswersTable,
+			Columns: []string{question.AnswersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(answersubmission.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

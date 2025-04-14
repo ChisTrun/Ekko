@@ -16,6 +16,18 @@ message Config {
   greyhole.database.Database database = 3 [ (validate.rules).message = {required : true} ];
   greyhole.redis.Redis redis = 4;
   greyhole.carbon.Listener http_listener = 8 [ (validate.rules).message = {required : true} ];
+  RabbitMQ rabbitmq = 5;
+}
+
+message RabbitMQ {
+  string address = 1;
+  int32 port = 2;
+  string username = 3;  
+  string password = 4;
+  string consume_queue = 5;
+  string public_queue = 6;
+  int32 max_consumer = 7;
+  int32 expire_time = 8;
 }
 
 

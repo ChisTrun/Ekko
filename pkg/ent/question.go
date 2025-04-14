@@ -40,9 +40,11 @@ type Question struct {
 type QuestionEdges struct {
 	// Scenario holds the value of the scenario edge.
 	Scenario *Scenario `json:"scenario,omitempty"`
+	// Answers holds the value of the answers edge.
+	Answers []*AnswerSubmission `json:"answers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ScenarioOrErr returns the Scenario value or an error if the edge
@@ -54,6 +56,15 @@ func (e QuestionEdges) ScenarioOrErr() (*Scenario, error) {
 		return nil, &NotFoundError{label: scenario.Label}
 	}
 	return nil, &NotLoadedError{edge: "scenario"}
+}
+
+// AnswersOrErr returns the Answers value or an error if the edge
+// was not loaded in eager-loading.
+func (e QuestionEdges) AnswersOrErr() ([]*AnswerSubmission, error) {
+	if e.loadedTypes[1] {
+		return e.Answers, nil
+	}
+	return nil, &NotLoadedError{edge: "answers"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -140,6 +151,11 @@ func (q *Question) Value(name string) (ent.Value, error) {
 // QueryScenario queries the "scenario" edge of the Question entity.
 func (q *Question) QueryScenario() *ScenarioQuery {
 	return NewQuestionClient(q.config).QueryScenario(q)
+}
+
+// QueryAnswers queries the "answers" edge of the Question entity.
+func (q *Question) QueryAnswers() *AnswerSubmissionQuery {
+	return NewQuestionClient(q.config).QueryAnswers(q)
 }
 
 // Update returns a builder for updating this Question.

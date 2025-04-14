@@ -7,6 +7,7 @@ import (
 	ekko "ekko/api"
 	"ekko/pkg/ent/answersubmission"
 	"ekko/pkg/ent/predicate"
+	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/submissionattempt"
 	"errors"
 	"fmt"
@@ -53,7 +54,6 @@ func (asu *AnswerSubmissionUpdate) SetNillableSubmissionAttemptID(u *uint64) *An
 
 // SetQuestionID sets the "question_id" field.
 func (asu *AnswerSubmissionUpdate) SetQuestionID(u uint64) *AnswerSubmissionUpdate {
-	asu.mutation.ResetQuestionID()
 	asu.mutation.SetQuestionID(u)
 	return asu
 }
@@ -63,12 +63,6 @@ func (asu *AnswerSubmissionUpdate) SetNillableQuestionID(u *uint64) *AnswerSubmi
 	if u != nil {
 		asu.SetQuestionID(*u)
 	}
-	return asu
-}
-
-// AddQuestionID adds u to the "question_id" field.
-func (asu *AnswerSubmissionUpdate) AddQuestionID(u int64) *AnswerSubmissionUpdate {
-	asu.mutation.AddQuestionID(u)
 	return asu
 }
 
@@ -196,6 +190,11 @@ func (asu *AnswerSubmissionUpdate) SetSubmissionAttempt(s *SubmissionAttempt) *A
 	return asu.SetSubmissionAttemptID(s.ID)
 }
 
+// SetQuestion sets the "question" edge to the Question entity.
+func (asu *AnswerSubmissionUpdate) SetQuestion(q *Question) *AnswerSubmissionUpdate {
+	return asu.SetQuestionID(q.ID)
+}
+
 // Mutation returns the AnswerSubmissionMutation object of the builder.
 func (asu *AnswerSubmissionUpdate) Mutation() *AnswerSubmissionMutation {
 	return asu.mutation
@@ -204,6 +203,12 @@ func (asu *AnswerSubmissionUpdate) Mutation() *AnswerSubmissionMutation {
 // ClearSubmissionAttempt clears the "submission_attempt" edge to the SubmissionAttempt entity.
 func (asu *AnswerSubmissionUpdate) ClearSubmissionAttempt() *AnswerSubmissionUpdate {
 	asu.mutation.ClearSubmissionAttempt()
+	return asu
+}
+
+// ClearQuestion clears the "question" edge to the Question entity.
+func (asu *AnswerSubmissionUpdate) ClearQuestion() *AnswerSubmissionUpdate {
+	asu.mutation.ClearQuestion()
 	return asu
 }
 
@@ -248,6 +253,9 @@ func (asu *AnswerSubmissionUpdate) check() error {
 	if asu.mutation.SubmissionAttemptCleared() && len(asu.mutation.SubmissionAttemptIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AnswerSubmission.submission_attempt"`)
 	}
+	if asu.mutation.QuestionCleared() && len(asu.mutation.QuestionIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AnswerSubmission.question"`)
+	}
 	return nil
 }
 
@@ -271,12 +279,6 @@ func (asu *AnswerSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 	}
 	if value, ok := asu.mutation.UpdatedAt(); ok {
 		_spec.SetField(answersubmission.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := asu.mutation.QuestionID(); ok {
-		_spec.SetField(answersubmission.FieldQuestionID, field.TypeUint64, value)
-	}
-	if value, ok := asu.mutation.AddedQuestionID(); ok {
-		_spec.AddField(answersubmission.FieldQuestionID, field.TypeUint64, value)
 	}
 	if value, ok := asu.mutation.Answer(); ok {
 		_spec.SetField(answersubmission.FieldAnswer, field.TypeString, value)
@@ -340,6 +342,35 @@ func (asu *AnswerSubmissionUpdate) sqlSave(ctx context.Context) (n int, err erro
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if asu.mutation.QuestionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.QuestionTable,
+			Columns: []string{answersubmission.QuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asu.mutation.QuestionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.QuestionTable,
+			Columns: []string{answersubmission.QuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(asu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, asu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -384,7 +415,6 @@ func (asuo *AnswerSubmissionUpdateOne) SetNillableSubmissionAttemptID(u *uint64)
 
 // SetQuestionID sets the "question_id" field.
 func (asuo *AnswerSubmissionUpdateOne) SetQuestionID(u uint64) *AnswerSubmissionUpdateOne {
-	asuo.mutation.ResetQuestionID()
 	asuo.mutation.SetQuestionID(u)
 	return asuo
 }
@@ -394,12 +424,6 @@ func (asuo *AnswerSubmissionUpdateOne) SetNillableQuestionID(u *uint64) *AnswerS
 	if u != nil {
 		asuo.SetQuestionID(*u)
 	}
-	return asuo
-}
-
-// AddQuestionID adds u to the "question_id" field.
-func (asuo *AnswerSubmissionUpdateOne) AddQuestionID(u int64) *AnswerSubmissionUpdateOne {
-	asuo.mutation.AddQuestionID(u)
 	return asuo
 }
 
@@ -527,6 +551,11 @@ func (asuo *AnswerSubmissionUpdateOne) SetSubmissionAttempt(s *SubmissionAttempt
 	return asuo.SetSubmissionAttemptID(s.ID)
 }
 
+// SetQuestion sets the "question" edge to the Question entity.
+func (asuo *AnswerSubmissionUpdateOne) SetQuestion(q *Question) *AnswerSubmissionUpdateOne {
+	return asuo.SetQuestionID(q.ID)
+}
+
 // Mutation returns the AnswerSubmissionMutation object of the builder.
 func (asuo *AnswerSubmissionUpdateOne) Mutation() *AnswerSubmissionMutation {
 	return asuo.mutation
@@ -535,6 +564,12 @@ func (asuo *AnswerSubmissionUpdateOne) Mutation() *AnswerSubmissionMutation {
 // ClearSubmissionAttempt clears the "submission_attempt" edge to the SubmissionAttempt entity.
 func (asuo *AnswerSubmissionUpdateOne) ClearSubmissionAttempt() *AnswerSubmissionUpdateOne {
 	asuo.mutation.ClearSubmissionAttempt()
+	return asuo
+}
+
+// ClearQuestion clears the "question" edge to the Question entity.
+func (asuo *AnswerSubmissionUpdateOne) ClearQuestion() *AnswerSubmissionUpdateOne {
+	asuo.mutation.ClearQuestion()
 	return asuo
 }
 
@@ -592,6 +627,9 @@ func (asuo *AnswerSubmissionUpdateOne) check() error {
 	if asuo.mutation.SubmissionAttemptCleared() && len(asuo.mutation.SubmissionAttemptIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "AnswerSubmission.submission_attempt"`)
 	}
+	if asuo.mutation.QuestionCleared() && len(asuo.mutation.QuestionIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AnswerSubmission.question"`)
+	}
 	return nil
 }
 
@@ -632,12 +670,6 @@ func (asuo *AnswerSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Answ
 	}
 	if value, ok := asuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(answersubmission.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := asuo.mutation.QuestionID(); ok {
-		_spec.SetField(answersubmission.FieldQuestionID, field.TypeUint64, value)
-	}
-	if value, ok := asuo.mutation.AddedQuestionID(); ok {
-		_spec.AddField(answersubmission.FieldQuestionID, field.TypeUint64, value)
 	}
 	if value, ok := asuo.mutation.Answer(); ok {
 		_spec.SetField(answersubmission.FieldAnswer, field.TypeString, value)
@@ -694,6 +726,35 @@ func (asuo *AnswerSubmissionUpdateOne) sqlSave(ctx context.Context) (_node *Answ
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(submissionattempt.FieldID, field.TypeUint64),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if asuo.mutation.QuestionCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.QuestionTable,
+			Columns: []string{answersubmission.QuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeUint64),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asuo.mutation.QuestionIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   answersubmission.QuestionTable,
+			Columns: []string{answersubmission.QuestionColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(question.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

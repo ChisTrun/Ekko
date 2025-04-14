@@ -380,6 +380,22 @@ func (c *AnswerSubmissionClient) QuerySubmissionAttempt(as *AnswerSubmission) *S
 	return query
 }
 
+// QueryQuestion queries the question edge of a AnswerSubmission.
+func (c *AnswerSubmissionClient) QueryQuestion(as *AnswerSubmission) *QuestionQuery {
+	query := (&QuestionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(answersubmission.Table, answersubmission.FieldID, id),
+			sqlgraph.To(question.Table, question.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, answersubmission.QuestionTable, answersubmission.QuestionColumn),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AnswerSubmissionClient) Hooks() []Hook {
 	return c.hooks.AnswerSubmission
@@ -522,6 +538,22 @@ func (c *QuestionClient) QueryScenario(q *Question) *ScenarioQuery {
 			sqlgraph.From(question.Table, question.FieldID, id),
 			sqlgraph.To(scenario.Table, scenario.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, question.ScenarioTable, question.ScenarioColumn),
+		)
+		fromV = sqlgraph.Neighbors(q.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAnswers queries the answers edge of a Question.
+func (c *QuestionClient) QueryAnswers(q *Question) *AnswerSubmissionQuery {
+	query := (&AnswerSubmissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := q.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(question.Table, question.FieldID, id),
+			sqlgraph.To(answersubmission.Table, answersubmission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, question.AnswersTable, question.AnswersColumn),
 		)
 		fromV = sqlgraph.Neighbors(q.driver.Dialect(), step)
 		return fromV, nil

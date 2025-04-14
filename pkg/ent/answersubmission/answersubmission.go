@@ -36,6 +36,8 @@ const (
 	FieldStatus = "status"
 	// EdgeSubmissionAttempt holds the string denoting the submission_attempt edge name in mutations.
 	EdgeSubmissionAttempt = "submission_attempt"
+	// EdgeQuestion holds the string denoting the question edge name in mutations.
+	EdgeQuestion = "question"
 	// Table holds the table name of the answersubmission in the database.
 	Table = "answer_submissions"
 	// SubmissionAttemptTable is the table that holds the submission_attempt relation/edge.
@@ -45,6 +47,13 @@ const (
 	SubmissionAttemptInverseTable = "submission_attempts"
 	// SubmissionAttemptColumn is the table column denoting the submission_attempt relation/edge.
 	SubmissionAttemptColumn = "submission_attempt_id"
+	// QuestionTable is the table that holds the question relation/edge.
+	QuestionTable = "answer_submissions"
+	// QuestionInverseTable is the table name for the Question entity.
+	// It exists in this package in order to avoid circular dependency with the "question" package.
+	QuestionInverseTable = "questions"
+	// QuestionColumn is the table column denoting the question relation/edge.
+	QuestionColumn = "question_id"
 )
 
 // Columns holds all SQL columns for answersubmission fields.
@@ -153,10 +162,24 @@ func BySubmissionAttemptField(field string, opts ...sql.OrderTermOption) OrderOp
 		sqlgraph.OrderByNeighborTerms(s, newSubmissionAttemptStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByQuestionField orders the results by question field.
+func ByQuestionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newQuestionStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newSubmissionAttemptStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubmissionAttemptInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, SubmissionAttemptTable, SubmissionAttemptColumn),
+	)
+}
+func newQuestionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(QuestionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, QuestionTable, QuestionColumn),
 	)
 }

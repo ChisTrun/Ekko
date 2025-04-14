@@ -166,6 +166,34 @@ message Answer {
   BaseData base_data = 8;
 }
 
+message EvaluationRequest {
+  EvalutionScenario scenario = 1;
+  repeated QuestionAnswerPair data = 2; 
+  message EvalutionScenario {
+    string name = 1;
+    string description = 2;
+  } 
+  message QuestionAnswerPair {
+    uint64 id = 1;
+    string question = 2;
+    string answer = 3;
+    string criteria = 4;
+  } 
+}
+
+message EvaluationResponse {
+  repeated Result result = 1;
+  message Result {
+    uint64 id = 1;
+    double relevance = 2;
+    double clarity_completeness = 3;
+    double accuracy = 4;
+    double overall = 5;
+    SubmissionStatus status = 6;
+  } 
+}
+
+
 message Attempt {
   uint64 id = 1;
   uint64 scenario_id = 2;
@@ -253,6 +281,8 @@ message SubmitAnswerRequest {
       string answer = 2;
   }
 }
+
+
 
 message SubmitAnswerResponse {
   Attempt attempt = 1;

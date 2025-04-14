@@ -3,16 +3,23 @@ package submission
 import (
 	"context"
 	ekko "ekko/api"
+	"ekko/internal/rabbit"
 	"ekko/internal/utils/paging"
 	utils "ekko/internal/utils/sort"
 	"ekko/internal/utils/tx"
 	"ekko/pkg/ent"
+	"ekko/pkg/ent/answersubmission"
 	"ekko/pkg/ent/question"
 	"ekko/pkg/ent/scenario"
 	"ekko/pkg/ent/scenariocandidate"
 	"ekko/pkg/ent/submissionattempt"
+	"ekko/pkg/logger/pkg/logging"
 	"errors"
 	"fmt"
+
+	amqp "github.com/rabbitmq/amqp091-go"
+	"go.uber.org/zap"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 type Submission interface {
@@ -20,10 +27,12 @@ type Submission interface {
 	GetAttempt(ctx context.Context, user uint64, isBm bool, attemptId uint64) (*ent.SubmissionAttempt, error)
 	ListAttempt(ctx context.Context, candidateId uint64, req *ekko.ListAttemptRequest) ([]*ent.SubmissionAttempt, int32, int32, error)
 	ListAllSubmission(ctx context.Context, req *ekko.ListAllSubmissionRequest) ([]*ent.ScenarioCandidate, int32, int32, error)
+	ReceiveResponse(ctx context.Context, msg amqp.Delivery) error
 }
 
 type submission struct {
-	ent *ent.Client
+	ent      *ent.Client
+	rabbitMQ rabbit.Rabbit
 }
 
 func New(ent *ent.Client) Submission {
@@ -33,6 +42,11 @@ func New(ent *ent.Client) Submission {
 }
 
 func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, req *ekko.SubmitAnswerRequest) (*ent.SubmissionAttempt, error) {
+
+	scenario, err := tx.Client().Scenario.Query().Where(scenario.ID(req.ScenarioId)).Select(scenario.FieldID, scenario.FieldName, scenario.FieldDescription).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
 
 	attemptNumber, err := s.getAvailableAttemptNumber(ctx, req.ScenarioId, candidateId)
 	if err != nil {
@@ -85,6 +99,7 @@ func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, r
 		return nil, err
 	}
 
+	go s.sendSubmission(context.Background(), tx, scenario, submission.ID)
 	return submission, nil
 }
 
@@ -196,4 +211,79 @@ func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSub
 		return nil, 0, 0, err
 	}
 	return attempts, int32(totalCount), totalPage, nil
+}
+
+func (s *submission) sendSubmission(ctx context.Context, tx tx.Tx, scenario *ent.Scenario, attempId uint64) {
+
+	answersubmissions, err := tx.Client().AnswerSubmission.Query().
+		Where(
+			answersubmission.SubmissionAttemptID(attempId),
+		).
+		WithQuestion(func(qq *ent.QuestionQuery) {
+			qq.Select(question.FieldContent, question.FieldCriteria)
+		}).
+		Select(answersubmission.FieldAnswer, answersubmission.FieldID).
+		All(ctx)
+
+	if err != nil {
+		logging.Logger(ctx).Error("can not get answer submission", zap.Error(err))
+	}
+
+	evaluationReq := ekko.EvaluationRequest{
+		Scenario: &ekko.EvaluationRequest_EvalutionScenario{
+			Name:        scenario.Name,
+			Description: scenario.Description,
+		},
+		Data: []*ekko.EvaluationRequest_QuestionAnswerPair{},
+	}
+
+	for _, answer := range answersubmissions {
+		if answer.Edges.Question == nil {
+			logging.Logger(ctx).Error("can not get question", zap.Error(err))
+			return
+		}
+		evaluationReq.Data = append(evaluationReq.Data, &ekko.EvaluationRequest_QuestionAnswerPair{
+			Id:       answer.ID,
+			Question: answer.Edges.Question.Content,
+			Answer:   answer.Answer,
+			Criteria: answer.Edges.Question.Criteria,
+		})
+	}
+
+	jsonData, err := protojson.Marshal(&evaluationReq)
+	if err != nil {
+		logging.Logger(ctx).Error("can not marshal evaluation request", zap.Error(err))
+		return
+	}
+
+	if err := s.rabbitMQ.Publish(ctx, jsonData); err != nil {
+		logging.Logger(ctx).Error("can not send message to rabbitmq", zap.Error(err))
+		return
+	}
+
+}
+
+func (s *submission) ReceiveResponse(ctx context.Context, msg amqp.Delivery) error {
+	evaluationRsp := &ekko.EvaluationResponse{}
+	if err := protojson.Unmarshal(msg.Body, evaluationRsp); err != nil {
+		logging.Logger(ctx).Error("can not unmarshal evaluation response", zap.Error(err))
+		return err
+	}
+
+	return tx.WithTransaction(ctx, s.ent, func(ctx context.Context, tx tx.Tx) error {
+		for _, result := range evaluationRsp.Result {
+			_, err := tx.Client().AnswerSubmission.UpdateOneID(result.Id).
+				SetStatus(result.Status).
+				SetAccuracy(result.Accuracy).
+				SetClarityCompleteness(result.ClarityCompleteness).
+				SetRelevance(result.Relevance).
+				SetOverall(result.Overall).
+				Save(ctx)
+			if err != nil {
+				logging.Logger(ctx).Error("can not update answer submission", zap.Error(err))
+				return err
+			}
+		}
+		return nil
+	})
 }
