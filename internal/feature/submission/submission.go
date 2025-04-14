@@ -107,6 +107,14 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 		return nil, err
 	}
 
+	scenario, err := s.repo.Scenario.Get(ctx, &ekko.GetScenarioRequest{
+		Id: req.ScenarioId,
+	})
+	if err != nil {
+		logging.Logger(ctx).Error(fmt.Sprintf("failed to get scenario: %v", err))
+		return nil, err
+	}
+
 	attempt := &ent.SubmissionAttempt{}
 	if txErr := tx.WithTransaction(ctx, s.repo.Ent, func(ctx context.Context, tx tx.Tx) error {
 		var err error
@@ -116,6 +124,8 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 		logging.Logger(ctx).Error(fmt.Sprintf("failed to submit answer: %v", txErr))
 		return nil, txErr
 	}
+
+	go s.repo.Submission.SendSubmission(ctx, scenario, attempt.ID)
 
 	return &ekko.SubmitAnswerResponse{
 		Attempt: converter.ConvertAttempt(attempt),

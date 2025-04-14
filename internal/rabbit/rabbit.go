@@ -51,12 +51,14 @@ func (r *rabbit) processMessage(ctx context.Context, msg amqp.Delivery, sem chan
 }
 
 func (r *rabbit) Consume(ctx context.Context, consumeFunction func(ctx context.Context, msg amqp.Delivery) error) error {
-	// conn, err := amqp.Dial("amqp://skillsharp:Skillsharp@123@localhost:5672/")
+
 	conn, err := amqp.Dial(r.connectionUrl)
 	if err != nil {
 		return err
 	}
 	defer conn.Close()
+
+	logging.Logger(ctx).Info("Connected to RabbitMQ")
 
 	ch, err := conn.Channel()
 	if err != nil {

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"ekko/internal/rabbit"
 	"ekko/internal/repository/field"
 	"ekko/internal/repository/question"
 	"ekko/internal/repository/scenario"
@@ -16,11 +17,11 @@ type Repository struct {
 	Ent        *ent.Client
 }
 
-func New(ent *ent.Client) *Repository {
+func New(ent *ent.Client, rabbitMQ rabbit.Rabbit) *Repository {
 	field := field.New(ent)
 	question := question.New()
 	scenario := scenario.New(ent, question)
-	submission := submission.New(ent)
+	submission := submission.New(ent, rabbitMQ)
 
 	return &Repository{
 		Field:      field,

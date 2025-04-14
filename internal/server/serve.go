@@ -61,7 +61,7 @@ func Serve(cfg *config.Config) {
 
 	rabbitMQ := rabbit.New(cfg.Rabbitmq)
 
-	repo := repository.New(ent)
+	repo := repository.New(ent, rabbitMQ)
 
 	go rabbitMQ.Consume(context.Background(), repo.Submission.ReceiveResponse)
 

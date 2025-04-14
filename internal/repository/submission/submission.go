@@ -28,6 +28,7 @@ type Submission interface {
 	ListAttempt(ctx context.Context, candidateId uint64, req *ekko.ListAttemptRequest) ([]*ent.SubmissionAttempt, int32, int32, error)
 	ListAllSubmission(ctx context.Context, req *ekko.ListAllSubmissionRequest) ([]*ent.ScenarioCandidate, int32, int32, error)
 	ReceiveResponse(ctx context.Context, msg amqp.Delivery) error
+	SendSubmission(ctx context.Context, scenario *ent.Scenario, attempId uint64)
 }
 
 type submission struct {
@@ -35,18 +36,19 @@ type submission struct {
 	rabbitMQ rabbit.Rabbit
 }
 
-func New(ent *ent.Client) Submission {
+func New(ent *ent.Client, rabbitMQ rabbit.Rabbit) Submission {
 	return &submission{
-		ent: ent,
+		ent:      ent,
+		rabbitMQ: rabbitMQ,
 	}
 }
 
 func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, req *ekko.SubmitAnswerRequest) (*ent.SubmissionAttempt, error) {
 
-	scenario, err := tx.Client().Scenario.Query().Where(scenario.ID(req.ScenarioId)).Select(scenario.FieldID, scenario.FieldName, scenario.FieldDescription).Only(ctx)
-	if err != nil {
-		return nil, err
-	}
+	// scenario, err := tx.Client().Scenario.Query().Where(scenario.ID(req.ScenarioId)).Select(scenario.FieldID, scenario.FieldName, scenario.FieldDescription).Only(ctx)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	attemptNumber, err := s.getAvailableAttemptNumber(ctx, req.ScenarioId, candidateId)
 	if err != nil {
@@ -99,7 +101,7 @@ func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, r
 		return nil, err
 	}
 
-	go s.sendSubmission(context.Background(), tx, scenario, submission.ID)
+	// s.sendSubmission(context.Background(), tx, scenario, submission.ID)
 	return submission, nil
 }
 
@@ -213,9 +215,9 @@ func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSub
 	return attempts, int32(totalCount), totalPage, nil
 }
 
-func (s *submission) sendSubmission(ctx context.Context, tx tx.Tx, scenario *ent.Scenario, attempId uint64) {
+func (s *submission) SendSubmission(ctx context.Context, scenario *ent.Scenario, attempId uint64) {
 
-	answersubmissions, err := tx.Client().AnswerSubmission.Query().
+	answersubmissions, err := s.ent.AnswerSubmission.Query().
 		Where(
 			answersubmission.SubmissionAttemptID(attempId),
 		).
