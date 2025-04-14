@@ -125,7 +125,7 @@ func (s *submission) SubmitAnswer(ctx context.Context, req *ekko.SubmitAnswerReq
 		return nil, txErr
 	}
 
-	go s.repo.Submission.SendSubmission(ctx, scenario, attempt.ID)
+	go s.repo.Submission.SendSubmission(context.Background(), scenario, attempt.ID)
 
 	return &ekko.SubmitAnswerResponse{
 		Attempt: converter.ConvertAttempt(attempt),
