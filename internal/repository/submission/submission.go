@@ -45,11 +45,6 @@ func New(ent *ent.Client, rabbitMQ rabbit.Rabbit) Submission {
 
 func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, req *ekko.SubmitAnswerRequest) (*ent.SubmissionAttempt, error) {
 
-	// scenario, err := tx.Client().Scenario.Query().Where(scenario.ID(req.ScenarioId)).Select(scenario.FieldID, scenario.FieldName, scenario.FieldDescription).Only(ctx)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
 	attemptNumber, err := s.getAvailableAttemptNumber(ctx, req.ScenarioId, candidateId)
 	if err != nil {
 		return nil, err
@@ -101,7 +96,6 @@ func (s *submission) Create(ctx context.Context, tx tx.Tx, candidateId uint64, r
 		return nil, err
 	}
 
-	// s.sendSubmission(context.Background(), tx, scenario, submission.ID)
 	return submission, nil
 }
 
@@ -219,7 +213,7 @@ func (s *submission) SendSubmission(ctx context.Context, scenario *ent.Scenario,
 
 	answersubmissions, err := s.ent.AnswerSubmission.Query().
 		Where(
-			answersubmission.SubmissionAttemptID(attempId),
+			answersubmission.SubmissionAttemptIDEQ(attempId),
 		).
 		WithQuestion(func(qq *ent.QuestionQuery) {
 			qq.Select(question.FieldContent, question.FieldCriteria)
@@ -228,7 +222,8 @@ func (s *submission) SendSubmission(ctx context.Context, scenario *ent.Scenario,
 		All(ctx)
 
 	if err != nil {
-		logging.Logger(ctx).Error("can not get answer submission", zap.Error(err))
+		logging.Logger(ctx).Error(fmt.Sprintf("can not get answer submission: %v", err.Error()))
+		return
 	}
 
 	evaluationReq := ekko.EvaluationRequest{

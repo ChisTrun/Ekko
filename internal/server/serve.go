@@ -45,7 +45,7 @@ func Serve(cfg *config.Config) {
 
 	server := service.Server()
 
-	drv, err := dbe.Open("mysql_rum", cfg.GetDatabase())
+	drv, err := dbe.Open("mysql_ekko", cfg.GetDatabase())
 	ent := ent.NewClient(ent.Driver(drv))
 	defer func() {
 		if err := ent.Close(); err != nil {
