@@ -11,7 +11,7 @@ http_listener:
     secure: false
 
 rabbitmq: 
-  address: 0.0.0.0
+  address: 10.148.0.11
   port: 5672  
   username: ${RABBITMQ_USERNAME}
   password: ${RABBITMQ_PASSWORD}
@@ -36,6 +36,6 @@ database:
   tracing_enabled: false
   max_idle_conns: 5
 
-redis:
-  address: ${REDIS_ADDRESS}
-  namespace: ${REDIS_NAMESPACE}
+# redis:
+#   address: ${REDIS_ADDRESS}
+#   namespace: ${REDIS_NAMESPACE}
