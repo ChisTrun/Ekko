@@ -57,7 +57,7 @@ func (s *scenario) CreateScenario(ctx context.Context, request *ekko.CreateScena
 	}
 
 	return &ekko.CreateScenarioResponse{
-		Scenario: converter.ConvertScenario(entScenario),
+		Scenario: converter.ConvertScenario(entScenario, false),
 	}, nil
 
 }
@@ -118,7 +118,7 @@ func (s *scenario) ListScenario(ctx context.Context, isAuth bool, req *ekko.List
 		wg.Add(1)
 		go func(i int, scenario ent.Scenario) {
 			defer wg.Done()
-			data[i] = converter.ConvertScenario(&scenario)
+			data[i] = converter.ConvertScenario(&scenario, true)
 		}(i, *scenario)
 	}
 	wg.Wait()
@@ -139,7 +139,7 @@ func (s *scenario) GetScenario(ctx context.Context, req *ekko.GetScenarioRequest
 	}
 
 	return &ekko.GetScenarioResponse{
-		Scenario: converter.ConvertScenario(entScenario),
+		Scenario: converter.ConvertScenario(entScenario, false),
 	}, nil
 }
 

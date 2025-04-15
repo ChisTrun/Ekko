@@ -229,6 +229,7 @@ message Scenario {
   repeated Field fields = 6;
   int32 total_participant = 7;
   repeated Question questions = 8;
+  int32 total_question = 9;
 }
 
 message Question{
@@ -246,6 +247,7 @@ message ListAllSubmissionRequest {
   repeated SortMethod sort_method = 4;
   google.protobuf.Timestamp from = 5;
   google.protobuf.Timestamp to = 6;
+  string search_content = 7;
 }
 
 message ListAllSubmissionResponse {

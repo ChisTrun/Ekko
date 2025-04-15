@@ -274,6 +274,35 @@ func (m *Config) validate(all bool) error {
 		}
 	}
 
+	if all {
+		switch v := interface{}(m.GetBulbasaur()).(type) {
+		case interface{ ValidateAll() error }:
+			if err := v.ValidateAll(); err != nil {
+				errors = append(errors, ConfigValidationError{
+					field:  "Bulbasaur",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		case interface{ Validate() error }:
+			if err := v.Validate(); err != nil {
+				errors = append(errors, ConfigValidationError{
+					field:  "Bulbasaur",
+					reason: "embedded message failed validation",
+					cause:  err,
+				})
+			}
+		}
+	} else if v, ok := interface{}(m.GetBulbasaur()).(interface{ Validate() error }); ok {
+		if err := v.Validate(); err != nil {
+			return ConfigValidationError{
+				field:  "Bulbasaur",
+				reason: "embedded message failed validation",
+				cause:  err,
+			}
+		}
+	}
+
 	if len(errors) > 0 {
 		return ConfigMultiError(errors)
 	}
@@ -465,3 +494,107 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = RabbitMQValidationError{}
+
+// Validate checks the field values on InternalService with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// first error encountered is returned, or nil if there are no violations.
+func (m *InternalService) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on InternalService with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// InternalServiceMultiError, or nil if none found.
+func (m *InternalService) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *InternalService) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for Address
+
+	// no validation rules for Port
+
+	if len(errors) > 0 {
+		return InternalServiceMultiError(errors)
+	}
+
+	return nil
+}
+
+// InternalServiceMultiError is an error wrapping multiple validation errors
+// returned by InternalService.ValidateAll() if the designated constraints
+// aren't met.
+type InternalServiceMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m InternalServiceMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m InternalServiceMultiError) AllErrors() []error { return m }
+
+// InternalServiceValidationError is the validation error returned by
+// InternalService.Validate if the designated constraints aren't met.
+type InternalServiceValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e InternalServiceValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e InternalServiceValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e InternalServiceValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e InternalServiceValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e InternalServiceValidationError) ErrorName() string { return "InternalServiceValidationError" }
+
+// Error satisfies the builtin error interface
+func (e InternalServiceValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sInternalService.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = InternalServiceValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = InternalServiceValidationError{}

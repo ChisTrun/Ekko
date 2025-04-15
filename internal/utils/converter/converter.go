@@ -18,7 +18,7 @@ func ConvertField(ent *ent.ScenarioField) *ekko.Field {
 	}
 }
 
-func ConvertScenario(ent *ent.Scenario) *ekko.Scenario {
+func ConvertScenario(ent *ent.Scenario, listing bool) *ekko.Scenario {
 	out := &ekko.Scenario{
 		Id:               ent.ID,
 		Name:             ent.Name,
@@ -28,14 +28,17 @@ func ConvertScenario(ent *ent.Scenario) *ekko.Scenario {
 		Fields:           []*ekko.Field{},
 		TotalParticipant: ent.Participants,
 		Questions:        []*ekko.Question{},
+		TotalQuestion:    int32(len(ent.Edges.Questions)),
 	}
 
 	for _, field := range ent.Edges.Field {
 		out.Fields = append(out.Fields, ConvertField(field))
 	}
 
-	for _, question := range ent.Edges.Questions {
-		out.Questions = append(out.Questions, ConvertQuestion(question))
+	if !listing {
+		for _, question := range ent.Edges.Questions {
+			out.Questions = append(out.Questions, ConvertQuestion(question))
+		}
 	}
 
 	return out

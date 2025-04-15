@@ -17,6 +17,7 @@ message Config {
   greyhole.redis.Redis redis = 4;
   greyhole.carbon.Listener http_listener = 8 [ (validate.rules).message = {required : true} ];
   RabbitMQ rabbitmq = 5;
+  InternalService bulbasaur = 6;
 }
 
 message RabbitMQ {
@@ -30,5 +31,9 @@ message RabbitMQ {
   int32 expire_time = 8;
 }
 
+message InternalService {
+  string address = 1;
+  int32 port = 2;
+}
 
 

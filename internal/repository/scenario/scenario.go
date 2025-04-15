@@ -8,6 +8,7 @@ import (
 	utils "ekko/internal/utils/sort"
 	"ekko/internal/utils/tx"
 	"ekko/pkg/ent"
+	entquestion "ekko/pkg/ent/question"
 	entscenario "ekko/pkg/ent/scenario"
 	"ekko/pkg/ent/scenariocandidate"
 	"ekko/pkg/ent/scenariofavorite"
@@ -158,6 +159,9 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 		Offset(int(req.PageIndex) * int(req.PageSize)).
 		Limit(int(req.PageSize)).
 		WithField().
+		WithQuestions(func(qq *ent.QuestionQuery) {
+			qq.Select(entquestion.FieldID, entquestion.FieldContent)
+		}).
 		All(ctx)
 	if err != nil {
 		return nil, 0, 0, err

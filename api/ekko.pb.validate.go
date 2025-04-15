@@ -1512,6 +1512,8 @@ func (m *Scenario) validate(all bool) error {
 
 	}
 
+	// no validation rules for TotalQuestion
+
 	if len(errors) > 0 {
 		return ScenarioMultiError(errors)
 	}
@@ -1862,6 +1864,8 @@ func (m *ListAllSubmissionRequest) validate(all bool) error {
 			}
 		}
 	}
+
+	// no validation rules for SearchContent
 
 	if len(errors) > 0 {
 		return ListAllSubmissionRequestMultiError(errors)

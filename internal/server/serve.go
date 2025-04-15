@@ -16,6 +16,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	pb0 "ekko/api"
+	"ekko/internal/bulbasaur"
 	"ekko/internal/feature"
 	"ekko/internal/rabbit"
 	"ekko/internal/repository"
@@ -61,7 +62,9 @@ func Serve(cfg *config.Config) {
 
 	rabbitMQ := rabbit.New(cfg.Rabbitmq)
 
-	repo := repository.New(ent, rabbitMQ)
+	bulbasaur := bulbasaur.New(cfg.Bulbasaur)
+
+	repo := repository.New(ent, rabbitMQ, bulbasaur)
 
 	go rabbitMQ.Consume(context.Background(), repo.Submission.ReceiveResponse)
 

@@ -3,6 +3,7 @@ package submission
 import (
 	"context"
 	ekko "ekko/api"
+	"ekko/internal/bulbasaur"
 	"ekko/internal/rabbit"
 	"ekko/internal/utils/paging"
 	utils "ekko/internal/utils/sort"
@@ -32,14 +33,16 @@ type Submission interface {
 }
 
 type submission struct {
-	ent      *ent.Client
-	rabbitMQ rabbit.Rabbit
+	ent       *ent.Client
+	rabbitMQ  rabbit.Rabbit
+	bulbasaur bulbasaur.Bulbasaur
 }
 
-func New(ent *ent.Client, rabbitMQ rabbit.Rabbit) Submission {
+func New(ent *ent.Client, rabbitMQ rabbit.Rabbit, bulbasaur bulbasaur.Bulbasaur) Submission {
 	return &submission{
-		ent:      ent,
-		rabbitMQ: rabbitMQ,
+		ent:       ent,
+		rabbitMQ:  rabbitMQ,
+		bulbasaur: bulbasaur,
 	}
 }
 
@@ -176,6 +179,13 @@ func (s *submission) ListAllSubmission(ctx context.Context, req *ekko.ListAllSub
 	query := s.ent.ScenarioCandidate.Query().Where(
 		scenariocandidate.ScenarioID(req.ScenarioId),
 	)
+
+	if req.SearchContent != "" {
+		userIds := s.bulbasaur.FindUserByNameRequest(ctx, req.SearchContent)
+		if len(userIds) != 0 {
+			query = query.Where(scenariocandidate.CandidateIDIn(userIds...))
+		}
+	}
 
 	if (req.From == nil && req.To != nil) || (req.From != nil && req.To == nil) {
 		return nil, 0, 0, errors.New("invalid time")

@@ -769,6 +769,7 @@ type Scenario struct {
 	Fields           []*Field               `protobuf:"bytes,6,rep,name=fields,proto3" json:"fields,omitempty"`
 	TotalParticipant int32                  `protobuf:"varint,7,opt,name=total_participant,json=totalParticipant,proto3" json:"total_participant,omitempty"`
 	Questions        []*Question            `protobuf:"bytes,8,rep,name=questions,proto3" json:"questions,omitempty"`
+	TotalQuestion    int32                  `protobuf:"varint,9,opt,name=total_question,json=totalQuestion,proto3" json:"total_question,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -859,6 +860,13 @@ func (x *Scenario) GetQuestions() []*Question {
 	return nil
 }
 
+func (x *Scenario) GetTotalQuestion() int32 {
+	if x != nil {
+		return x.TotalQuestion
+	}
+	return 0
+}
+
 type Question struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            uint64                 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -943,6 +951,7 @@ type ListAllSubmissionRequest struct {
 	SortMethod    []*SortMethod          `protobuf:"bytes,4,rep,name=sort_method,json=sortMethod,proto3" json:"sort_method,omitempty"`
 	From          *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=from,proto3" json:"from,omitempty"`
 	To            *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=to,proto3" json:"to,omitempty"`
+	SearchContent string                 `protobuf:"bytes,7,opt,name=search_content,json=searchContent,proto3" json:"search_content,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1017,6 +1026,13 @@ func (x *ListAllSubmissionRequest) GetTo() *timestamppb.Timestamp {
 		return x.To
 	}
 	return nil
+}
+
+func (x *ListAllSubmissionRequest) GetSearchContent() string {
+	if x != nil {
+		return x.SearchContent
+	}
+	return ""
 }
 
 type ListAllSubmissionResponse struct {
@@ -2731,7 +2747,7 @@ const file_ekko_api_ekko_proto_rawDesc = "" +
 	"\x05Field\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12+\n" +
-	"\tbase_data\x18\x03 \x01(\v2\x0e.ekko.BaseDataR\bbaseData\"\x95\x02\n" +
+	"\tbase_data\x18\x03 \x01(\v2\x0e.ekko.BaseDataR\bbaseData\"\xbc\x02\n" +
 	"\bScenario\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -2740,13 +2756,14 @@ const file_ekko_api_ekko_proto_rawDesc = "" +
 	"\x06rating\x18\x05 \x01(\x02R\x06rating\x12#\n" +
 	"\x06fields\x18\x06 \x03(\v2\v.ekko.FieldR\x06fields\x12+\n" +
 	"\x11total_participant\x18\a \x01(\x05R\x10totalParticipant\x12,\n" +
-	"\tquestions\x18\b \x03(\v2\x0e.ekko.QuestionR\tquestions\"\x91\x01\n" +
+	"\tquestions\x18\b \x03(\v2\x0e.ekko.QuestionR\tquestions\x12%\n" +
+	"\x0etotal_question\x18\t \x01(\x05R\rtotalQuestion\"\x91\x01\n" +
 	"\bQuestion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\bcriteria\x18\x03 \x01(\tR\bcriteria\x12\x12\n" +
 	"\x04hint\x18\x04 \x01(\tR\x04hint\x12\x18\n" +
 	"\acontent\x18\x05 \x01(\tR\acontent\x12+\n" +
-	"\tbase_data\x18\x06 \x01(\v2\x0e.ekko.BaseDataR\bbaseData\"\x98\x02\n" +
+	"\tbase_data\x18\x06 \x01(\v2\x0e.ekko.BaseDataR\bbaseData\"\xbf\x02\n" +
 	"\x18ListAllSubmissionRequest\x12\x1f\n" +
 	"\vscenario_id\x18\x01 \x01(\x04R\n" +
 	"scenarioId\x12&\n" +
@@ -2756,7 +2773,8 @@ const file_ekko_api_ekko_proto_rawDesc = "" +
 	"\vsort_method\x18\x04 \x03(\v2\x10.ekko.SortMethodR\n" +
 	"sortMethod\x12.\n" +
 	"\x04from\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\x04from\x12*\n" +
-	"\x02to\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x02to\"\xc9\x01\n" +
+	"\x02to\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x02to\x12%\n" +
+	"\x0esearch_content\x18\a \x01(\tR\rsearchContent\"\xc9\x01\n" +
 	"\x19ListAllSubmissionResponse\x122\n" +
 	"\vsubmissions\x18\x01 \x03(\v2\x10.ekko.SubmissionR\vsubmissions\x12\x1f\n" +
 	"\vtotal_count\x18\x02 \x01(\x05R\n" +
