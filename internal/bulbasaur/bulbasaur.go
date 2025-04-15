@@ -10,6 +10,7 @@ import (
 	cfg "ekko/pkg/config"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Bulbasaur interface {
@@ -28,8 +29,11 @@ func New(cfg *cfg.InternalService) Bulbasaur {
 	}
 
 	serverAddr := flag.String("addr", fmt.Sprintf("%v:%v", cfg.Address, cfg.Port), "The server address in the format of host:port")
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
 
-	conn, err := grpc.NewClient(*serverAddr)
+	conn, err := grpc.NewClient(*serverAddr, opts...)
 	if err != nil {
 		logging.Logger(ctx).Error(fmt.Sprintf("failed to connect: %v", err.Error()))
 		return &Noop{}
