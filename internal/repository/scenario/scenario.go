@@ -191,6 +191,7 @@ func (s *scenario) Random(ctx context.Context) (*ent.Scenario, error) {
 	sc, err := s.ent.Scenario.Query().
 		Offset(offset).
 		Limit(1).
+		WithField().
 		First(ctx)
 
 	if err != nil {
