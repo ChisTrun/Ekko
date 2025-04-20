@@ -14,6 +14,7 @@ import (
 type Redis interface {
 	Set(ctx context.Context, key string, value proto.Message, expireTime time.Duration) (bool, error)
 	Get(ctx context.Context, key string) ([]byte, error)
+	Delete(ctx context.Context, key string) (bool, error)
 }
 
 type redis struct {
@@ -56,4 +57,13 @@ func (r *redis) Get(ctx context.Context, key string) ([]byte, error) {
 		return nil, err
 	}
 	return []byte(val), nil
+}
+
+func (r *redis) Delete(ctx context.Context, key string) (bool, error) {
+	namespacedKey := r.withNamespace(key)
+	result, err := r.redis.Del(ctx, namespacedKey).Result()
+	if err != nil {
+		return false, err
+	}
+	return result > 0, nil
 }

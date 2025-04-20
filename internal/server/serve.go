@@ -24,6 +24,8 @@ import (
 	"ekko/internal/server/ekko"
 	"ekko/internal/utils/redis"
 	config "ekko/pkg/config"
+
+	"github.com/robfig/cron/v3"
 )
 
 func customMetadataAnnotator(ctx context.Context, req *http.Request) metadata.MD {
@@ -72,6 +74,14 @@ func Serve(cfg *config.Config) {
 	feature := feature.New(repo)
 
 	redis := redis.New(cfg.Flags.EnableRedis, cfg)
+
+	cron := cron.New()
+
+	cron.AddFunc("@midnight", func() {
+		redis.Delete(context.Background(), "random_scenario")
+	})
+
+	cron.Start()
 
 	ekkoServer := ekko.NewServer(feature)
 	chronobreakServer := chronobreak.NewServer(feature, redis)

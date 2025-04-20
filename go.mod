@@ -20,6 +20,7 @@ require (
 	github.com/hashicorp/vault/api/auth/kubernetes v0.4.0
 	github.com/rabbitmq/amqp091-go v1.10.0
 	github.com/redis/go-redis/v9 v9.1.0
+	github.com/robfig/cron/v3 v3.0.1
 	github.com/vrischmann/envconfig v1.3.0
 	go.uber.org/zap v1.24.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250204164813-702378808489

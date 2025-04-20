@@ -29,7 +29,7 @@ func (s *chronobreakServer) GetRandomScenario(ctx context.Context, request *empt
 	}
 
 	go func(ctx context.Context, mss proto.Message) {
-		if _, err := s.Redis.Set(ctx, "random_scenario", mss, 24*time.Hour); err != nil {
+		if _, err := s.Redis.Set(ctx, "random_scenario", mss, 48*time.Hour); err != nil {
 		}
 	}(context.Background(), mss)
 

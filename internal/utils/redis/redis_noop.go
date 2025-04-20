@@ -21,3 +21,7 @@ func (d *noop) Set(ctx context.Context, key string, value proto.Message, expireT
 func (d *noop) Get(ctx context.Context, key string) ([]byte, error) {
 	return nil, nil
 }
+
+func (d *noop) Delete(ctx context.Context, key string) (bool, error) {
+	return false, nil
+}
