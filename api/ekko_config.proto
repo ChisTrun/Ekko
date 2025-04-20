@@ -18,6 +18,7 @@ message Config {
   greyhole.carbon.Listener http_listener = 8 [ (validate.rules).message = {required : true} ];
   RabbitMQ rabbitmq = 5;
   InternalService bulbasaur = 6;
+  Flags flags = 7;
 }
 
 message RabbitMQ {
@@ -36,4 +37,7 @@ message InternalService {
   int32 port = 2;
 }
 
+message Flags {
+  bool enable_redis = 1;
+}
 

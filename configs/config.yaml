@@ -43,3 +43,7 @@ database:
 redis:
   address: ${REDIS_ADDRESS}
   namespace: ${REDIS_NAMESPACE}
+
+
+flags:
+  enable_redis: true

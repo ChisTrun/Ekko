@@ -584,9 +584,10 @@ var Ekko_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	Chronobreak_ListField_FullMethodName    = "/ekko.Chronobreak/ListField"
-	Chronobreak_ListScenario_FullMethodName = "/ekko.Chronobreak/ListScenario"
-	Chronobreak_GetScenario_FullMethodName  = "/ekko.Chronobreak/GetScenario"
+	Chronobreak_ListField_FullMethodName         = "/ekko.Chronobreak/ListField"
+	Chronobreak_ListScenario_FullMethodName      = "/ekko.Chronobreak/ListScenario"
+	Chronobreak_GetScenario_FullMethodName       = "/ekko.Chronobreak/GetScenario"
+	Chronobreak_GetRandomScenario_FullMethodName = "/ekko.Chronobreak/GetRandomScenario"
 )
 
 // ChronobreakClient is the client API for Chronobreak service.
@@ -596,6 +597,7 @@ type ChronobreakClient interface {
 	ListField(ctx context.Context, in *ListFieldRequest, opts ...grpc.CallOption) (*ListFieldResponse, error)
 	ListScenario(ctx context.Context, in *ListScenarioRequest, opts ...grpc.CallOption) (*ListScenarioResponse, error)
 	GetScenario(ctx context.Context, in *GetScenarioRequest, opts ...grpc.CallOption) (*GetScenarioResponse, error)
+	GetRandomScenario(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetScenarioResponse, error)
 }
 
 type chronobreakClient struct {
@@ -636,6 +638,16 @@ func (c *chronobreakClient) GetScenario(ctx context.Context, in *GetScenarioRequ
 	return out, nil
 }
 
+func (c *chronobreakClient) GetRandomScenario(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetScenarioResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetScenarioResponse)
+	err := c.cc.Invoke(ctx, Chronobreak_GetRandomScenario_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ChronobreakServer is the server API for Chronobreak service.
 // All implementations must embed UnimplementedChronobreakServer
 // for forward compatibility.
@@ -643,6 +655,7 @@ type ChronobreakServer interface {
 	ListField(context.Context, *ListFieldRequest) (*ListFieldResponse, error)
 	ListScenario(context.Context, *ListScenarioRequest) (*ListScenarioResponse, error)
 	GetScenario(context.Context, *GetScenarioRequest) (*GetScenarioResponse, error)
+	GetRandomScenario(context.Context, *emptypb.Empty) (*GetScenarioResponse, error)
 	mustEmbedUnimplementedChronobreakServer()
 }
 
@@ -661,6 +674,9 @@ func (UnimplementedChronobreakServer) ListScenario(context.Context, *ListScenari
 }
 func (UnimplementedChronobreakServer) GetScenario(context.Context, *GetScenarioRequest) (*GetScenarioResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetScenario not implemented")
+}
+func (UnimplementedChronobreakServer) GetRandomScenario(context.Context, *emptypb.Empty) (*GetScenarioResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRandomScenario not implemented")
 }
 func (UnimplementedChronobreakServer) mustEmbedUnimplementedChronobreakServer() {}
 func (UnimplementedChronobreakServer) testEmbeddedByValue()                     {}
@@ -737,6 +753,24 @@ func _Chronobreak_GetScenario_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Chronobreak_GetRandomScenario_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ChronobreakServer).GetRandomScenario(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Chronobreak_GetRandomScenario_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ChronobreakServer).GetRandomScenario(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Chronobreak_ServiceDesc is the grpc.ServiceDesc for Chronobreak service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -755,6 +789,10 @@ var Chronobreak_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetScenario",
 			Handler:    _Chronobreak_GetScenario_Handler,
+		},
+		{
+			MethodName: "GetRandomScenario",
+			Handler:    _Chronobreak_GetRandomScenario_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

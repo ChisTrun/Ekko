@@ -770,6 +770,7 @@ type Scenario struct {
 	TotalParticipant int32                  `protobuf:"varint,7,opt,name=total_participant,json=totalParticipant,proto3" json:"total_participant,omitempty"`
 	Questions        []*Question            `protobuf:"bytes,8,rep,name=questions,proto3" json:"questions,omitempty"`
 	TotalQuestion    int32                  `protobuf:"varint,9,opt,name=total_question,json=totalQuestion,proto3" json:"total_question,omitempty"`
+	OwnerId          uint64                 `protobuf:"varint,10,opt,name=owner_id,json=ownerId,proto3" json:"owner_id,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -863,6 +864,13 @@ func (x *Scenario) GetQuestions() []*Question {
 func (x *Scenario) GetTotalQuestion() int32 {
 	if x != nil {
 		return x.TotalQuestion
+	}
+	return 0
+}
+
+func (x *Scenario) GetOwnerId() uint64 {
+	if x != nil {
+		return x.OwnerId
 	}
 	return 0
 }
@@ -2747,7 +2755,7 @@ const file_ekko_api_ekko_proto_rawDesc = "" +
 	"\x05Field\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12+\n" +
-	"\tbase_data\x18\x03 \x01(\v2\x0e.ekko.BaseDataR\bbaseData\"\xbc\x02\n" +
+	"\tbase_data\x18\x03 \x01(\v2\x0e.ekko.BaseDataR\bbaseData\"\xd7\x02\n" +
 	"\bScenario\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -2757,7 +2765,9 @@ const file_ekko_api_ekko_proto_rawDesc = "" +
 	"\x06fields\x18\x06 \x03(\v2\v.ekko.FieldR\x06fields\x12+\n" +
 	"\x11total_participant\x18\a \x01(\x05R\x10totalParticipant\x12,\n" +
 	"\tquestions\x18\b \x03(\v2\x0e.ekko.QuestionR\tquestions\x12%\n" +
-	"\x0etotal_question\x18\t \x01(\x05R\rtotalQuestion\"\x91\x01\n" +
+	"\x0etotal_question\x18\t \x01(\x05R\rtotalQuestion\x12\x19\n" +
+	"\bowner_id\x18\n" +
+	" \x01(\x04R\aownerId\"\x91\x01\n" +
 	"\bQuestion\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x04R\x02id\x12\x1a\n" +
 	"\bcriteria\x18\x03 \x01(\tR\bcriteria\x12\x12\n" +
@@ -2923,11 +2933,12 @@ const file_ekko_api_ekko_proto_rawDesc = "" +
 	"\n" +
 	"GetAttempt\x12\x17.ekko.GetAttemptRequest\x1a\x18.ekko.GetAttemptResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/ekko/attempt/get\x12^\n" +
 	"\fSubmitAnswer\x12\x19.ekko.SubmitAnswerRequest\x1a\x1a.ekko.SubmitAnswerResponse\"\x17\x82\xd3\xe4\x93\x02\x11:\x01*\"\f/ekko/submit\x12v\n" +
-	"\x11ListAllSubmission\x12\x1e.ekko.ListAllSubmissionRequest\x1a\x1f.ekko.ListAllSubmissionResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/ekko/submission/list2\xca\x02\n" +
+	"\x11ListAllSubmission\x12\x1e.ekko.ListAllSubmissionRequest\x1a\x1f.ekko.ListAllSubmissionResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/ekko/submission/list2\xb8\x03\n" +
 	"\vChronobreak\x12`\n" +
 	"\tListField\x12\x16.ekko.ListFieldRequest\x1a\x17.ekko.ListFieldResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\"\x17/chronobreak/field/list\x12s\n" +
 	"\fListScenario\x12\x19.ekko.ListScenarioRequest\x1a\x1a.ekko.ListScenarioResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/chronobreak/scenario/noauth/list\x12d\n" +
-	"\vGetScenario\x12\x18.ekko.GetScenarioRequest\x1a\x19.ekko.GetScenarioResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/chronobreak/scenarioB\x0fZ\rekko/api;ekkob\x06proto3"
+	"\vGetScenario\x12\x18.ekko.GetScenarioRequest\x1a\x19.ekko.GetScenarioResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/chronobreak/scenario\x12l\n" +
+	"\x11GetRandomScenario\x12\x16.google.protobuf.Empty\x1a\x19.ekko.GetScenarioResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/chronobreak/scenario/randomB\x0fZ\rekko/api;ekkob\x06proto3"
 
 var (
 	file_ekko_api_ekko_proto_rawDescOnce sync.Once
@@ -3049,24 +3060,26 @@ var file_ekko_api_ekko_proto_depIdxs = []int32{
 	27, // 54: ekko.Chronobreak.ListField:input_type -> ekko.ListFieldRequest
 	34, // 55: ekko.Chronobreak.ListScenario:input_type -> ekko.ListScenarioRequest
 	36, // 56: ekko.Chronobreak.GetScenario:input_type -> ekko.GetScenarioRequest
-	23, // 57: ekko.Ekko.CreateField:output_type -> ekko.CreateFieldResponse
-	45, // 58: ekko.Ekko.UpdateField:output_type -> google.protobuf.Empty
-	45, // 59: ekko.Ekko.DeleteField:output_type -> google.protobuf.Empty
-	30, // 60: ekko.Ekko.CreateScenario:output_type -> ekko.CreateScenarioResponse
-	45, // 61: ekko.Ekko.UpdateScenario:output_type -> google.protobuf.Empty
-	45, // 62: ekko.Ekko.DeleteScenario:output_type -> google.protobuf.Empty
-	35, // 63: ekko.Ekko.ListScenario:output_type -> ekko.ListScenarioResponse
-	45, // 64: ekko.Ekko.FavoriteScenario:output_type -> google.protobuf.Empty
-	45, // 65: ekko.Ekko.RatingScenario:output_type -> google.protobuf.Empty
-	18, // 66: ekko.Ekko.ListAttempt:output_type -> ekko.ListAttemptResponse
-	22, // 67: ekko.Ekko.GetAttempt:output_type -> ekko.GetAttemptResponse
-	21, // 68: ekko.Ekko.SubmitAnswer:output_type -> ekko.SubmitAnswerResponse
-	16, // 69: ekko.Ekko.ListAllSubmission:output_type -> ekko.ListAllSubmissionResponse
-	28, // 70: ekko.Chronobreak.ListField:output_type -> ekko.ListFieldResponse
-	35, // 71: ekko.Chronobreak.ListScenario:output_type -> ekko.ListScenarioResponse
-	37, // 72: ekko.Chronobreak.GetScenario:output_type -> ekko.GetScenarioResponse
-	57, // [57:73] is the sub-list for method output_type
-	41, // [41:57] is the sub-list for method input_type
+	45, // 57: ekko.Chronobreak.GetRandomScenario:input_type -> google.protobuf.Empty
+	23, // 58: ekko.Ekko.CreateField:output_type -> ekko.CreateFieldResponse
+	45, // 59: ekko.Ekko.UpdateField:output_type -> google.protobuf.Empty
+	45, // 60: ekko.Ekko.DeleteField:output_type -> google.protobuf.Empty
+	30, // 61: ekko.Ekko.CreateScenario:output_type -> ekko.CreateScenarioResponse
+	45, // 62: ekko.Ekko.UpdateScenario:output_type -> google.protobuf.Empty
+	45, // 63: ekko.Ekko.DeleteScenario:output_type -> google.protobuf.Empty
+	35, // 64: ekko.Ekko.ListScenario:output_type -> ekko.ListScenarioResponse
+	45, // 65: ekko.Ekko.FavoriteScenario:output_type -> google.protobuf.Empty
+	45, // 66: ekko.Ekko.RatingScenario:output_type -> google.protobuf.Empty
+	18, // 67: ekko.Ekko.ListAttempt:output_type -> ekko.ListAttemptResponse
+	22, // 68: ekko.Ekko.GetAttempt:output_type -> ekko.GetAttemptResponse
+	21, // 69: ekko.Ekko.SubmitAnswer:output_type -> ekko.SubmitAnswerResponse
+	16, // 70: ekko.Ekko.ListAllSubmission:output_type -> ekko.ListAllSubmissionResponse
+	28, // 71: ekko.Chronobreak.ListField:output_type -> ekko.ListFieldResponse
+	35, // 72: ekko.Chronobreak.ListScenario:output_type -> ekko.ListScenarioResponse
+	37, // 73: ekko.Chronobreak.GetScenario:output_type -> ekko.GetScenarioResponse
+	37, // 74: ekko.Chronobreak.GetRandomScenario:output_type -> ekko.GetScenarioResponse
+	58, // [58:75] is the sub-list for method output_type
+	41, // [41:58] is the sub-list for method input_type
 	41, // [41:41] is the sub-list for extension type_name
 	41, // [41:41] is the sub-list for extension extendee
 	0,  // [0:41] is the sub-list for field type_name

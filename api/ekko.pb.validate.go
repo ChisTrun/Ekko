@@ -1514,6 +1514,8 @@ func (m *Scenario) validate(all bool) error {
 
 	// no validation rules for TotalQuestion
 
+	// no validation rules for OwnerId
+
 	if len(errors) > 0 {
 		return ScenarioMultiError(errors)
 	}

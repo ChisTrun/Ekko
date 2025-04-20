@@ -15,6 +15,7 @@ import (
 	"ekko/pkg/ent/scenariofield"
 	"errors"
 	"fmt"
+	"math/rand"
 	"sync"
 )
 
@@ -24,6 +25,7 @@ type Scenario interface {
 	Delete(ctx context.Context, tx tx.Tx, bmId uint64, ids []uint64) error
 	List(ctx context.Context, req *ekko.ListScenarioRequest, userId *uint64) ([]*ent.Scenario, int32, int32, error)
 	Get(ctx context.Context, req *ekko.GetScenarioRequest) (*ent.Scenario, error)
+	Random(ctx context.Context) (*ent.Scenario, error)
 	Favorite(ctx context.Context, userId uint64, scenarioId uint64) error
 	Rating(ctx context.Context, id uint64, rating float64) error
 }
@@ -172,6 +174,30 @@ func (s *scenario) List(ctx context.Context, req *ekko.ListScenarioRequest, user
 
 func (s *scenario) Get(ctx context.Context, req *ekko.GetScenarioRequest) (*ent.Scenario, error) {
 	return s.ent.Scenario.Query().Where(entscenario.IDEQ(req.Id)).WithQuestions().WithField().First(ctx)
+}
+
+func (s *scenario) Random(ctx context.Context) (*ent.Scenario, error) {
+	totalCount, err := s.ent.Scenario.Query().Count(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get total count: %v", err)
+	}
+
+	if totalCount == 0 {
+		return nil, fmt.Errorf("no scenarios found")
+	}
+
+	offset := rand.Intn(totalCount)
+
+	sc, err := s.ent.Scenario.Query().
+		Offset(offset).
+		Limit(1).
+		First(ctx)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed to get random scenario: %v", err)
+	}
+
+	return sc, nil
 }
 
 func (s *scenario) Favorite(ctx context.Context, userId uint64, scenarioId uint64) error {

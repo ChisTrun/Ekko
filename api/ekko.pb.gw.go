@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 // Suppress "imported and not used" errors
@@ -419,6 +420,25 @@ func local_request_Chronobreak_GetScenario_0(ctx context.Context, marshaler runt
 	return msg, metadata, err
 }
 
+func request_Chronobreak_GetRandomScenario_0(ctx context.Context, marshaler runtime.Marshaler, client ChronobreakClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	io.Copy(io.Discard, req.Body)
+	msg, err := client.GetRandomScenario(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_Chronobreak_GetRandomScenario_0(ctx context.Context, marshaler runtime.Marshaler, server ChronobreakServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq emptypb.Empty
+		metadata runtime.ServerMetadata
+	)
+	msg, err := server.GetRandomScenario(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterEkkoHandlerServer registers the http handlers for service Ekko to "mux".
 // UnaryRPC     :call EkkoServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -754,6 +774,26 @@ func RegisterChronobreakHandlerServer(ctx context.Context, mux *runtime.ServeMux
 			return
 		}
 		forward_Chronobreak_GetScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_Chronobreak_GetRandomScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/ekko.Chronobreak/GetRandomScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/random"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Chronobreak_GetRandomScenario_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Chronobreak_GetRandomScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 
 	return nil
@@ -1138,17 +1178,36 @@ func RegisterChronobreakHandlerClient(ctx context.Context, mux *runtime.ServeMux
 		}
 		forward_Chronobreak_GetScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_Chronobreak_GetRandomScenario_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/ekko.Chronobreak/GetRandomScenario", runtime.WithHTTPPathPattern("/chronobreak/scenario/random"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Chronobreak_GetRandomScenario_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_Chronobreak_GetRandomScenario_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_Chronobreak_ListField_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"chronobreak", "field", "list"}, ""))
-	pattern_Chronobreak_ListScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"chronobreak", "scenario", "noauth", "list"}, ""))
-	pattern_Chronobreak_GetScenario_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"chronobreak", "scenario"}, ""))
+	pattern_Chronobreak_ListField_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"chronobreak", "field", "list"}, ""))
+	pattern_Chronobreak_ListScenario_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"chronobreak", "scenario", "noauth", "list"}, ""))
+	pattern_Chronobreak_GetScenario_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"chronobreak", "scenario"}, ""))
+	pattern_Chronobreak_GetRandomScenario_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"chronobreak", "scenario", "random"}, ""))
 )
 
 var (
-	forward_Chronobreak_ListField_0    = runtime.ForwardResponseMessage
-	forward_Chronobreak_ListScenario_0 = runtime.ForwardResponseMessage
-	forward_Chronobreak_GetScenario_0  = runtime.ForwardResponseMessage
+	forward_Chronobreak_ListField_0         = runtime.ForwardResponseMessage
+	forward_Chronobreak_ListScenario_0      = runtime.ForwardResponseMessage
+	forward_Chronobreak_GetScenario_0       = runtime.ForwardResponseMessage
+	forward_Chronobreak_GetRandomScenario_0 = runtime.ForwardResponseMessage
 )

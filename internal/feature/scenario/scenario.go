@@ -22,6 +22,7 @@ type Scenario interface {
 	GetScenario(ctx context.Context, req *ekko.GetScenarioRequest) (*ekko.GetScenarioResponse, error)
 	FavoriteScenario(ctx context.Context, req *ekko.FavoriteScenarioRequest) error
 	RatingScenario(ctx context.Context, req *ekko.RatingScenarioRequest) error
+	GetRandomScenario(ctx context.Context) (*ekko.GetScenarioResponse, error)
 }
 
 type scenario struct {
@@ -134,6 +135,18 @@ func (s *scenario) ListScenario(ctx context.Context, isAuth bool, req *ekko.List
 func (s *scenario) GetScenario(ctx context.Context, req *ekko.GetScenarioRequest) (*ekko.GetScenarioResponse, error) {
 
 	entScenario, err := s.repo.Scenario.Get(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ekko.GetScenarioResponse{
+		Scenario: converter.ConvertScenario(entScenario, false),
+	}, nil
+}
+
+func (s *scenario) GetRandomScenario(ctx context.Context) (*ekko.GetScenarioResponse, error) {
+
+	entScenario, err := s.repo.Scenario.Random(ctx)
 	if err != nil {
 		return nil, err
 	}

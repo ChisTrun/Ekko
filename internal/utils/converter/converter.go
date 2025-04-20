@@ -29,6 +29,7 @@ func ConvertScenario(ent *ent.Scenario, listing bool) *ekko.Scenario {
 		TotalParticipant: ent.Participants,
 		Questions:        []*ekko.Question{},
 		TotalQuestion:    int32(len(ent.Edges.Questions)),
+		OwnerId:          ent.BmID,
 	}
 
 	for _, field := range ent.Edges.Field {

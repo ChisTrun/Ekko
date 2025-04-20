@@ -22,6 +22,7 @@ import (
 	"ekko/internal/repository"
 	"ekko/internal/server/chronobreak"
 	"ekko/internal/server/ekko"
+	"ekko/internal/utils/redis"
 	config "ekko/pkg/config"
 )
 
@@ -70,8 +71,10 @@ func Serve(cfg *config.Config) {
 
 	feature := feature.New(repo)
 
+	redis := redis.New(cfg.Flags.EnableRedis, cfg)
+
 	ekkoServer := ekko.NewServer(feature)
-	chronobreakServer := chronobreak.NewServer(feature)
+	chronobreakServer := chronobreak.NewServer(feature, redis)
 
 	grpcGatewayMux := runtime.NewServeMux(
 		runtime.WithMetadata(customMetadataAnnotator),
